@@ -710,7 +710,7 @@ td:last-child { text-align: right; font-weight: 600; }
   height: 100vh;              /* black fallback – bahut helpful rahega */
   overflow: hidden;
 }
-
+ 
 .smartgst-bg-image {
   width: 100%;                    /* full width force karo */
   height: 100%;                   /* full height force karo */
