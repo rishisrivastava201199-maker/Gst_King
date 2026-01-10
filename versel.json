@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "my-react-app/backendd-mail/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "my-react-app/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/send-otp",
+      "dest": "/my-react-app/backendd-mail/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/my-react-app/dist/$1"
+    }
+  ]
+}
