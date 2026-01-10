@@ -59,12 +59,14 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/backend-mail", {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const res = await fetch(`${API_URL}/send-otp`,{
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
       });
-const data = await res.json();
+
+      const data = await res.json();
 
       if (data.success) {
         setOtpSent(true);
@@ -75,7 +77,7 @@ const data = await res.json();
       }
     } catch (err) {
       console.error(err);
-      alert("Server error. Please try again later.");
+      alert("Server error. Make sure backend is running on port 5000.");
     } finally {
       setLoading(false);
     }
