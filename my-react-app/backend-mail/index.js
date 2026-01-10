@@ -21,9 +21,10 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false, // Use STARTTLS
   auth: {
-    user: "rishisrivastava201199@gmail.com",                    // Your Gmail
-    pass: "ywdrbsnnlqwvsupo",            // Your 16-digit App Password (already correct)
-  },
+  user: process.env.EMAIL_USER,
+  pass: process.env.EMAIL_PASS,
+},
+
 });
 
 // Test route - visit http://localhost:5000 in browser
@@ -84,8 +85,7 @@ app.post("/send-otp", async (req, res) => {
 });
 
 // Start server
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`\n✅ Backend server running at http://localhost:${PORT}`);
-  console.log(`🔗 Open this URL to test: http://localhost:${PORT}\n`);
+  console.log(`Backend running on port ${PORT}`);
 });
