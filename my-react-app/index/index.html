@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GST King – User Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1180px; /* Reduced from 1300px */
+      margin: 15px auto; /* Less top margin */
+      padding: 0 15px;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #0056b3, #007bff);
+      color: #fff;
+      padding: 18px 25px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+    .header p {
+      font-size: 0.92rem;
+      margin-top: 4px;
+      opacity: 0.95;
+    }
+    .user-info {
+      text-align: right;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      background: #fff;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .left-section, .right-section {
+      padding: 22px; /* Reduced padding */
+    }
+    .left-section {
+      border-right: 1px solid #eee;
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      color: #003087;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    /* Calendar */
+    .calendar-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #333;
+    }
+    .calendar-title strong {
+      color: #c62828;
+      font-size: 1.45rem;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+      text-align: center;
+    }
+    .day-name {
+      background: #e3f2fd;
+      padding: 9px 0;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #003087;
+      font-size: 0.88rem;
+    }
+    .day {
+      background: #f8fbff;
+      padding: 11px 0;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    .due-date, .today {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .due-date { background: #ef5350; }
+    .today { background: #d32f2f; }
+
+    /* Filing Status */
+    .filing-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .filing-table th {
+      background: #e3f2fd;
+      color: #003087;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .filing-table td {
+      padding: 12px;
+      font-size: 0.94rem;
+    }
+    .status-filed {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-right: 8px;
+    }
+    .status-pending {
+      background: #ffebee;
+      color: #c62828;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    /* Client Section */
+    .client-section {
+      padding: 25px;
+    }
+    .client-types-title {
+      font-size: 1.35rem;
+      color: #c62828;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .client-types-table {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .client-types-table td {
+      padding: 10px 0;
+      vertical-align: middle;
+    }
+    .client-type-number {
+      width: 40px;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    .client-type-name {
+      width: 300px;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    .client-count {
+      color: #003087;
+      font-size: 1.7rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .client-buttons {
+      text-align: right;
+    }
+    .btn-open {
+      background: #6f42c1;
+      color: white;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      margin-bottom: 6px;
+      display: block;
+      width: 100px;
+    }
+    .btn-add {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      display: block;
+      width: 100px;
+    }
+
+    /* Client List */
+    .search-box {
+      width: 260px;
+      padding: 11px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+    }
+    .client-list-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .client-list-table th {
+      background: #003087;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .client-list-table td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.94rem;
+    }
+    .status-badge {
+      background: #d4edda;
+      color: #155724;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+    .open-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      .left-section {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+      }
+    }
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        text-align: center;
+      }
+      .user-info {
+        margin-top: 12px;
+      }
+      .calendar-grid {
+        gap: 6px;
+      }
+      .due-date, .today {
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
+      }
+      .client-types-table td {
+        display: block;
+        text-align: center !important;
+        width: 100%;
+      }
+      .client-buttons {
+        margin-top: 10px;
+      }
+      .btn-open, .btn-add {
+        width: 120px;
+        margin: 5px auto;
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>GST King – Raj & Company</h1>
+      <p><strong>GSTIN:</strong> 09ABMCS5888A1ZU   |   <strong>Legal Name:</strong> RAJ   |   <strong>GSTIN Status:</strong> Active</p>
+      <p><strong>Registration Date:</strong> 10-Feb-2020</p>
+    </div>
+    <div class="user-info">
+      Dashboard<br>
+      Raj & Co.
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard">
+    <div class="main-content">
+      <!-- Left: Calendar -->
+      <div class="left-section">
+        <div class="calendar-title">
+          Due Dates of GST Returns: <strong>January 2025</strong>
+        </div>
+        <div class="calendar-grid">
+          <div class="day-name">SUN</div>
+          <div class="day-name">MON</div>
+          <div class="day-name">TUE</div>
+          <div class="day-name">WED</div>
+          <div class="day-name">THU</div>
+          <div class="day-name">FRI</div>
+          <div class="day-name">SAT</div>
+
+          <div class="day"></div>
+          <div class="day"></div>
+          <div class="day"></div>
+          <div class="day">1</div>
+          <div class="day">2</div>
+          <div class="day">3</div>
+          <div class="day">4</div>
+
+          <div class="day">5</div>
+          <div class="day">6</div>
+          <div class="day">7</div>
+          <div class="day">8</div>
+          <div class="day">9</div>
+          <div class="due-date">10</div>
+          <div class="day">11</div>
+
+          <div class="day">12</div>
+          <div class="day">13</div>
+          <div class="day">14</div>
+          <div class="day">15</div>
+          <div class="day">16</div>
+          <div class="day">17</div>
+          <div class="day">18</div>
+
+          <div class="day">19</div>
+          <div class="day">20</div>
+          <div class="day">21</div>
+          <div class="day">22</div>
+          <div class="day">23</div>
+          <div class="day">24</div>
+          <div class="today">25</div>
+
+          <div class="day">26</div>
+          <div class="day">27</div>
+          <div class="day">28</div>
+          <div class="day">29</div>
+          <div class="day">30</div>
+          <div class="day">31</div>
+          <div class="day"></div>
+        </div>
+      </div>
+
+      <!-- Right: Filing Status -->
+      <div class="right-section">
+        <div class="section-title">GST Return Filing Status</div>
+        <div style="margin-bottom: 14px;">
+          Current Year's Month: 
+          <select style="padding:10px 16px; border-radius:8px; border:1px solid #ccc; font-size:0.95rem;">
+            <option>Select</option>
+            <option selected>January 2025</option>
+          </select>
+        </div>
+
+        <table class="filing-table">
+          <thead>
+            <tr>
+              <th>Return Type</th>
+              <th>File Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>GSTR-1</strong></td>
+              <td><span class="status-filed">Filed - 365</span> <span class="status-pending">Pending - 210</span></td>
+            </tr>
+            <tr>
+              <td><strong>GSTR-1A</strong></td>
+              <td><span class="status-filed">Filed - 365</span> <span class="status-pending">Pending - 210</span></td>
+            </tr>
+            <tr>
+              <td><strong>GSTR-3B</strong></td>
+              <td><span class="status-filed">Filed - 300</span> <span class="status-pending">Pending - 275</span></td>
+            </tr>
+            <tr>
+              <td><strong>GSTR-7</strong></td>
+              <td><span class="status-filed">Filed - 300</span> <span class="status-pending">Pending - 275</span></td>
+            </tr>
+            <tr>
+              <td><strong>GSTR-8</strong></td>
+              <td><span class="status-filed">Filed - 300</span> <span class="status-pending">Pending - 275</span></td>
+            </tr>
+            <tr>
+              <td><strong>CMP-08</strong></td>
+              <td><span class="status-filed">Filed - 300</span> <span class="status-pending">Pending - 275</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Client Section -->
+    <div class="client-section">
+      <div class="section-title">List of clients</div>
+      
+      <div class="client-types-title">Types of clients</div>
+      
+      <table class="client-types-table">
+        <tr>
+          <td class="client-type-number">1.</td>
+          <td class="client-type-name">Tax Payer (Regular)</td>
+          <td class="client-count">428</td>
+          <td class="client-buttons">
+            <button class="btn-open">Open List</button>
+            <button class="btn-add">Add Client</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="client-type-number">2.</td>
+          <td class="client-type-name">Tax Payer (Composition)</td>
+          <td class="client-count">165</td>
+          <td class="client-buttons">
+            <button class="btn-open">Open List</button>
+            <button class="btn-add">Add Client</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="client-type-number">3.</td>
+          <td class="client-type-name">Tax Deductor</td>
+          <td class="client-count">34</td>
+          <td class="client-buttons">
+            <button class="btn-open">Open List</button>
+            <button class="btn-add">Add Client</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="client-type-number">4.</td>
+          <td class="client-type-name">Tax Collector (ECO)</td>
+          <td class="client-count">02</td>
+          <td class="client-buttons">
+            <button class="btn-open">Open List</button>
+            <button class="btn-add">Add Client</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="client-type-number">5.</td>
+          <td class="client-type-name">Input Service Distributor (ISD)</td>
+          <td class="client-count">11</td>
+          <td class="client-buttons">
+            <button class="btn-open">Open List</button>
+            <button class="btn-add">Add Client</button>
+          </td>
+        </tr>
+      </table>
+
+      <input type="text" class="search-box" placeholder="Search">
+
+      <table class="client-list-table">
+        <thead>
+          <tr>
+            <th>Name of clients</th>
+            <th>GSTIN</th>
+            <th>Legal Name</th>
+            <th>Status</th>
+            <th>Last Return</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1. G. K. CONSTRUCTION</td>
+            <td>09ABCDE2233F1Z4</td>
+            <td>Gyanendra Kumar Gautam</td>
+            <td>Regular</td>
+            <td><span class="status-badge">Active</span></td>
+            <td>Dec-24   <button class="open-btn">Open</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
