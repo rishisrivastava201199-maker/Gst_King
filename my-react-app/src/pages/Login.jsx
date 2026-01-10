@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../style.css";
 
+
 export default function Login() {
   const navigate = useNavigate();
   const [isSignup, setIsSignup] = useState(false);
@@ -106,12 +107,15 @@ export default function Login() {
     <div className="smartgst-login-container">
       {/* Left Side - Image */}
       <div className="smartgst-image-half">
-        <img src="/tax.jpg" alt="SmartGST" className="smartgst-bg-image" />
-        <div className="smartgst-overlay">
-          <h1>SmartGST</h1>
-          <p>Powered by Sharma & Co Chartered Accountants</p>
-        </div>
-      </div>
+  <div className="image-wrapper">   {/* ← yeh naya div add kar */}
+    <img src="/tax.jpg" alt="SmartGST" className="smartgst-bg-image" />
+  </div>
+  <div className="smartgst-overlay">
+    <h1>SmartGST</h1>
+    <p>Powered by Sharma & Co Chartered Accountants</p>
+  </div>
+</div>
+
 
       {/* Right Side - Form */}
       <div className="smartgst-form-half">

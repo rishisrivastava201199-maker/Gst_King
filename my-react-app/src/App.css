@@ -703,5 +703,26 @@ td:last-child { text-align: right; font-weight: 600; }
   box-sizing: border-box;
   min-height: calc(100vh - 80px); /* navbar height */
 }
+/* ===== FORCE LOGIN IMAGE POSITION FIX ===== */
+.smartgst-image-half {
+  position: relative;
+  width: 50%;
+  height: 100vh;              /* black fallback – bahut helpful rahega */
+  overflow: hidden;
+}
 
-/* ==================== END OF LOGIN STYLES ==================== */ 
+.smartgst-bg-image {
+  width: 100%;                    /* full width force karo */
+  height: 100%;                   /* full height force karo */
+  object-fit: cover;              /* ← change to cover (poora container bhar dega) */
+  object-position: center 15%;    /* thoda upar shift – 10% se 25% tak try kar sakta hai */
+}
+
+/* Agar image ab bhi stretch ho rahi hai ya crop zyada hai to yeh alternative try kar */
+.smartgst-bg-image.alt-fit {
+  object-fit: contain;
+  width: 90%;
+  height: 90%;
+  margin: auto;
+  display: block;
+}
