@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiArrowLeft, HiX, HiHome, HiMail, HiPhone } from "react-icons/hi";
+import { HiNewspaper } from "react-icons/hi";
+
 
 import {
   HiLockClosed,      // ← add this
@@ -44,6 +46,9 @@ import {
   Filler,
 } from "chart.js";
 import { Line, Pie, Bar } from "react-chartjs-2";
+import { HiSearch, HiChevronDown } from "react-icons/hi";
+
+
 
 ChartJS.register(
   ArcElement,
@@ -58,7 +63,446 @@ ChartJS.register(
 );
 
 
+// --------------------- Expanded Mock Data (more realistic GST/CBIC style entries) ---------------------
+const allNewsItems = [
+  // ────────────────────────────────────────────── 2026 (current / latest) ──────────────────────────────────────────────
+  { id: 1,   date: 'Jan 15, 2026', year: 2026, month: 'January', title: 'GSTR-3B late fee waiver extended till 31st March 2026', type: 'Notification', category: 'Returns', content: 'CBIC Notification No. 03/2026 – Central Tax dated 14.01.2026 extends the waiver of late fee for delayed filing of FORM GSTR-3B for specified taxpayers...', important: true, pdfLink: 'https://cbic-gst.gov.in/pdf/notfctn-03-2026-ct.pdf' },
+  { id: 2,   date: 'Jan 12, 2026', year: 2026, month: 'January', title: 'Gross GST revenue for December 2025 crosses ₹1.78 lakh crore', type: 'Revenue Update', category: 'Others', content: 'Net collection after refunds stands at ₹1.52 lakh crore. MoM growth 7.8%, YoY growth 11.4%. Detailed state-wise data released.', important: true, pdfLink: '#' },
+  { id: 3,   date: 'Jan 8, 2026',  year: 2026, month: 'January', title: 'Advisory – Mandatory Aadhaar authentication for new registrations from Feb 2026', type: 'Advisory', category: 'Registration', content: 'All fresh applicants will mandatorily undergo Aadhaar authentication w.e.f. 01.02.2026. Physical verification may be waived in certain cases...', important: false },
+  { id: 4,   date: 'Jan 3, 2026',  year: 2026, month: 'January', title: 'QRMP scheme – Option to opt-in/out for Q1 2026 extended to 31st Jan', type: 'Advisory', category: 'Compliance', content: 'Taxpayers having turnover up to ₹5 crore can opt for Quarterly Return Monthly Payment scheme...', pdfLink: '#' },
 
+  // ────────────────────────────────────────────── 2025 ──────────────────────────────────────────────
+  { id: 10,  date: 'Dec 30, 2025', year: 2025, month: 'December', title: 'Due date for GSTR-9 & GSTR-9C (FY 2024-25) extended to 31.03.2026', type: 'Notification', category: 'Returns', content: 'CBIC has granted one-time extension vide Notification No. 25/2025-CT dated 28.12.2025...', important: true },
+  { id: 11,  date: 'Dec 18, 2025', year: 2025, month: 'December', title: '54th GST Council meeting – Key decisions on rate rationalisation', type: 'Update', category: 'Policy', content: 'Reduction in GST rate on 17 items from 18% to 12%, 5 items from 12% to 5%...', pdfLink: '#' },
+  { id: 12,  date: 'Nov 25, 2025', year: 2025, month: 'November', title: 'New functionality – Invoice-wise reporting in GSTR-1 from Nov 2025', type: 'Advisory', category: 'Returns', content: 'Phase-wise rollout of e-invoice mandatory reporting in GSTR-1...', important: false },
+  { id: 13,  date: 'Oct 14, 2025', year: 2025, month: 'October', title: 'Refund processing timeline reduced to 15 days in certain cases', type: 'Circular', category: 'Refund', content: 'Circular No. 234/28/2025-GST clarifies faster processing...', pdfLink: '#' },
+  { id: 14,  date: 'Sep 5, 2025',  year: 2025, month: 'September', title: 'GST collection for Aug 2025: ₹1.75 lakh crore – all-time high', type: 'Revenue Update', category: 'Others', content: 'Highest ever monthly collection...', important: true },
+
+  // ────────────────────────────────────────────── 2024 & earlier (selected important ones) ──────────────────────────────────────────────
+  { id: 20,  date: 'Jul 10, 2024', year: 2024, month: 'July', title: '53rd GST Council – Major decisions on composition scheme', type: 'Update', category: 'Policy', content: 'Turnover limit increased to ₹2 crore for traders...', pdfLink: '#' },
+  { id: 21,  date: 'Mar 22, 2024', year: 2024, month: 'March', title: 'Amnesty scheme for filing pending returns till March 2024', type: 'Notification', category: 'Returns', content: 'One-time waiver of late fee for GSTR-3B up to Nov 2021...', important: true },
+  { id: 30,  date: 'Jul 1, 2017',  year: 2017, month: 'July', title: 'Launch of Goods and Services Tax (GST) in India', type: 'Press Release', category: 'General', content: 'Nationwide rollout from midnight 30th June 2017...', important: true },
+  { id: 31,  date: 'Sep 15, 2017', year: 2017, month: 'September', title: 'First GST Council meeting post-launch – rate changes', type: 'Update', category: 'Rates', content: 'Reduction on 178 items from highest slab...', pdfLink: '#' },
+];
+
+function NewsAndUpdates() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedType, setSelectedType] = useState('All');
+  const [expandedYear, setExpandedYear] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [showArchives, setShowArchives] = useState(false);
+  const [selectedNews, setSelectedNews] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
+
+  const years = Array.from({ length: 2026 - 2017 + 1 }, (_, i) => 2026 - i);
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  const types = ['All', 'Notification', 'Advisory', 'Revenue Update', 'Circular', 'Update', 'Press Release'];
+
+  // Filter + Sort
+  const filteredNews = allNewsItems
+    .filter(item => {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch = item.title.toLowerCase().includes(q) || item.content.toLowerCase().includes(q);
+      const matchesType = selectedType === 'All' || item.type === selectedType || item.category === selectedType;
+
+      let matchesDate = true;
+      if (selectedYear !== null) {
+        matchesDate = item.year === selectedYear;
+        if (selectedMonth !== null) matchesDate = matchesDate && item.month === selectedMonth;
+      }
+      // Default view: show recent items (2026 + late 2025)
+      else if (!searchQuery && selectedType === 'All') {
+        matchesDate = item.year >= 2025;
+      }
+
+      return matchesSearch && matchesType && matchesDate;
+    })
+    .sort((a, b) => new Date(b.date + ` ${b.year}`) - new Date(a.date + ` ${a.year}`));
+
+  const toggleYear = (year) => {
+    setExpandedYear(expandedYear === year ? null : year);
+  };
+
+  const selectMonth = (year, month) => {
+    setSelectedYear(year);
+    setSelectedMonth(month);
+    setShowArchives(false);
+    setExpandedYear(null);
+  };
+
+  const selectFullYear = (year) => {
+    setSelectedYear(year);
+    setSelectedMonth(null);
+    setShowArchives(false);
+    setExpandedYear(null);
+  };
+
+  const resetToLatest = () => {
+    setSelectedYear(null);
+    setSelectedMonth(null);
+    setExpandedYear(null);
+    setSearchQuery('');
+    setSelectedType('All');
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: darkMode ? '#0f172a' : 'linear-gradient(135deg, #f8faff 0%, #eef2ff 100%)',
+      color: darkMode ? '#e2e8f0' : '#1e293b',
+      padding: '24px 16px',
+      fontFamily: 'system-ui, sans-serif',
+    }}>
+      <ToastContainer theme={darkMode ? 'dark' : 'light'} />
+
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '32px',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <div style={{ cursor: 'pointer' }} onClick={resetToLatest}>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 700, color: darkMode ? '#c084fc' : '#6d28d9' }}>
+              GST News & Updates
+            </h1>
+            <p style={{ marginTop: 4, opacity: 0.85 }}>
+              {selectedYear 
+                ? selectedMonth 
+                  ? `${selectedMonth} ${selectedYear}`
+                  : `All months of ${selectedYear}`
+                : 'Latest notifications, advisories & revenue updates'}
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+            <button onClick={() => setDarkMode(!darkMode)} style={{ background: 'none', border: 'none', fontSize: '1.6rem', cursor: 'pointer' }}>
+              {darkMode ? <HiSun /> : <HiMoon />}
+            </button>
+            <button 
+              onClick={() => setShowArchives(true)}
+              style={{
+                background: darkMode ? '#7c3aed' : '#6d28d9',
+                color: 'white',
+                padding: '10px 24px',
+                borderRadius: '10px',
+                border: 'none',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              Archives
+            </button>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div style={{ display: 'flex', gap: '14px', marginBottom: '36px', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: 1, minWidth: '300px' }}>
+            <HiSearch style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: darkMode ? '#a78bfa' : '#7c3aed', fontSize: '1.3rem' }} />
+            <input
+              placeholder="Search notifications, circulars, advisories..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px 14px 14px 48px',
+                borderRadius: '10px',
+                border: `1px solid ${darkMode ? '#475569' : '#cbd5e1'}`,
+                background: darkMode ? '#1e293b' : 'white',
+                color: 'inherit',
+                fontSize: '1.05rem'
+              }}
+            />
+          </div>
+
+          <div style={{ position: 'relative', minWidth: '200px' }}>
+            <select 
+              value={selectedType}
+              onChange={e => setSelectedType(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px 40px 14px 16px',
+                borderRadius: '10px',
+                border: `1px solid ${darkMode ? '#475569' : '#cbd5e1'}`,
+                background: darkMode ? '#1e293b' : 'white',
+                color: 'inherit',
+                appearance: 'none',
+                fontSize: '1.05rem'
+              }}
+            >
+              {types.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <HiChevronDown style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: darkMode ? '#a78bfa' : '#7c3aed' }} />
+          </div>
+        </div>
+
+        {/* News Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+          gap: '24px'
+        }}>
+          {filteredNews.length === 0 ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '100px 20px', opacity: 0.7 }}>
+              No matching updates found
+            </div>
+          ) : (
+            filteredNews.map(item => (
+              <div 
+                key={item.id}
+                onClick={() => setSelectedNews(item)}
+                style={{
+                  background: darkMode ? '#1e293b' : 'white',
+                  borderRadius: '14px',
+                  overflow: 'hidden',
+                  boxShadow: darkMode ? '0 8px 24px rgba(0,0,0,0.45)' : '0 8px 24px rgba(0,0,0,0.09)',
+                  cursor: 'pointer',
+                  transition: 'transform 0.18s, box-shadow 0.18s',
+                  border: item.important ? `2px solid ${darkMode ? '#c084fc' : '#7c3aed'}` : '1px solid transparent'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = darkMode ? '0 16px 40px rgba(0,0,0,0.5)' : '0 16px 40px rgba(124,58,237,0.18)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = darkMode ? '0 8px 24px rgba(0,0,0,0.45)' : '0 8px 24px rgba(0,0,0,0.09)';
+                }}
+              >
+                <div style={{
+                  background: item.important 
+                    ? (darkMode ? 'linear-gradient(90deg, #8b5cf6, #c084fc)' : 'linear-gradient(90deg, #7c3aed, #a78bfa)') 
+                    : (darkMode ? '#334155' : '#f8f9ff'),
+                  padding: '16px 24px',
+                  color: item.important ? 'white' : (darkMode ? '#cbd5e1' : '#4c1d95'),
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <strong style={{ fontSize: '1.1rem' }}>{item.type}</strong>
+                  <span style={{ fontSize: '0.92rem', opacity: item.important ? 1 : 0.85 }}>{item.date}</span>
+                </div>
+
+                <div style={{ padding: '24px' }}>
+                  <h3 style={{ margin: '0 0 14px 0', fontSize: '1.32rem', lineHeight: 1.4 }}>
+                    {item.title}
+                  </h3>
+                  <p style={{ margin: 0, lineHeight: 1.6, opacity: 0.9 }}>
+                    {item.content.substring(0, 180)}{item.content.length > 180 ? '...' : ''}
+                  </p>
+                  <div style={{ marginTop: '20px', fontSize: '0.95rem', opacity: 0.8 }}>
+                    {item.category} {item.pdfLink && ' • Official PDF available'}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* ────────────────────────────────────────────── Archives Panel ────────────────────────────────────────────── */}
+      {showArchives && (
+        <div 
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 1000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}
+          onClick={() => setShowArchives(false)}
+        >
+          <div 
+            style={{
+              background: darkMode ? '#1e293b' : 'white',
+              borderRadius: '16px',
+              width: '92%',
+              maxWidth: '720px',
+              maxHeight: '88vh',
+              overflowY: 'auto',
+              padding: '32px',
+              color: 'inherit'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+              <h2 style={{ margin: 0, color: darkMode ? '#c084fc' : '#6d28d9' }}>Archives (2017–2026)</h2>
+              <HiX style={{ fontSize: '1.9rem', cursor: 'pointer' }} onClick={() => setShowArchives(false)} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {years.map(year => (
+                <div key={year}>
+                  <div 
+                    onClick={() => toggleYear(year)}
+                    style={{
+                      padding: '16px 20px',
+                      background: expandedYear === year 
+                        ? (darkMode ? '#334155' : '#f3e8ff') 
+                        : (darkMode ? '#1e293b' : '#f8fafc'),
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      fontWeight: expandedYear === year ? 600 : 500,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      fontSize: '1.1rem'
+                    }}
+                  >
+                    <span>{year}</span>
+                    {expandedYear === year 
+                      ? <HiChevronDown style={{ fontSize: '1.3rem' }} /> 
+                      : <HiChevronDown style={{ transform: 'rotate(-90deg)', fontSize: '1.3rem' }} />}
+                  </div>
+
+                  {expandedYear === year && (
+                    <div style={{
+                      marginTop: '12px',
+                      paddingLeft: '20px',
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                      gap: '10px'
+                    }}>
+                      <div 
+                        onClick={() => selectFullYear(year)}
+                        style={{
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          background: selectedYear === year && selectedMonth === null 
+                            ? (darkMode ? '#6d28d9' : '#e0e7ff') 
+                            : (darkMode ? '#334155' : '#f1f5f9'),
+                          borderRadius: '10px',
+                          cursor: 'pointer',
+                          color: selectedYear === year && selectedMonth === null ? 'white' : 'inherit',
+                          fontWeight: 500
+                        }}
+                      >
+                        All months
+                      </div>
+
+                      {months.map(month => (
+                        <div 
+                          key={month}
+                          onClick={() => selectMonth(year, month)}
+                          style={{
+                            padding: '12px 16px',
+                            textAlign: 'center',
+                            background: selectedYear === year && selectedMonth === month 
+                              ? (darkMode ? '#6d28d9' : '#e0e7ff') 
+                              : (darkMode ? '#334155' : '#f1f5f9'),
+                            borderRadius: '10px',
+                            cursor: 'pointer',
+                            color: selectedYear === year && selectedMonth === month ? 'white' : 'inherit',
+                            fontWeight: 500
+                          }}
+                        >
+                          {month}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ────────────────────────────────────────────── Full News Detail View ────────────────────────────────────────────── */}
+      {selectedNews && (
+        <div 
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1100,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px'
+          }}
+          onClick={() => setSelectedNews(null)}
+        >
+          <div 
+            style={{
+              background: darkMode ? '#0f172a' : 'white',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '860px',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+              padding: '32px',
+              color: 'inherit'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+              <button 
+                onClick={() => setSelectedNews(null)}
+                style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', color: 'inherit' }}
+              >
+                <HiArrowLeft /> Back to list
+              </button>
+
+              <div style={{ display: 'flex', gap: '20px' }}>
+                <HiShare style={{ cursor: 'pointer', fontSize: '1.4rem' }} onClick={() => toast.info('Share link copied (demo)')} />
+                <HiPrinter style={{ cursor: 'pointer', fontSize: '1.4rem' }} onClick={() => window.print()} />
+              </div>
+            </div>
+
+            <div style={{
+              background: selectedNews.important 
+                ? (darkMode ? 'linear-gradient(90deg, #8b5cf6, #c084fc)' : 'linear-gradient(90deg, #7c3aed, #a78bfa)') 
+                : (darkMode ? '#334155' : '#f8f9ff'),
+              padding: '18px 24px',
+              borderRadius: '12px',
+              marginBottom: '28px',
+              color: selectedNews.important ? 'white' : (darkMode ? '#e2e8f0' : '#4c1d95')
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', fontWeight: 600 }}>
+                <span>{selectedNews.type}</span>
+                <span>{selectedNews.date}</span>
+              </div>
+            </div>
+
+            <h1 style={{ fontSize: '1.95rem', margin: '0 0 20px 0', lineHeight: 1.35 }}>
+              {selectedNews.title}
+            </h1>
+
+            <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.8, fontSize: '1.07rem' }}>
+              {selectedNews.content}
+              {/* You can add more detailed content here if you want longer text */}
+              <br /><br />
+              Additional details / background information can be placed here...
+              <br />
+              Issued by: {selectedNews.important ? 'CBIC / GST Council' : 'GSTN Team'}
+            </div>
+
+            {selectedNews.pdfLink && (
+              <a 
+                href={selectedNews.pdfLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  marginTop: '36px',
+                  padding: '14px 32px',
+                  background: darkMode ? '#059669' : '#16a34a',
+                  color: 'white',
+                  borderRadius: '12px',
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  fontSize: '1.05rem'
+                }}
+              >
+                <HiCalendar /> Open Official Document (PDF)
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function UserDashboard() {
   
@@ -119,8 +563,7 @@ function UserDashboard() {
   { icon: <HiUserGroup className="sidebar-icon" />, text: "My Clients", link: "/user/clients" },
   // { icon: <HiDocumentText className="sidebar-icon" />, text: "Vouchers", link: "/user/vouchers" },
   { icon: <HiFolder className="sidebar-icon" />, text: "GSTR Filed", link: "/user/returns" },
-  // { icon: <HiFolder className="sidebar-icon" />, text: "Documents", link: "/user/documents" },
-  // { icon: <HiChartBar className="sidebar-icon" />, text: "Reports", link: "/user/reports" },
+  { icon: <HiNewspaper className="sidebar-icon" />, text: "News & Updates", link: "/user/news-updates" },
   { icon: <HiBell className="sidebar-icon" />, text: "Notifications", link: "/user/notifications" },
 ];
 
@@ -439,26 +882,28 @@ const submitNewClient = () => {
     </div>
   );
 
-
 const ClientGSTDashboardModal = ({ client, onClose }) => {
   const [activeMenu, setActiveMenu] = useState("Dashboard");
   const [hoveredMenu, setHoveredMenu] = useState(null);
   const [activeSubTab, setActiveSubTab] = useState("Manually");
   const [activeAnnualSubTab, setActiveAnnualSubTab] = useState("GSTR-9");
-
-  // New states for Import flow
+  // Import flow states (future use ke liye rakha hai, remove mat karna)
   const [importStep, setImportStep] = useState("list"); // "list" | "upload"
-  const [selectedImportType, setSelectedImportType] = useState(null); // e.g. "Bulk New File Creation for GST"
+  const [selectedImportType, setSelectedImportType] = useState(null);
 
-  // Dynamic client data - controls the top header card
+  // NEW STATES FOR LEDGER SUMMARY TABS & ACCORDIONS
+  const [activeLedgerTab, setActiveLedgerTab] = useState("summary"); // summary, elb, turnover, liability, payment
+  const [showCreditLedger, setShowCreditLedger] = useState(false);
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+
+  // Dynamic client header data
   const [dynamicClient, setDynamicClient] = useState({
     gstin: client?.gstin || "09ABMCS5888A1ZU",
     company: client?.company || "SALVIA GRAFIX PRIVATE LIMITED",
     registrationDate: "10-Feb-2020",
     status: "Active",
   });
-
-  // Editable form state - used in Client Detail tab
+  // Editable form state for Client Detail tab
   const [formData, setFormData] = useState({
     name: "SALVIA GRAFIX PRIVATE LIMITED",
     address: "Shop No. 13, First Floor, Royal Plaza, Haj...",
@@ -485,12 +930,10 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     uploadType: "GST",
     lutNumber: "",
   });
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleUpdate = () => {
     setDynamicClient({
       gstin: formData.gstin,
@@ -498,11 +941,10 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       registrationDate: formData.regDate,
       status: "Active",
     });
-    alert("Client details updated successfully! Changes are now visible in the header card.");
+    toast.success("Client details updated successfully! Changes are now visible in the header card.");
   };
-
   const months = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
-
+  // UPDATED MENU - sirf ye items rakhe hain (cmp-08, 2A, 2B, 2, Refund, Payment sab hata diye)
   const menuItems = [
     "Dashboard",
     "Client Detail",
@@ -510,30 +952,20 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     "gstr-1A",
     "gstr 3b",
     "IMS",
-    "cmp-08",
-    "gstr 2A",
-    "gstr 2B",
-    "gstr 2",
     "Annual Return",
-    "Refund",
-    "Payment",
     "Reports",
   ];
 
-  const modalOverlayStyle = {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 9999,
-  };
+  // Ledger Tabs List
+  const ledgerTabs = [
+    { id: "summary", label: "Ledger Summary" },
+    { id: "elb", label: "ELB" },
+    { id: "turnover", label: "Turnover" },
+    { id: "liability", label: "Liability Ledger" },
+    { id: "payment", label: "Payment" },
+  ];
 
-  // Excel Template Download (unchanged)
+  // Excel Template Download function (same as original)
   const downloadClientTemplate = () => {
     const notes = [
       ["Note"],
@@ -599,9 +1031,9 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Client Master");
     XLSX.writeFile(wb, "Client_Master_Template.xlsx");
+    toast.success("Client Master Template Downloaded!");
   };
-
-  // Import Options List (Second Image)
+  // Import Options List Component
   const ImportOptionsList = () => {
     const options = [
       { title: "Bulk New File Creation for GST", hasTemplate: true },
@@ -611,7 +1043,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       { title: "Bulk New File Creation for Income Tax ( Excel )", hasTemplate: true },
       { title: "Transfer Income Tax Data From Previous Year", hasTemplate: false, singleButton: true },
     ];
-
     return (
       <div style={{ padding: "20px", background: "#f8fafc" }}>
         <div style={{ background: "#ffffff", borderRadius: "12px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
@@ -691,8 +1122,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     );
   };
-
-  // File Upload Screen (First Image)
+  // File Upload Screen Component
   const FileUploadScreen = () => {
     return (
       <div style={{ padding: "20px", background: "#f8fafc" }}>
@@ -703,7 +1133,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
           <div style={{ marginBottom: "32px", color: "#475569", fontSize: "1rem" }}>
             Step 1 : Upload File
           </div>
-
           <div
             style={{
               border: "2px dashed #cbd5e1",
@@ -719,7 +1148,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
             </p>
             <div style={{ fontSize: "2.5rem", color: "#94a3b8" }}>↓</div>
           </div>
-
           <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
             <button
               style={{
@@ -757,8 +1185,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     );
   };
-
-  // Reusable GSTR Layout - Modified Import Tab
+  // Reusable GSTR Layout Component
   const GSTRLayout = ({ title }) => (
     <div style={{ padding: "20px", background: "#f8fafc" }}>
       <div style={{ background: "#ffffff", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
@@ -787,7 +1214,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
             </select>
           </div>
         </div>
-
         <div style={{ display: "flex", gap: "12px", marginBottom: "32px", borderBottom: "2px solid #e2e8f0" }}>
           {["Manually", "Import", "Summary"].map((tab) => (
             <button
@@ -795,7 +1221,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               onClick={() => {
                 setActiveSubTab(tab);
                 if (tab === "Import") {
-                  setImportStep("list"); // Always start from list when clicking Import tab
+                  setImportStep("list");
                   setSelectedImportType(null);
                 }
               }}
@@ -814,16 +1240,12 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
             </button>
           ))}
         </div>
-
-        {/* Import Tab - New Flow */}
         {activeSubTab === "Import" && (
           <>
             {importStep === "list" && <ImportOptionsList />}
             {importStep === "upload" && <FileUploadScreen />}
           </>
         )}
-
-        {/* Summary Tab - Unchanged */}
         {activeSubTab === "Summary" && (
           <div style={{ textAlign: "center", padding: "80px 20px" }}>
             <div style={{ maxWidth: "700px", margin: "0 auto" }}>
@@ -840,8 +1262,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
             </div>
           </div>
         )}
-
-        {/* Manually Tab - Unchanged */}
         {activeSubTab === "Manually" && (
           <div style={{ textAlign: "center", padding: "100px 20px", color: "#64748b" }}>
             <h3 style={{ fontSize: "1.8rem" }}>Manual Entry - Coming Soon</h3>
@@ -851,55 +1271,56 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     </div>
   );
 
+  // Main content rendering function (with all your new features)
   const renderContent = () => {
     if (activeMenu === "Dashboard") {
       return (
-        <div style={{ padding: "20px", background: "#f8fafc" }}>
+        <div style={{ padding: "24px 32px", background: "#f8fafc" }}>
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: "18px",
+              marginBottom: "24px",
               flexWrap: "wrap",
-              gap: "12px",
+              gap: "16px",
             }}
           >
             <h2
               style={{
                 margin: 0,
                 color: "#0d9488",
-                fontSize: "1.5rem",
+                fontSize: "1.8rem",
                 fontWeight: "700",
               }}
             >
               Returns / Ledger Status
             </h2>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
               <select
                 style={{
-                  padding: "8px 14px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  fontSize: "0.95rem",
+                  padding: "10px 16px",
+                  borderRadius: "10px",
+                  border: "1px solid #d1d5db",
+                  fontSize: "1rem",
                   background: "white",
                 }}
               >
                 <option>2024-25</option>
                 <option>2025-26</option>
               </select>
-              <div style={{ fontSize: "0.9rem", color: "#059669", fontWeight: "600" }}>
+              <div style={{ fontSize: "0.95rem", color: "#059669", fontWeight: "600" }}>
                 Last Update: 03-Jan-2026
               </div>
               <button
                 style={{
                   background: "#10b981",
                   color: "white",
-                  padding: "8px 16px",
+                  padding: "10px 20px",
                   border: "none",
-                  borderRadius: "8px",
+                  borderRadius: "10px",
                   fontWeight: "600",
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                   cursor: "pointer",
                 }}
               >
@@ -907,14 +1328,17 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               </button>
             </div>
           </div>
+
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "100px repeat(12, 1fr)",
-              gap: "6px",
-              marginBottom: "12px",
+              gridTemplateColumns: "120px repeat(12, 1fr)",
+              gap: "8px",
+              marginBottom: "16px",
               fontWeight: "700",
-              fontSize: "0.85rem",
+              fontSize: "0.9rem",
+              minWidth: "1000px",
+              overflowX: "auto",
             }}
           >
             <div style={{ paddingLeft: "8px" }}>Return</div>
@@ -923,9 +1347,9 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                 key={m}
                 style={{
                   textAlign: "center",
-                  padding: "6px 0",
+                  padding: "8px 0",
                   background: "#e0e7ff",
-                  borderRadius: "6px",
+                  borderRadius: "8px",
                   color: "#4338ca",
                 }}
               >
@@ -933,6 +1357,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               </div>
             ))}
           </div>
+
           {[
             { name: "GSTR-1", filed: 9 },
             { name: "GSTR-1A", filed: 0 },
@@ -943,17 +1368,19 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               key={ret.name}
               style={{
                 display: "grid",
-                gridTemplateColumns: "100px repeat(12, 1fr)",
-                gap: "6px",
+                gridTemplateColumns: "120px repeat(12, 1fr)",
+                gap: "8px",
                 alignItems: "center",
-                marginBottom: "10px",
+                marginBottom: "12px",
+                minWidth: "1000px",
+                overflowX: "auto",
               }}
             >
               <div
                 style={{
                   fontWeight: "700",
                   color: "#0d9488",
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                   paddingLeft: "8px",
                 }}
               >
@@ -961,7 +1388,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                 <br />
                 <a
                   href="#"
-                  style={{ fontSize: "0.75rem", color: "#2563eb", textDecoration: "underline" }}
+                  style={{ fontSize: "0.8rem", color: "#2563eb", textDecoration: "underline" }}
                 >
                   All Download →
                 </a>
@@ -981,30 +1408,30 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                       background: "#ffffff",
                       borderRadius: "8px",
                       boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-                      padding: "8px 4px",
+                      padding: "10px 6px",
                       textAlign: "center",
-                      fontSize: "0.78rem",
-                      minHeight: "68px",
+                      fontSize: "0.85rem",
+                      minHeight: "80px",
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "center",
-                      gap: "3px",
+                      gap: "4px",
                     }}
                   >
                     {filed ? (
                       <>
-                        <span style={{ color: "#059669", fontWeight: "700", fontSize: "0.8rem" }}>
+                        <span style={{ color: "#059669", fontWeight: "700", fontSize: "0.9rem" }}>
                           Filed
                         </span>
-                        <span style={{ color: "#666", fontSize: "0.68rem" }}>ARN:</span>
-                        <span style={{ color: "#333", fontWeight: "600", fontSize: "0.72rem" }}>
+                        <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN:</span>
+                        <span style={{ color: "#333", fontWeight: "600", fontSize: "0.8rem" }}>
                           {arn}
                         </span>
                         <a
                           href="#"
                           style={{
                             color: "#2563eb",
-                            fontSize: "0.7rem",
+                            fontSize: "0.75rem",
                             textDecoration: "underline",
                             marginTop: "4px",
                           }}
@@ -1014,13 +1441,13 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                       </>
                     ) : isCurrentPeriod ? (
                       <>
-                        <span style={{ color: "#dc2626", fontWeight: "700" }}>Due</span>
-                        <span style={{ color: "#999", fontSize: "0.7rem" }}>Not Filed</span>
+                        <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Due</span>
+                        <span style={{ color: "#999", fontSize: "0.75rem" }}>Not Filed</span>
                       </>
                     ) : (
                       <>
-                        <span style={{ color: "#dc2626", fontWeight: "700" }}>Not Filed</span>
-                        <span style={{ color: "#666", fontSize: "0.68rem" }}>ARN: {arn}</span>
+                        <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Not Filed</span>
+                        <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN: {arn}</span>
                       </>
                     )}
                   </div>
@@ -1028,17 +1455,18 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               })}
             </div>
           ))}
-          <div style={{ display: "flex", justifyContent: "center", gap: "40px", margin: "20px 0", flexWrap: "wrap" }}>
+
+          <div style={{ display: "flex", justifyContent: "center", gap: "48px", margin: "32px 0", flexWrap: "wrap" }}>
             <div style={{ textAlign: "center" }}>
               <strong>GSTR-9:</strong>{" "}
               <span
                 style={{
                   background: "#fde68a",
                   color: "#92400e",
-                  padding: "6px 16px",
+                  padding: "8px 20px",
                   borderRadius: "30px",
                   fontWeight: "600",
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                 }}
               >
                 Due
@@ -1050,10 +1478,10 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                 style={{
                   background: "#fde68a",
                   color: "#92400e",
-                  padding: "6px 16px",
+                  padding: "8px 20px",
                   borderRadius: "30px",
                   fontWeight: "600",
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                 }}
               >
                 Due
@@ -1063,28 +1491,29 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               <strong>IMS:</strong>
               <button
                 style={{
-                  marginLeft: "10px",
+                  marginLeft: "12px",
                   background: "#3b82f6",
                   color: "white",
-                  padding: "8px 16px",
-                  borderRadius: "8px",
+                  padding: "10px 20px",
+                  borderRadius: "10px",
                   fontWeight: "600",
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                 }}
               >
                 File
               </button>
             </div>
           </div>
-          <div style={{ textAlign: "center", margin: "20px 0" }}>
+
+          <div style={{ textAlign: "center", margin: "32px 0" }}>
             <button
               style={{
                 background: "#f97316",
                 color: "#fff",
-                padding: "12px 36px",
+                padding: "14px 40px",
                 border: "none",
-                borderRadius: "8px",
-                fontSize: "1rem",
+                borderRadius: "10px",
+                fontSize: "1.1rem",
                 fontWeight: "600",
                 cursor: "pointer",
               }}
@@ -1095,323 +1524,358 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               style={{
                 background: "#16a34a",
                 color: "#fff",
-                padding: "12px 36px",
+                padding: "14px 40px",
                 border: "none",
-                borderRadius: "8px",
-                fontSize: "1rem",
+                borderRadius: "10px",
+                fontSize: "1.1rem",
                 fontWeight: "600",
                 cursor: "pointer",
-                marginLeft: "20px",
+                marginLeft: "24px",
               }}
             >
               Excel Download
             </button>
           </div>
-          <div style={{ marginTop: "30px" }}>
+
+          {/* LEDGER SUMMARY SECTION WITH TABS & ACCORDIONS */}
+          <div style={{ marginTop: "48px" }}>
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: "16px",
+                marginBottom: "24px",
               }}
             >
-              <h2 style={{ margin: 0, fontSize: "1.4rem", fontWeight: "700", color: "#1f2937" }}>
+              <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "700", color: "#1f2937" }}>
                 Ledger Summary
               </h2>
               <button
                 style={{
                   background: "#16a34a",
                   color: "#fff",
-                  padding: "8px 16px",
-                  borderRadius: "6px",
+                  padding: "10px 20px",
+                  borderRadius: "8px",
                   border: "none",
                   fontWeight: "600",
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                 }}
               >
                 Update
               </button>
             </div>
-            <div style={{ display: "flex", gap: "20px", marginBottom: "30px", overflowX: "auto" }}>
-              <div
-                style={{
-                  background: "#ffffff",
-                  borderRadius: "12px",
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-                  minWidth: "500px",
-                  flex: 1,
-                }}
-              >
-                <div
+
+            {/* Ledger Tabs */}
+            <div style={{ display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap" }}>
+              {ledgerTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveLedgerTab(tab.id)}
                   style={{
-                    background: "#a21caf",
-                    color: "#fff",
-                    padding: "10px 14px",
-                    fontWeight: "700",
-                    fontSize: "1rem",
+                    padding: "12px 28px",
+                    background: activeLedgerTab === tab.id ? "#7c3aed" : "#f3f4f6",
+                    color: activeLedgerTab === tab.id ? "white" : "#444",
+                    border: "none",
+                    borderRadius: "10px",
+                    fontWeight: activeLedgerTab === tab.id ? "700" : "600",
+                    fontSize: "1.1rem",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    boxShadow: activeLedgerTab === tab.id ? "0 6px 20px rgba(124,58,237,0.4)" : "none",
+                    transform: activeLedgerTab === tab.id ? "translateY(-3px)" : "translateY(0)",
                   }}
                 >
-                  Electronic Ledger Balances
-                </div>
-                <div style={{ padding: "12px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontWeight: "600" }}>
-                    <span>Cash Balance</span>
-                    <strong>₹58,756.00</strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontWeight: "600" }}>
-                    <span>Credit Balance</span>
-                    <strong>₹36,845.00</strong>
-                  </div>
-                </div>
-                <div
-                  style={{
-                    background: "#16a34a",
-                    color: "#fff",
-                    padding: "8px",
-                    textAlign: "center",
-                    fontWeight: "700",
-                  }}
-                >
-                  Balance of Electronic Credit Ledger
-                </div>
-                <table style={{ width: "100%", borderCollapse: "collapse", background: "#ecfdf5" }}>
-                  <thead>
-                    <tr>
-                      <th style={{ padding: "8px", textAlign: "center" }}>IGST</th>
-                      <th style={{ padding: "8px", textAlign: "center" }}>CGST</th>
-                      <th style={{ padding: "8px", textAlign: "center" }}>SGST</th>
-                      <th style={{ padding: "8px", textAlign: "center" }}>CESS</th>
-                      <th style={{ padding: "8px", textAlign: "center" }}>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td style={{ padding: "10px", textAlign: "center" }}>₹25,165</td>
-                      <td style={{ padding: "10px", textAlign: "center" }}>₹12,324</td>
-                      <td style={{ padding: "10px", textAlign: "center" }}>₹5,632</td>
-                      <td style={{ padding: "10px", textAlign: "center" }}>₹15,635</td>
-                      <td style={{ padding: "10px", textAlign: "center", fontWeight: "700" }}>₹58,756</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div
-                style={{
-                  background: "#ffffff",
-                  borderRadius: "12px",
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-                  minWidth: "400px",
-                  flex: 1,
-                }}
-              >
-                <div
-                  style={{
-                    background: "#a21caf",
-                    color: "#fff",
-                    padding: "10px 14px",
-                    fontWeight: "700",
-                    fontSize: "1rem",
-                  }}
-                >
-                  Turnover Balances
-                </div>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <tbody>
-                    <tr>
-                      <td style={{ padding: "12px" }}>Turnover Estimated</td>
-                      <td style={{ textAlign: "right" }}>₹1,25,65,635.00</td>
-                    </tr>
-                    <tr>
-                      <td style={{ padding: "12px" }}>Aggregate Turnover</td>
-                      <td style={{ textAlign: "right" }}>₹1,25,65,635.00</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                  {tab.label}
+                </button>
+              ))}
             </div>
-            <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", justifyContent: "center" }}>
-              <div
-                style={{
-                  flex: "1 1 340px",
-                  maxWidth: "420px",
-                  background: "#ffffff",
-                  borderRadius: "12px",
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-                }}
-              >
-                <div
-                  style={{
-                    background: "#a21caf",
-                    color: "#fff",
-                    padding: "10px 14px",
-                    fontWeight: "700",
-                    fontSize: "1rem",
-                  }}
-                >
-                  Liability Ledger
+
+            {/* Tab Content Container */}
+            <div style={{ background: "#ffffff", borderRadius: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.1)", overflow: "hidden" }}>
+              {/* Summary Tab (both ELB & Turnover side by side) */}
+              {activeLedgerTab === "summary" && (
+                <div style={{ padding: "32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
+                  {/* ELB Card with Clickable Cash Balance */}
+                  <div style={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
+                    <div style={{ background: "#a21caf", color: "#fff", padding: "16px 24px", fontWeight: "700", fontSize: "1.3rem" }}>
+                      Electronic Ledger Balances
+                    </div>
+                    <div style={{ padding: "24px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", fontWeight: "600", fontSize: "1.2rem" }}>
+                        <span>Cash Balance</span>
+                        <strong
+                          style={{ color: "#7c3aed", cursor: "pointer", textDecoration: "underline" }}
+                          onClick={() => setShowCreditLedger(!showCreditLedger)}
+                        >
+                          ₹58,756.00
+                        </strong>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px", fontWeight: "600", fontSize: "1.2rem" }}>
+                        <span>Credit Balance</span>
+                        <strong>₹36,845.00</strong>
+                      </div>
+
+                      {/* Credit Ledger Accordion */}
+                      {showCreditLedger && (
+                        <div style={{ marginTop: "24px", paddingTop: "24px", borderTop: "1px solid #e5e7eb" }}>
+                          <div style={{ background: "#16a34a", color: "#fff", padding: "14px", textAlign: "center", fontWeight: "700", fontSize: "1.2rem" }}>
+                            Balance of Electronic Credit Ledger
+                          </div>
+                          <table style={{ width: "100%", borderCollapse: "collapse", background: "#ecfdf5" }}>
+                            <thead>
+                              <tr>
+                                <th style={{ padding: "12px", textAlign: "center" }}>IGST</th>
+                                <th style={{ padding: "12px", textAlign: "center" }}>CGST</th>
+                                <th style={{ padding: "12px", textAlign: "center" }}>SGST</th>
+                                <th style={{ padding: "12px", textAlign: "center" }}>CESS</th>
+                                <th style={{ padding: "12px", textAlign: "center" }}>Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td style={{ padding: "12px", textAlign: "center" }}>₹25,165</td>
+                                <td style={{ padding: "12px", textAlign: "center" }}>₹12,324</td>
+                                <td style={{ padding: "12px", textAlign: "center" }}>₹5,632</td>
+                                <td style={{ padding: "12px", textAlign: "center" }}>₹15,635</td>
+                                <td style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>₹58,756</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Turnover Card */}
+                  <div style={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
+                    <div style={{ background: "#a21caf", color: "#fff", padding: "16px 24px", fontWeight: "700", fontSize: "1.3rem" }}>
+                      Turnover Balances
+                    </div>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: "16px", fontWeight: "600" }}>Turnover Estimated</td>
+                          <td style={{ padding: "16px", textAlign: "right", fontWeight: "700" }}>₹1,25,65,635.00</td>
+                        </tr>
+                        <tr style={{ background: "#f3f4f6" }}>
+                          <td style={{ padding: "16px", fontWeight: "600" }}>Aggregate Turnover</td>
+                          <td style={{ padding: "16px", textAlign: "right", fontWeight: "700" }}>₹1,25,65,635.00</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-                <div style={{ padding: "16px" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px" }}>
+              )}
+
+              {/* ELB Detailed Tab */}
+              {activeLedgerTab === "elb" && (
+                <div style={{ padding: "32px" }}>
+                  <div style={{ background: "#a21caf", color: "#fff", padding: "20px 32px", borderRadius: "12px 12px 0 0", fontWeight: "700", fontSize: "1.4rem" }}>
+                    Electronic Ledger Balances - Detailed View
+                  </div>
+                  <div style={{ padding: "32px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px", fontSize: "1.3rem", fontWeight: "600" }}>
+                      <span>Cash Balance</span>
+                      <strong>₹58,756.00</strong>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "32px", fontSize: "1.3rem", fontWeight: "600" }}>
+                      <span>Credit Balance</span>
+                      <strong>₹36,845.00</strong>
+                    </div>
+                    <div style={{ background: "#16a34a", color: "#fff", padding: "16px", textAlign: "center", fontWeight: "700", fontSize: "1.3rem" }}>
+                      Balance of Electronic Credit Ledger
+                    </div>
+                    <table style={{ width: "100%", borderCollapse: "collapse", background: "#ecfdf5" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ padding: "16px", textAlign: "center" }}>IGST</th>
+                          <th style={{ padding: "16px", textAlign: "center" }}>CGST</th>
+                          <th style={{ padding: "16px", textAlign: "center" }}>SGST</th>
+                          <th style={{ padding: "16px", textAlign: "center" }}>CESS</th>
+                          <th style={{ padding: "16px", textAlign: "center" }}>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: "16px", textAlign: "center" }}>₹25,165</td>
+                          <td style={{ padding: "16px", textAlign: "center" }}>₹12,324</td>
+                          <td style={{ padding: "16px", textAlign: "center" }}>₹5,632</td>
+                          <td style={{ padding: "16px", textAlign: "center" }}>₹15,635</td>
+                          <td style={{ padding: "16px", textAlign: "center", fontWeight: "700" }}>₹58,756</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Turnover Detailed Tab */}
+              {activeLedgerTab === "turnover" && (
+                <div style={{ padding: "32px" }}>
+                  <div style={{ background: "#a21caf", color: "#fff", padding: "20px 32px", borderRadius: "12px 12px 0 0", fontWeight: "700", fontSize: "1.4rem" }}>
+                    Turnover Balances - Detailed View
+                  </div>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <tbody>
                       <tr>
-                        <td>Liability (GSTR-1)</td>
-                        <td style={{ textAlign: "right", fontWeight: "600" }}>₹10,25,365.25</td>
+                        <td style={{ padding: "20px", fontWeight: "600", fontSize: "1.3rem" }}>Turnover Estimated</td>
+                        <td style={{ padding: "20px", textAlign: "right", fontWeight: "700", fontSize: "1.3rem" }}>₹1,25,65,635.00</td>
                       </tr>
-                      <tr>
-                        <td>Liability (GSTR-3B)</td>
-                        <td style={{ textAlign: "right", fontWeight: "600" }}>₹10,20,365.25</td>
-                      </tr>
-                      <tr style={{ color: "red", fontWeight: "700" }}>
-                        <td style={{ color: "red" }}>Difference</td>
-                        <td style={{ textAlign: "right", color: "red" }}>₹5,000.00</td>
-                      </tr>
-                      <tr>
-                        <td>ITC (GSTR-2B)</td>
-                        <td style={{ textAlign: "right", fontWeight: "600" }}>₹11,11,265.50</td>
-                      </tr>
-                      <tr>
-                        <td>ITC (GSTR-3B)</td>
-                        <td style={{ textAlign: "right", fontWeight: "600" }}>₹11,10,265.50</td>
-                      </tr>
-                      <tr style={{ color: "#f97316", fontWeight: "700" }}>
-                        <td style={{ color: "orange" }}>Difference</td>
-                        <td style={{ textAlign: "right", color: "orange" }}>-₹1,000.00</td>
-                      </tr>
-                      <tr>
-                        <td>ITC (GSTR-2A)</td>
-                        <td style={{ textAlign: "right", fontWeight: "600" }}>₹11,11,265.50</td>
-                      </tr>
-                      <tr>
-                        <td>ITC (GSTR-3B)</td>
-                        <td style={{ textAlign: "right", fontWeight: "600" }}>₹11,10,265.50</td>
-                      </tr>
-                      <tr style={{ color: "#16a34a", fontWeight: "700" }}>
-                        <td style={{ color: "green" }}>Difference</td>
-                        <td style={{ textAlign: "right", color: "green" }}>₹0.00</td>
+                      <tr style={{ background: "#f3f4f6" }}>
+                        <td style={{ padding: "20px", fontWeight: "600", fontSize: "1.3rem" }}>Aggregate Turnover</td>
+                        <td style={{ padding: "20px", textAlign: "right", fontWeight: "700", fontSize: "1.3rem" }}>₹1,25,65,635.00</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-              </div>
-              <div
-                style={{
-                  flex: "2 1 500px",
-                  background: "#ffffff",
-                  borderRadius: "12px",
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-                }}
-              >
-                <div
-                  style={{
-                    background: "#a21caf",
-                    color: "#fff",
-                    padding: "10px 14px",
-                    fontWeight: "700",
-                    fontSize: "1rem",
-                  }}
-                >
-                  Payment of Demand
+              )}
+
+              {/* Liability Detailed Tab */}
+              {activeLedgerTab === "liability" && (
+                <div style={{ padding: "32px" }}>
+                  <div style={{ background: "#a21caf", color: "#fff", padding: "20px 32px", borderRadius: "12px 12px 0 0", fontWeight: "700", fontSize: "1.4rem" }}>
+                    Liability Ledger - Detailed View
+                  </div>
+                  <div style={{ padding: "32px" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "1.1rem" }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: "18px" }}>Liability (GSTR-1)</td>
+                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹10,25,365.25</td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: "18px" }}>Liability (GSTR-3B)</td>
+                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹10,20,365.25</td>
+                        </tr>
+                        <tr style={{ color: "red", fontWeight: "700", background: "#fee2e2" }}>
+                          <td style={{ padding: "18px" }}>Difference</td>
+                          <td style={{ padding: "18px", textAlign: "right" }}>₹5,000.00</td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: "18px" }}>ITC (GSTR-2B)</td>
+                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹11,11,265.50</td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: "18px" }}>ITC (GSTR-3B)</td>
+                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹11,10,265.50</td>
+                        </tr>
+                        <tr style={{ color: "#f97316", fontWeight: "700", background: "#fefce8" }}>
+                          <td style={{ padding: "18px" }}>Difference</td>
+                          <td style={{ padding: "18px", textAlign: "right" }}>-₹1,000.00</td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: "18px" }}>ITC (GSTR-2A)</td>
+                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹11,11,265.50</td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: "18px" }}>ITC (GSTR-3B)</td>
+                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹11,10,265.50</td>
+                        </tr>
+                        <tr style={{ color: "#16a34a", fontWeight: "700", background: "#ecfdf5" }}>
+                          <td style={{ padding: "18px" }}>Difference</td>
+                          <td style={{ padding: "18px", textAlign: "right" }}>₹0.00</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-                <div
-                  style={{
-                    padding: "12px 16px",
-                    fontSize: "0.9rem",
-                    color: "#374151",
-                    borderBottom: "1px solid #e5e7eb",
-                  }}
-                >
-                  Date: 10-05-2024 | Order ID: <strong>ZD09012545845G</strong> | Total: <strong>₹1,31,122.00</strong>
+              )}
+
+              {/* Payment Tab with Clickable Total */}
+              {activeLedgerTab === "payment" && (
+                <div>
+                  <div style={{ background: "#a21caf", color: "#fff", padding: "20px 32px", fontWeight: "700", fontSize: "1.4rem", borderRadius: "12px 12px 0 0" }}>
+                    Payment of Demand
+                  </div>
+
+                  {/* Summary Row - Click to expand */}
+                  <div
+                    onClick={() => setShowPaymentDetails(!showPaymentDetails)}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 2fr 1fr",
+                      padding: "20px 32px",
+                      background: "#f8fafc",
+                      cursor: "pointer",
+                      fontSize: "1.2rem",
+                      fontWeight: "600",
+                      transition: "background 0.2s",
+                    }}
+                  >
+                    <div>
+                      <strong>Date:</strong> 10-05-2024
+                    </div>
+                    <div>
+                      <strong>Order ID:</strong> ZD09012545845G
+                    </div>
+                    <div style={{ textAlign: "right", color: "#7c3aed", textDecoration: "underline" }}>
+                      Total: ₹1,31,122.00
+                    </div>
+                  </div>
+
+                  {/* Detailed Table - shown on click */}
+                  {showPaymentDetails && (
+                    <div style={{ padding: "32px", background: "#fff" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", background: "#fef2f2" }}>
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: "left", padding: "16px" }}>Act</th>
+                            <th style={{ textAlign: "right", padding: "16px" }}>IGST</th>
+                            <th style={{ textAlign: "right", padding: "16px" }}>CGST</th>
+                            <th style={{ textAlign: "right", padding: "16px" }}>SGST</th>
+                            <th style={{ textAlign: "right", padding: "16px" }}>CESS</th>
+                            <th style={{ textAlign: "right", padding: "16px" }}>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td style={{ padding: "16px" }}>Tax</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹65,635</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹5,825</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹5,825</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹0</td>
+                            <td style={{ padding: "16px", textAlign: "right", fontWeight: "600" }}>₹77,285</td>
+                          </tr>
+                          <tr>
+                            <td style={{ padding: "16px" }}>Interest</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹12,125</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹856</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹856</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹0</td>
+                            <td style={{ padding: "16px", textAlign: "right", fontWeight: "600" }}>₹13,837</td>
+                          </tr>
+                          <tr>
+                            <td style={{ padding: "16px" }}>Penalty</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹20,000</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹10,000</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹10,000</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹0</td>
+                            <td style={{ padding: "16px", textAlign: "right", fontWeight: "600" }}>₹40,000</td>
+                          </tr>
+                          <tr style={{ fontWeight: "700", background: "#fee2e2" }}>
+                            <td style={{ padding: "16px" }}>Total</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹97,760</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹16,681</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹16,681</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹0</td>
+                            <td style={{ padding: "16px", textAlign: "right" }}>₹1,31,122</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
-                <div style={{ padding: "16px" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", background: "#fef2f2" }}>
-                    <thead>
-                      <tr>
-                        <th style={{ textAlign: "left" }}>Act</th>
-                        <th style={{ textAlign: "right" }}>IGST</th>
-                        <th style={{ textAlign: "right" }}>CGST</th>
-                        <th style={{ textAlign: "right" }}>SGST</th>
-                        <th style={{ textAlign: "right" }}>CESS</th>
-                        <th style={{ textAlign: "right" }}>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Tax</td>
-                        <td style={{ textAlign: "right" }}>₹65,635</td>
-                        <td style={{ textAlign: "right" }}>₹5,825</td>
-                        <td style={{ textAlign: "right" }}>₹5,825</td>
-                        <td style={{ textAlign: "right" }}>₹0</td>
-                        <td style={{ textAlign: "right", fontWeight: "600" }}>₹77,285</td>
-                      </tr>
-                      <tr>
-                        <td>Interest</td>
-                        <td style={{ textAlign: "right" }}>₹12,125</td>
-                        <td style={{ textAlign: "right" }}>₹856</td>
-                        <td style={{ textAlign: "right" }}>₹856</td>
-                        <td style={{ textAlign: "right" }}>₹0</td>
-                        <td style={{ textAlign: "right", fontWeight: "600" }}>₹13,837</td>
-                      </tr>
-                      <tr>
-                        <td>Penalty</td>
-                        <td style={{ textAlign: "right" }}>₹20,000</td>
-                        <td style={{ textAlign: "right" }}>₹10,000</td>
-                        <td style={{ textAlign: "right" }}>₹10,000</td>
-                        <td style={{ textAlign: "right" }}>₹0</td>
-                        <td style={{ textAlign: "right", fontWeight: "600" }}>₹40,000</td>
-                      </tr>
-                      <tr style={{ fontWeight: "700", background: "#fee2e2" }}>
-                        <td>Total</td>
-                        <td style={{ textAlign: "right" }}>₹97,760</td>
-                        <td style={{ textAlign: "right" }}>₹16,681</td>
-                        <td style={{ textAlign: "right" }}>₹16,681</td>
-                        <td style={{ textAlign: "right" }}>₹0</td>
-                        <td style={{ textAlign: "right" }}>₹1,31,122</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div style={{ textAlign: "center", marginTop: "30px" }}>
-              <button
-                style={{
-                  background: "#f97316",
-                  color: "#fff",
-                  padding: "12px 36px",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                }}
-              >
-                PDF Download
-              </button>
-              <button
-                style={{
-                  background: "#16a34a",
-                  color: "#fff",
-                  padding: "12px 36px",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  marginLeft: "30px",
-                }}
-              >
-                Excel Download
-              </button>
+              )}
             </div>
           </div>
         </div>
       );
     }
 
+    // Client Detail (same as your code, just better spacing)
     if (activeMenu === "Client Detail") {
       return (
-        <div style={{ padding: "20px", background: "#f8fafc" }}>
+        <div style={{ padding: "24px", background: "#f8fafc" }}>
           <div style={{ marginBottom: "40px" }}>
             <div
               style={{
@@ -1733,23 +2197,12 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       );
     }
 
-    const regularGstrTabs = [
-      "gstr-1",
-      "gstr-1A",
-      "gstr 3b",
-      "IMS",
-      "cmp-08",
-      "gstr 2A",
-      "gstr 2B",
-      "gstr 2",
-    ];
-
+    const regularGstrTabs = ["gstr-1", "gstr-1A", "gstr 3b", "IMS"];
     if (regularGstrTabs.includes(activeMenu)) {
       const displayTitle = activeMenu
         .toUpperCase()
         .replace("GSTR ", "GSTR-")
-        .replace(" 3B", " 3B")
-        .replace("CMP-08", "CMP-08");
+        .replace(" 3B", " 3B");
       return <GSTRLayout title={displayTitle} />;
     }
 
@@ -1794,39 +2247,81 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
   };
 
   return (
-    <div style={modalOverlayStyle} onClick={onClose}>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.75)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 9999,
+        backdropFilter: "blur(8px)",
+      }}
+      onClick={onClose}
+    >
       <div
         style={{
-          width: "1350px",
-          maxWidth: "96%",
-          height: "85vh",
+          width: "98vw",
+          maxWidth: "1480px",
+          height: "96vh",
           background: "#ffffff",
           borderRadius: "16px",
           overflow: "hidden",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.45)",
           display: "flex",
           flexDirection: "column",
-          fontFamily: "'Segoe UI', sans-serif",
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Premium Header with All Clients Button */}
         <div
           style={{
-            background: "linear-gradient(135deg, #0d9488, #089178)",
+            background: "linear-gradient(135deg, #6d28d9, #7c3aed, #a78bfa)",
             color: "white",
-            padding: "14px 28px",
-            fontSize: "0.95rem",
-            fontWeight: "600",
+            padding: "16px 28px",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            fontSize: "1rem",
+            fontWeight: "600",
+            boxShadow: "0 4px 15px rgba(109,40,217,0.4)",
           }}
         >
-          <div>
-            GSTIN: <strong>{dynamicClient.gstin}</strong> |
-            Reg Date: <strong>{dynamicClient.registrationDate}</strong> |
-            Name: <strong>{dynamicClient.company}</strong> |
-            Status: <strong style={{ color: "#a7f3d0" }}>{dynamicClient.status}</strong>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            <button
+              onClick={onClose}
+              style={{
+                background: "rgba(255,255,255,0.25)",
+                border: "none",
+                color: "white",
+                padding: "10px 20px",
+                borderRadius: "10px",
+                fontSize: "0.98rem",
+                fontWeight: "700",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                transition: "all 0.25s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.4)";
+                e.currentTarget.style.transform = "translateX(-3px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.25)";
+                e.currentTarget.style.transform = "translateX(0)";
+              }}
+            >
+              ← All Clients
+            </button>
+            <div>
+              GSTIN: <strong>{dynamicClient.gstin}</strong> |
+              Reg Date: <strong>{dynamicClient.registrationDate}</strong> |
+              Name: <strong>{dynamicClient.company}</strong> |
+              Status: <strong style={{ color: "#a7f3d0" }}>{dynamicClient.status}</strong>
+            </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
             <span style={{ background: "#dc2626", padding: "6px 14px", borderRadius: "30px", fontWeight: "600", fontSize: "0.9rem" }}>
@@ -1840,17 +2335,18 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
             >
               Go to GST Portal →
             </a>
-            <button
-              onClick={onClose}
-              style={{ background: "none", border: "none", color: "white", fontSize: "1.6rem", cursor: "pointer" }}
-            >
-              <HiX />
-            </button>
           </div>
         </div>
-
-        <div style={{ background: "#ffffff", borderBottom: "1px solid #e2e8f0", padding: "0 16px", overflowX: "auto" }}>
-          <div style={{ display: "inline-flex", gap: "4px", padding: "10px 0" }}>
+        {/* Premium Menu Bar */}
+        <div
+          style={{
+            background: "linear-gradient(to right, #4c1d95, #6d28d9)",
+            padding: "0 20px",
+            overflowX: "auto",
+            boxShadow: "0 4px 12px rgba(109,40,217,0.3)",
+          }}
+        >
+          <div style={{ display: "inline-flex", gap: "6px", padding: "14px 0" }}>
             {menuItems.map((item) => (
               <button
                 key={item}
@@ -1864,21 +2360,23 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                 onMouseEnter={() => setHoveredMenu(item)}
                 onMouseLeave={() => setHoveredMenu(null)}
                 style={{
-                  padding: "12px 20px",
+                  padding: "12px 24px",
                   background:
                     activeMenu === item
-                      ? "#7c3aed"
+                      ? "#a78bfa"
                       : hoveredMenu === item
-                      ? "#9f7aea"
+                      ? "rgba(167,139,250,0.25)"
                       : "transparent",
-                  color: activeMenu === item || hoveredMenu === item ? "white" : "#475569",
+                  color: activeMenu === item || hoveredMenu === item ? "white" : "#e0e7ff",
                   border: "none",
                   borderRadius: "10px 10px 0 0",
-                  fontSize: "0.95rem",
-                  fontWeight: activeMenu === item ? "600" : "500",
+                  fontSize: "0.96rem",
+                  fontWeight: activeMenu === item ? "700" : "600",
                   cursor: "pointer",
-                  minWidth: "110px",
+                  minWidth: "115px",
                   transition: "all 0.3s ease",
+                  boxShadow: activeMenu === item ? "0 6px 20px rgba(167,139,250,0.5)" : "none",
+                  transform: hoveredMenu === item ? "translateY(-3px)" : "translateY(0)",
                 }}
               >
                 {item.toUpperCase().replace(/-/g, " ")}
@@ -1886,17 +2384,14 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
             ))}
           </div>
         </div>
-
-        <div style={{ flex: 1, overflowY: "auto", background: "#f8fafc" }}>
+        {/* Main Content Area */}
+        <div style={{ flex: 1, overflowY: "auto", background: "#f9fafb" }}>
           {renderContent()}
         </div>
       </div>
     </div>
   );
 };
-
-
-
 
   const PendingVouchersModal = () => (
     <div style={modalOverlayStyle} onClick={() => setShowPendingVouchersModal(false)}>
@@ -2075,7 +2570,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     </div>
   );
-
 const ClientsPage = ({
   allClients,
   clientViewMode,
@@ -2086,50 +2580,111 @@ const ClientsPage = ({
   deactivateClient,
   deleteClient,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+
   const filteredClients = allClients.filter((c) => {
-    if (clientViewMode === "active") return c.status === "active";
-    if (clientViewMode === "inactive") return c.status === "inactive";
-    return true;
+    // Status filter
+    if (clientViewMode === "active" && c.status !== "active") return false;
+    if (clientViewMode === "inactive" && c.status !== "inactive") return false;
+
+    // Search filter
+    if (!searchTerm.trim()) return true;
+
+    const term = searchTerm.toLowerCase().trim();
+    return (
+      (c.name || "").toLowerCase().includes(term) ||
+      (c.company || "").toLowerCase().includes(term) ||
+      (c.gstin || "").toLowerCase().includes(term)
+    );
   });
 
   return (
     <div style={{ padding: "20px" }}>
-      <div style={{ background: "#fff", borderRadius: "12px", padding: "30px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-          <h2 style={{ fontSize: "1.8rem", color: "#7c3aed" }}>My Clients ({allClients.length})</h2>
-          <div style={{ display: "flex", gap: "12px" }}>
+      <div
+        style={{
+          background: "#ffffff",
+          borderRadius: "12px",
+          padding: "20px",
+          boxShadow: "0 6px 24px rgba(0,0,0,0.1)",
+        }}
+      >
+        {/* Header + Search + Filters */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "16px",
+            marginBottom: "16px",
+          }}
+        >
+          <h2 style={{ fontSize: "1.75rem", color: "#7c3aed", margin: 0 }}>
+            My Clients ({allClients.length})
+          </h2>
+
+          {/* Search Box */}
+          <div style={{ minWidth: "280px", flex: "1 1 320px" }}>
+            <input
+              type="text"
+              placeholder="Search by name, company or GSTIN..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                borderRadius: "10px",
+                border: "1px solid #d1d5db",
+                fontSize: "0.98rem",
+                outline: "none",
+                boxShadow: "inset 0 1px 3px rgba(0,0,0,0.05)",
+              }}
+            />
+          </div>
+
+          {/* Filter Buttons */}
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
             <button
               onClick={() => setClientViewMode("all")}
               style={{
-                padding: "10px 20px",
-                background: clientViewMode === "all" ? "#7c3aed" : "#f0f0f0",
-                color: clientViewMode === "all" ? "white" : "#333",
+                padding: "9px 18px",
+                background: clientViewMode === "all" ? "#7c3aed" : "#f3f4f6",
+                color: clientViewMode === "all" ? "white" : "#444",
                 border: "none",
                 borderRadius: "8px",
+                fontSize: "0.92rem",
+                minWidth: "85px",
+                boxShadow: clientViewMode === "all" ? "0 3px 10px rgba(124,58,237,0.3)" : "none",
               }}
             >
               All ({allClients.length})
             </button>
+
             <button
               onClick={() => setClientViewMode("active")}
               style={{
-                padding: "10px 20px",
-                background: clientViewMode === "active" ? "#22c55e" : "#f0f0f0",
-                color: clientViewMode === "active" ? "white" : "#333",
+                padding: "9px 18px",
+                background: clientViewMode === "active" ? "#10b981" : "#f3f4f6",
+                color: clientViewMode === "active" ? "white" : "#444",
                 border: "none",
                 borderRadius: "8px",
+                fontSize: "0.92rem",
+                boxShadow: clientViewMode === "active" ? "0 3px 10px rgba(16,185,129,0.3)" : "none",
               }}
             >
               Active ({allClients.filter((c) => c.status === "active").length})
             </button>
+
             <button
               onClick={() => setClientViewMode("inactive")}
               style={{
-                padding: "10px 20px",
-                background: clientViewMode === "inactive" ? "#ef4444" : "#f0f0f0",
-                color: clientViewMode === "inactive" ? "white" : "#333",
+                padding: "9px 18px",
+                background: clientViewMode === "inactive" ? "#ef4444" : "#f3f4f6",
+                color: clientViewMode === "inactive" ? "white" : "#444",
                 border: "none",
                 borderRadius: "8px",
+                fontSize: "0.92rem",
+                boxShadow: clientViewMode === "inactive" ? "0 3px 10px rgba(239,68,68,0.3)" : "none",
               }}
             >
               Inactive ({allClients.filter((c) => c.status === "inactive").length})
@@ -2137,67 +2692,226 @@ const ClientsPage = ({
           </div>
         </div>
 
+        {/* ── Premium Colored Rows Table ──────────────────────────────── */}
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "separate",
+              borderSpacing: "0 5px",
+              fontSize: "0.95rem",
+            }}
+          >
             <thead>
-              <tr style={{ background: "#f3f4f6" }}>
-                <th style={{ padding: "15px", textAlign: "left" }}>Name</th>
-                <th style={{ padding: "15px", textAlign: "left" }}>Company</th>
-                <th style={{ padding: "15px", textAlign: "left" }}>GSTIN</th>
-                <th style={{ padding: "15px", textAlign: "left" }}>Status</th>
-                <th style={{ padding: "15px", textAlign: "left" }}>Actions</th>
-                <th style={{ padding: "15px", textAlign: "left" }}>Select</th>
+              <tr>
+                <th
+                  style={{
+                    padding: "11px 14px",
+                    textAlign: "left",
+                    background: "#0f766e", // Deep Teal
+                    color: "white",
+                    fontWeight: "600",
+                    borderTopLeftRadius: "8px",
+                  }}
+                >
+                  Name
+                </th>
+                <th
+                  style={{
+                    padding: "11px 14px",
+                    textAlign: "left",
+                    background: "#4338ca", // Rich Indigo
+                    color: "white",
+                    fontWeight: "600",
+                  }}
+                >
+                  Company
+                </th>
+                <th
+                  style={{
+                    padding: "11px 14px",
+                    textAlign: "left",
+                    background: "#6d28d9", // Elegant Purple
+                    color: "white",
+                    fontWeight: "600",
+                  }}
+                >
+                  GSTIN
+                </th>
+                <th
+                  style={{
+                    padding: "11px 14px",
+                    textAlign: "center",
+                    background: "#059669", // Premium Emerald
+                    color: "white",
+                    fontWeight: "600",
+                  }}
+                >
+                  Status
+                </th>
+                <th
+                  style={{
+                    padding: "11px 14px",
+                    textAlign: "center",
+                    background: "#d97706", // Warm Amber-Gold
+                    color: "white",
+                    fontWeight: "600",
+                  }}
+                >
+                  Actions
+                </th>
+                <th
+                  style={{
+                    padding: "11px 14px",
+                    textAlign: "center",
+                    background: "#1e40af", // Modern Slate Blue
+                    color: "white",
+                    fontWeight: "600",
+                    borderTopRightRadius: "8px",
+                  }}
+                >
+                  Select
+                </th>
               </tr>
             </thead>
             <tbody>
-              {filteredClients.map((client) => (
-                <tr key={client.id} style={{ borderBottom: "1px solid #eee" }}>
-                  <td style={{ padding: "15px" }}>{client.name}</td>
-                  <td style={{ padding: "15px" }}>{client.company}</td>
-                  <td style={{ padding: "15px" }}>{client.gstin}</td>
-                  <td style={{ padding: "15px" }}>
-                    <span
+              {filteredClients.map((client, index) => {
+                // Alternate light colors for rows (premium feel)
+                const rowColors = [
+                  "#f0fdfa", // very light teal
+                  "#f3e8ff", // very light purple
+                  "#fefce8", // very light amber
+                  "#ecfdf5", // very light emerald
+                ];
+                const bgColor = rowColors[index % rowColors.length];
+
+                return (
+                  <tr
+                    key={client.id}
+                    style={{
+                      background: bgColor,
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#e0f2fe";
+                      e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.08)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = bgColor;
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <td style={{ padding: "10px 14px", borderBottom: "1px solid #e2e8f0" }}>
+                      {client.name}
+                    </td>
+                    <td style={{ padding: "10px 14px", borderBottom: "1px solid #e2e8f0" }}>
+                      {client.company}
+                    </td>
+                    <td style={{ padding: "10px 14px", borderBottom: "1px solid #e2e8f0" }}>
+                      {client.gstin}
+                    </td>
+                    <td
                       style={{
-                        padding: "8px 16px",
-                        borderRadius: "30px",
-                        background: client.status === "active" ? "#d4edda" : "#fee2e2",
-                        color: client.status === "active" ? "#166534" : "#991b1b",
-                        fontWeight: "600",
-                        fontSize: "0.9rem",
+                        padding: "10px 14px",
+                        textAlign: "center",
+                        borderBottom: "1px solid #e2e8f0",
                       }}
                     >
-                      {client.status.toUpperCase()}
-                    </span>
-                  </td>
-                  <td style={{ padding: "15px" }}>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedClient({ ...client, showFullDashboard: false });
-                      }}
-                      style={{ background: "transparent", border: "none", color: "#7c3aed", fontWeight: "600", cursor: "pointer" }}
-                    >
-                      View Details →
-                    </button>
-                  </td>
-                  <td style={{ padding: "15px" }}>
-                    <button
-                      onClick={() => setSelectedClient({ ...client, showFullDashboard: true })}
+                      <span
+                        style={{
+                          padding: "5px 12px",
+                          borderRadius: "999px",
+                          fontSize: "0.82rem",
+                          background: client.status === "active" ? "#d1fae5" : "#fee2e2",
+                          color: client.status === "active" ? "#065f46" : "#991b1b",
+                          fontWeight: "600",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        }}
+                      >
+                        {client.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td
                       style={{
-                        background: "#7c3aed",
-                        color: "white",
-                        padding: "12px 28px",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontWeight: "600",
-                        cursor: "pointer",
+                        padding: "10px 14px",
+                        textAlign: "center",
+                        borderBottom: "1px solid #e2e8f0",
                       }}
                     >
-                      Select
-                    </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedClient({ ...client, showFullDashboard: false });
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#7c3aed",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          fontSize: "0.92rem",
+                          transition: "color 0.2s",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = "#5b21b6")}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = "#7c3aed")}
+                      >
+                        View Details →
+                      </button>
+                    </td>
+                    <td
+                      style={{
+                        padding: "10px 14px",
+                        textAlign: "center",
+                        borderBottom: "1px solid #e2e8f0",
+                      }}
+                    >
+                      <button
+                        onClick={() => setSelectedClient({ ...client, showFullDashboard: true })}
+                        style={{
+                          background: "#7c3aed",
+                          color: "white",
+                          padding: "7px 18px",
+                          border: "none",
+                          borderRadius: "8px",
+                          fontSize: "0.9rem",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          boxShadow: "0 2px 8px rgba(124,58,237,0.3)",
+                          transition: "all 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                          e.currentTarget.style.boxShadow = "0 4px 14px rgba(124,58,237,0.4)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 2px 8px rgba(124,58,237,0.3)";
+                        }}
+                      >
+                        Select
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {filteredClients.length === 0 && searchTerm.trim() && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    style={{
+                      padding: "50px 20px",
+                      textAlign: "center",
+                      color: "#6b7280",
+                      fontSize: "1.1rem",
+                      background: "#f8fafc",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    No clients found matching "<strong>{searchTerm}</strong>"
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -3942,21 +4656,16 @@ case "/user/clients":
   );
   break;
 
-  case "/user/vouchers":
-    pageContent = <VouchersPage />;
-    break;
-
+  
   case "/user/returns":
     pageContent = <GSTReturnsPage />;
     break;
 
-  case "/user/documents":
-    pageContent = <DocumentsPage />;
+  case "/user/news-updates":                         // ← Yeh add karo
+    pageContent = <NewsAndUpdates />;              // ← Tumhara naya component
     break;
 
-  case "/user/reports":
-    pageContent = <ReportsPage />;
-    break;
+  
 
   case "/user/notifications":
     pageContent = <NotificationsPage />;

@@ -48,42 +48,46 @@ export default function Login() {
     navigateToDashboard();
   };
 
-  const handleSendOtp = async () => {
-    if (!email || !email.includes("@")) {
-      alert("Please enter a valid email address.");
-      return;
-    }
+ const handleSendOtp = async () => {
+  if (!email || !email.includes("@")) {
+    alert("Please enter a valid email address.");
+    return;
+  }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(otp);
-    setLoading(true);
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  setGeneratedOtp(otp);
+  setLoading(true);
 
-    try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-      const res = await fetch("/api", {
+  try {
+    // Yeh line sabse important hai – full backend URL use karo
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+    const res = await fetch(`${API_URL}/send-otp`, {   // ← /send-otp add kiya + full URL
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp }),
     });
 
-
-      const data = await res.json();
-
-      if (data.success) {
-        setOtpSent(true);
-        setShowOtpSection(true);
-        alert("OTP sent successfully! Check your email.");
-      } else {
-        alert("Failed to send OTP. Please try again.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Server error. Make sure backend is running on port 5000.");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`);
     }
-  };
 
+    const data = await res.json();
+
+    if (data.success) {
+      setOtpSent(true);
+      setShowOtpSection(true);
+      alert("OTP sent successfully! Check your email.");
+    } else {
+      alert("Failed to send OTP: " + (data.message || "Unknown error"));
+    }
+  } catch (err) {
+    console.error("OTP Send Error:", err);
+    alert("Server error. Make sure backend is running on port 5000.");
+  } finally {
+    setLoading(false);
+  }
+};
   const handleVerifyOtp = (e) => {
     e.preventDefault();
     if (enteredOtp !== generatedOtp) {
