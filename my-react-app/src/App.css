@@ -726,3 +726,48 @@ td:last-child { text-align: right; font-weight: 600; }
   margin: auto;
   display: block;
 }
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.popup-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 900px;
+}
+
+.returns-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.returns-table th,
+.returns-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.pending {
+  background: #ffc107;
+  font-weight: bold;
+}
+
+.close-btn {
+  margin-top: 15px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
