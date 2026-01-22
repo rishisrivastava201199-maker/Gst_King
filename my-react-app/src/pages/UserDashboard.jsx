@@ -575,64 +575,88 @@ function UserDashboard() {
   { icon: <HiBell className="sidebar-icon" />, text: "Notifications", link: "/user/notifications" },
 ];
 
-
-
-
-// ──────────────────────────────────────────────
 const GSTReturnPeriodSelection = ({
   selectedFY, setSelectedFY,
   selectedQuarter, setSelectedQuarter,
   selectedPeriod, setSelectedPeriod,
   onSearch
 }) => (
-  <div style={{
-    padding: "40px 5%",
-    background: "linear-gradient(135deg, #f0f5ff 0%, #e0e7ff 100%)",
-    minHeight: "100vh",
-    fontFamily: "system-ui, sans-serif"
-  }}>
-    <div style={{
-      maxWidth: "940px",
-      margin: "0 auto",
-      background: "white",
-      borderRadius: "20px",
-      overflow: "hidden",
-      boxShadow: "0 20px 60px rgba(0,0,0,0.12)"
-    }}>
-      {/* Header */}
-      <div style={{
-        background: "linear-gradient(90deg, #1e40af, #3b82f6)",
-        color: "white",
-        padding: "28px 40px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center"
-      }}>
-        <h1 style={{ margin: 0, fontSize: "1.95rem", fontWeight: 700 }}>
+  <div
+    style={{
+      padding: "24px 5%",
+      background: "linear-gradient(180deg,#f8fafc,#ffffff)",
+      minHeight: "100vh",
+      fontFamily: "system-ui, sans-serif"
+    }}
+  >
+    <div
+      style={{
+        maxWidth: "820px",
+        margin: "0 auto",
+        background: "#ffffff",
+        borderRadius: "16px",
+        overflow: "hidden",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
+        border: "1px solid #e5e7eb"
+      }}
+    >
+      {/* ───── Header ───── */}
+      <div
+        style={{
+          background: "linear-gradient(135deg,#eef2ff,#f8fafc)",
+          padding: "14px 22px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderBottom: "1px solid #e5e7eb"
+        }}
+      >
+        <h1
+          style={{
+            margin: 0,
+            fontSize: "1.25rem",
+            fontWeight: 700,
+            color: "#0f172a"
+          }}
+        >
           File GST Returns
         </h1>
-        <div style={{ fontSize: "1rem", opacity: 0.9, fontWeight: 500 }}>
+
+        <span
+          style={{
+            fontSize: "0.8rem",
+            fontWeight: 600,
+            color: "#334155",
+            background: "#e0f2fe",
+            padding: "4px 10px",
+            borderRadius: "999px"
+          }}
+        >
           GSTIN: 09ACNPU2195H1ZY
-        </div>
+        </span>
       </div>
 
-      {/* Form Area */}
-      <div style={{ padding: "40px 50px" }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "28px",
-          marginBottom: "48px"
-        }}>
+      {/* ───── Form Area ───── */}
+      <div style={{ padding: "22px 28px" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: "18px",
+            marginBottom: "26px"
+          }}
+        >
           {/* Financial Year */}
           <div>
-            <label style={{
-              display: "block",
-              marginBottom: "10px",
-              fontWeight: 600,
-              color: "#1e293b",
-              fontSize: "1.05rem"
-            }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontWeight: 600,
+                color: "#1e293b",
+                fontSize: "0.85rem"
+              }}
+            >
               Financial Year <span style={{ color: "#ef4444" }}>*</span>
             </label>
             <select
@@ -640,13 +664,13 @@ const GSTReturnPeriodSelection = ({
               onChange={e => setSelectedFY(e.target.value)}
               style={{
                 width: "100%",
-                padding: "14px 18px",
+                padding: "10px 14px",
+                borderRadius: "10px",
                 border: "1px solid #cbd5e1",
-                borderRadius: "12px",
-                fontSize: "1.05rem",
-                background: "#f9fafb",
+                background: "#f8fafc",
+                fontSize: "0.9rem",
                 outline: "none",
-                boxShadow: "inset 0 1px 3px rgba(0,0,0,0.05)"
+                boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)"
               }}
             >
               <option>2025-26</option>
@@ -657,13 +681,15 @@ const GSTReturnPeriodSelection = ({
 
           {/* Quarter */}
           <div>
-            <label style={{
-              display: "block",
-              marginBottom: "10px",
-              fontWeight: 600,
-              color: "#1e293b",
-              fontSize: "1.05rem"
-            }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontWeight: 600,
+                color: "#1e293b",
+                fontSize: "0.85rem"
+              }}
+            >
               Quarter <span style={{ color: "#ef4444" }}>*</span>
             </label>
             <select
@@ -671,16 +697,12 @@ const GSTReturnPeriodSelection = ({
               onChange={e => setSelectedQuarter(e.target.value)}
               style={{
                 width: "100%",
-                padding: "14px 18px",
+                padding: "10px 14px",
+                borderRadius: "10px",
                 border: "1px solid #cbd5e1",
-                borderRadius: "12px",
-                fontSize: "1.05rem",
-                background: "#f9fafb",
-                outline: "none",
-                appearance: "none",
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%233b82f6' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "right 16px center"
+                background: "#f8fafc",
+                fontSize: "0.9rem",
+                outline: "none"
               }}
             >
               <option>Quarter 4 (Jan - Mar)</option>
@@ -692,13 +714,15 @@ const GSTReturnPeriodSelection = ({
 
           {/* Period */}
           <div>
-            <label style={{
-              display: "block",
-              marginBottom: "10px",
-              fontWeight: 600,
-              color: "#1e293b",
-              fontSize: "1.05rem"
-            }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontWeight: 600,
+                color: "#1e293b",
+                fontSize: "0.85rem"
+              }}
+            >
               Period <span style={{ color: "#ef4444" }}>*</span>
             </label>
             <select
@@ -706,76 +730,70 @@ const GSTReturnPeriodSelection = ({
               onChange={e => setSelectedPeriod(e.target.value)}
               style={{
                 width: "100%",
-                padding: "14px 18px",
+                padding: "10px 14px",
+                borderRadius: "10px",
                 border: "1px solid #cbd5e1",
-                borderRadius: "12px",
-                fontSize: "1.05rem",
-                background: "#f9fafb",
-                outline: "none",
-                appearance: "none",
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%233b82f6' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "right 16px center"
+                background: "#f8fafc",
+                fontSize: "0.9rem",
+                outline: "none"
               }}
             >
-              <option>January</option>
-              <option>February</option>
-              <option>March</option>
-              <option>April</option>
-              <option>May</option>
-              <option>June</option>
-              <option>July</option>
-              <option>August</option>
-              <option>September</option>
-              <option>October</option>
-              <option>November</option>
-              <option>December</option>
+              {[
+                "January","February","March","April","May","June",
+                "July","August","September","October","November","December"
+              ].map(m => (
+                <option key={m}>{m}</option>
+              ))}
             </select>
           </div>
         </div>
 
-        {/* Note + SEARCH Button */}
-        <div style={{ textAlign: "center" }}>
-          <p style={{
-            color: "#4b5563",
-            fontStyle: "italic",
-            marginBottom: "28px",
-            fontSize: "0.98rem",
-            background: "#e0f2fe",
-            padding: "14px 24px",
-            borderRadius: "12px",
-            borderLeft: "5px solid #3b82f6",
-            maxWidth: "680px",
-            marginLeft: "auto",
-            marginRight: "auto"
-          }}>
-            You have selected to file the return on monthly frequency, GSTR-1 and GSTR-3B shall be required to be filed for each month of the quarter.
-          </p>
+        {/* ───── Note ───── */}
+        <div
+          style={{
+            background: "#eff6ff",
+            borderLeft: "4px solid #3b82f6",
+            padding: "10px 14px",
+            borderRadius: "10px",
+            fontSize: "0.8rem",
+            color: "#334155",
+            marginBottom: "22px",
+            maxWidth: "520px",
+            marginInline: "auto"
+          }}
+        >
+          You have selected to file the return on monthly frequency.  
+          GSTR-1 and GSTR-3B are required for each month of the quarter.
+        </div>
 
+        {/* ───── Search Button ───── */}
+        <div style={{ textAlign: "center" }}>
           <button
             onClick={onSearch}
             style={{
-              background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+              background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
               color: "white",
-              padding: "16px 72px",
-              fontSize: "1.18rem",
+              padding: "12px 56px",
+              fontSize: "1rem",
               fontWeight: 700,
               border: "none",
-              borderRadius: "14px",
+              borderRadius: "999px",
               cursor: "pointer",
-              boxShadow: "0 10px 30px rgba(59,130,246,0.4)",
-              transition: "all 0.25s ease"
+              boxShadow: "0 12px 30px rgba(37,99,235,0.45)",
+              transition: "all 0.2s ease"
             }}
             onMouseOver={e => {
-              e.currentTarget.style.transform = "translateY(-3px)";
-              e.currentTarget.style.boxShadow = "0 16px 40px rgba(59,130,246,0.5)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow =
+                "0 18px 40px rgba(37,99,235,0.6)";
             }}
             onMouseOut={e => {
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 10px 30px rgba(59,130,246,0.4)";
+              e.currentTarget.style.boxShadow =
+                "0 12px 30px rgba(37,99,235,0.45)";
             }}
           >
-            SEARCH
+            SEARCH RETURNS
           </button>
         </div>
       </div>
@@ -784,116 +802,478 @@ const GSTReturnPeriodSelection = ({
 );
 
 // ──────────────────────────────────────────────
-// Returns Summary Screen
-// ──────────────────────────────────────────────
 const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => (
-  <div style={{
-    padding: "40px 5%",
-    background: "linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)",
-    minHeight: "100vh",
-    fontFamily: "system-ui, sans-serif"
-  }}>
-    <div style={{ maxWidth: "1300px", margin: "0 auto" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px", flexWrap: "wrap", gap: "16px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <button onClick={onBack} style={{ background: "#e5e7eb", border: "none", padding: "12px", borderRadius: "50%", cursor: "pointer" }}>
-            <HiArrowLeft size={24} color="#4b5563" />
+  <div
+    style={{
+      padding: "20px 5% 32px",
+      background: "linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%)",
+      minHeight: "100vh",
+      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    }}
+  >
+    <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+          flexWrap: "wrap",
+          gap: "12px"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <button
+            onClick={onBack}
+            style={{
+              background: "white",
+              border: "1px solid #cbd5e1",
+              width: "44px",
+              height: "44px",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              fontSize: "1.1rem",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+            }}
+          >
+            ←
           </button>
-          <h1 style={{ margin: 0, fontSize: "2.1rem", fontWeight: 700, color: "#1e293b" }}>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "1.75rem",
+              fontWeight: 700,
+              color: "#0f172a"
+            }}
+          >
             Returns Dashboard
           </h1>
         </div>
-        <div style={{ background: "#dbeafe", padding: "10px 20px", borderRadius: "12px", fontWeight: 600, color: "#1e40af" }}>
-          {period} {fy} • {quarter}
+
+        <div
+          style={{
+            background: "#eff6ff",
+            padding: "8px 16px",
+            borderRadius: "9999px",
+            fontSize: "0.95rem",
+            fontWeight: 600,
+            color: "#1d4ed8",
+            border: "1px solid #bfdbfe",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
+          }}
+        >
+          FY {fy} · {quarter}
         </div>
       </div>
 
-      <div style={{ background: "#e0f2fe", borderLeft: "6px solid #3b82f6", padding: "16px 24px", borderRadius: "12px", marginBottom: "40px", color: "#1e40af", fontWeight: 500, fontSize: "1.05rem" }}>
-        <strong>Note:</strong> You have selected to file the return on monthly frequency. GSTR-1 and GSTR-3B shall be required to be filed for each month of the quarter.
+      {/* Note */}
+      <div
+        style={{
+          background: "white",
+          borderLeft: "4px solid #3b82f6",
+          padding: "12px 16px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          fontSize: "0.95rem",
+          color: "#1e40af",
+          fontWeight: 500
+        }}
+      >
+        Monthly filing enabled. GSTR-1 & GSTR-3B required every month.
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: "28px" }}>
+      {/* Cards Grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: "20px"
+        }}
+      >
         {/* GSTR-1 */}
-        <div style={{ background: "white", borderRadius: "16px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}>
-          <div style={{ background: "#1e40af", color: "white", padding: "20px 28px", fontSize: "1.25rem", fontWeight: 700 }}>
-            Details of outward supplies of goods or services
+        <div
+          style={{
+            background: "white",
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "260px"
+          }}
+        >
+          <div
+            style={{
+              padding: "14px 20px",
+              background: "linear-gradient(90deg, #eff6ff, #dbeafe)",
+              color: "#1d4ed8",
+              fontSize: "1.1rem",
+              fontWeight: 700,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "10px"
+            }}
+          >
+            <span>GSTR-1 · Outward Supplies</span>
+            <span
+              style={{
+                background: "#ecfdf5",
+                color: "#065f46",
+                padding: "5px 14px",
+                borderRadius: "9999px",
+                fontSize: "0.85rem",
+                fontWeight: 600
+              }}
+            >
+              Filed
+            </span>
           </div>
-          <div style={{ padding: "28px" }}>
-            <div style={{ background: "#ecfdf5", color: "#065f46", padding: "12px 20px", borderRadius: "10px", fontWeight: 600, marginBottom: "24px", textAlign: "center" }}>
-              Status: Filed
-            </div>
-            <div style={{ display: "flex", gap: "16px" }}>
-              <button onClick={() => onViewForm("GSTR1")} style={{ flex: 1, padding: "14px", background: "#e5e7eb", border: "none", borderRadius: "10px", fontWeight: 600, cursor: "pointer" }}>
-                VIEW
+          <div
+            style={{
+              padding: "16px 20px",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}
+          >
+            <p
+              style={{
+                fontSize: "0.92rem",
+                color: "#475569",
+                lineHeight: "1.45",
+                margin: 0
+              }}
+            >
+              Summary of outward taxable supplies reported for the selected period.
+            </p>
+
+            <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+              <button
+                onClick={() => onViewForm("GSTR1")}
+                style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "#f1f5f9",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}
+              >
+                View
               </button>
-              <button style={{ flex: 1, padding: "14px", background: "#10b981", color: "white", border: "none", borderRadius: "10px", fontWeight: 600, cursor: "pointer" }}>
-                DOWNLOAD
+              <button
+                style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}
+              >
+                Download
               </button>
             </div>
           </div>
         </div>
 
-        {/* GSTR-1A */}
-        <div style={{ background: "white", borderRadius: "16px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}>
-          <div style={{ background: "#1e40af", color: "white", padding: "20px 28px", fontSize: "1.25rem", fontWeight: 700 }}>
-            Amendment of outward supplies of goods or services for current tax period
+        {/* Amendments */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "260px"
+          }}
+        >
+          <div
+            style={{
+              padding: "14px 20px",
+              background: "linear-gradient(90deg, #fffbeb, #fef3c7)",
+              color: "#92400e",
+              fontSize: "1.1rem",
+              fontWeight: 700,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "10px"
+            }}
+          >
+            <span>Amendments</span>
+            <span
+              style={{
+                background: "#fefce8",
+                color: "#854d0e",
+                padding: "5px 14px",
+                borderRadius: "9999px",
+                fontSize: "0.85rem",
+                fontWeight: 600
+              }}
+            >
+              Open
+            </span>
           </div>
-          <div style={{ padding: "80px 28px", textAlign: "center" }}>
-            <button style={{ background: "#3b82f6", color: "white", padding: "16px 48px", border: "none", borderRadius: "12px", fontSize: "1.15rem", fontWeight: 700, cursor: "pointer" }}>
-              PREPARE ONLINE
+          <div
+            style={{
+              padding: "16px 20px",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}
+          >
+            <p
+              style={{
+                fontSize: "0.92rem",
+                color: "#475569",
+                lineHeight: "1.45",
+                margin: 0
+              }}
+            >
+              Update invoices, debit notes, or credit notes for the current tax period.
+            </p>
+
+            <button
+              style={{
+                width: "100%",
+                padding: "10px 0",
+                marginTop: "20px",
+                background: "linear-gradient(90deg, #f59e0b, #d97706)",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: 600,
+                fontSize: "0.92rem",
+                cursor: "pointer"
+              }}
+            >
+              Prepare Online
             </button>
           </div>
         </div>
 
-        {/* GSTR-2B */}
-        <div style={{ background: "white", borderRadius: "16px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}>
-          <div style={{ background: "#1e40af", color: "white", padding: "20px 28px", fontSize: "1.25rem", fontWeight: 700 }}>
-            Auto - drafted ITC Statement for the month
+        {/* Auto-Drafted ITC */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "260px"
+          }}
+        >
+          <div
+            style={{
+              padding: "14px 20px",
+              background: "linear-gradient(90deg, #f0fdfa, #ccfbf1)",
+              color: "#0f766e",
+              fontSize: "1.1rem",
+              fontWeight: 700,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "10px"
+            }}
+          >
+            <span>Auto-Drafted ITC</span>
+            <span
+              style={{
+                background: "#f0fdfa",
+                color: "#0f766e",
+                padding: "5px 14px",
+                borderRadius: "9999px",
+                fontSize: "0.85rem",
+                fontWeight: 600
+              }}
+            >
+              Available
+            </span>
           </div>
-          <div style={{ padding: "28px" }}>
-            <div style={{ display: "flex", gap: "16px" }}>
-              <button onClick={() => onViewForm("GSTR2B")} style={{ flex: 1, padding: "14px", background: "#e5e7eb", border: "none", borderRadius: "10px", fontWeight: 600, cursor: "pointer" }}>
-                VIEW
+          <div
+            style={{
+              padding: "16px 20px",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}
+          >
+            <p
+              style={{
+                fontSize: "0.92rem",
+                color: "#475569",
+                lineHeight: "1.45",
+                margin: 0
+              }}
+            >
+              ITC statement auto-generated based on supplier filings.
+            </p>
+
+            <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+              <button
+                onClick={() => onViewForm("AutoDraftedITC")}
+                style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "#f1f5f9",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}
+              >
+                View
               </button>
-              <button style={{ flex: 1, padding: "14px", background: "#10b981", color: "white", border: "none", borderRadius: "10px", fontWeight: 600, cursor: "pointer" }}>
-                DOWNLOAD
+              <button
+                style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}
+              >
+                Download
               </button>
             </div>
           </div>
         </div>
 
         {/* GSTR-3B */}
-        <div style={{ background: "white", borderRadius: "16px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}>
-          <div style={{ background: "#1e40af", color: "white", padding: "20px 28px", fontSize: "1.25rem", fontWeight: 700 }}>
-            Monthly Return
+        <div
+          style={{
+            background: "white",
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 6px 24px rgba(153,27,27,0.18)",
+            border: "1px solid #fecaca",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "260px"
+          }}
+        >
+          <div
+            style={{
+              padding: "14px 20px",
+              background: "linear-gradient(90deg, #fef2f2, #fee2e2)",
+              color: "#991b1b",
+              fontSize: "1.1rem",
+              fontWeight: 700,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "10px"
+            }}
+          >
+            <span>GSTR-3B · Monthly Return</span>
+            <span
+              style={{
+                background: "#fef2f2",
+                color: "#991b1b",
+                padding: "5px 14px",
+                borderRadius: "9999px",
+                fontSize: "0.85rem",
+                fontWeight: 600
+              }}
+            >
+              Pending
+            </span>
           </div>
-          <div style={{ padding: "28px" }}>
-            <div style={{ color: "#b45309", fontWeight: 600, marginBottom: "20px", textAlign: "center", background: "#fef3c7", padding: "12px", borderRadius: "10px" }}>
-              Due Date - 20/01/2026
-            </div>
-            <div style={{ display: "flex", gap: "16px" }}>
-              <button style={{ flex: 1, padding: "14px", background: "#3b82f6", color: "white", border: "none", borderRadius: "10px", fontWeight: 700, cursor: "pointer" }}>
-                PREPARE ONLINE
-              </button>
-              <button style={{ flex: 1, padding: "14px", background: "#e5e7eb", border: "none", borderRadius: "10px", fontWeight: 600, cursor: "pointer" }}>
-                PREPARE OFFLINE
-              </button>
-            </div>
-          </div>
-        </div>
+          <div
+            style={{
+              padding: "16px 20px",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  background: "#fefce8",
+                  color: "#854d0e",
+                  padding: "8px 12px",
+                  borderRadius: "8px",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  textAlign: "center",
+                  marginBottom: "16px"
+                }}
+              >
+                Due date: 20 Jan 2026
+              </div>
 
-        {/* GSTR-2A */}
-        <div style={{ background: "white", borderRadius: "16px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}>
-          <div style={{ background: "#1e40af", color: "white", padding: "20px 28px", fontSize: "1.25rem", fontWeight: 700 }}>
-            Auto Drafted details (For view only)
-          </div>
-          <div style={{ padding: "28px" }}>
-            <div style={{ display: "flex", gap: "16px" }}>
-              <button onClick={() => onViewForm("GSTR2A")} style={{ flex: 1, padding: "14px", background: "#e5e7eb", border: "none", borderRadius: "10px", fontWeight: 600, cursor: "pointer" }}>
-                VIEW
+              <p
+                style={{
+                  fontSize: "0.92rem",
+                  color: "#475569",
+                  lineHeight: "1.45",
+                  margin: 0
+                }}
+              >
+                Summary of monthly return including liability, ITC and payment details.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+              <button
+                style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}
+              >
+                Prepare Online
               </button>
-              <button style={{ flex: 1, padding: "14px", background: "#10b981", color: "white", border: "none", borderRadius: "10px", fontWeight: 600, cursor: "pointer" }}>
-                DOWNLOAD
+              <button
+                style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "#f1f5f9",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}
+              >
+                Prepare Offline
               </button>
             </div>
           </div>
@@ -903,12 +1283,12 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => (
   </div>
 );
 
+
+
 // ──────────────────────────────────────────────
 // Detailed GST View (fixed modal)
-// ──────────────────────────────────────────────
 const DetailedGSTView = ({ formType, fy, period, onBack }) => {
   const [selectedSection, setSelectedSection] = useState(null);
-
   const sections = [
     { title: "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices", count: 1 },
     { title: "5 - B2C (Large) Invoices", count: 0 },
@@ -924,60 +1304,56 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
     { title: "14 - Supplies made through ECO", count: 0 },
     { title: "15 - Supplies U/s 9(5)", count: 0 }
   ];
-
   const handleCardClick = (section) => {
     if (section.count > 0) {
       setSelectedSection(section);
     }
   };
-
   return (
     <div style={{
-      padding: "32px 5% 60px",
-      background: "#f8fafc",
+      padding: "20px 5% 40px",
+      background: "#ffffff",
       minHeight: "100vh",
       fontFamily: "system-ui, sans-serif"
     }}>
-      <div style={{ maxWidth: "1480px", margin: "0 auto" }}>
-
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         {/* Back button */}
         <button
           onClick={onBack}
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: "10px",
-            background: "white",
+            gap: "8px",
+            background: "#ffffff",
             border: "1px solid #d1d5db",
-            color: "#2563eb",
-            fontSize: "1.1rem",
+            color: "#070707ff",
+            fontSize: "1rem",
             fontWeight: 600,
-            padding: "10px 20px",
-            borderRadius: "12px",
+            padding: "8px 16px",
+            borderRadius: "8px",
             cursor: "pointer",
-            marginBottom: "32px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-            transition: "all 0.2s ease"
+            marginBottom: "24px",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+            transition: "all 0.15s ease"
           }}
           onMouseOver={e => {
-            e.currentTarget.style.boxShadow = "0 4px 16px rgba(37,99,235,0.2)";
+            e.currentTarget.style.boxShadow = "0 2px 8px rgba(37,99,235,0.15)";
             e.currentTarget.style.borderColor = "#3b82f6";
           }}
           onMouseOut={e => {
-            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
+            e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)";
             e.currentTarget.style.borderColor = "#d1d5db";
           }}
         >
-          <HiArrowLeft size={22} /> Back to Returns Dashboard
+          <HiArrowLeft size={18} /> Back to Returns Dashboard
         </button>
-
         {/* Main info card */}
         <div style={{
-          background: "white",
-          borderRadius: "16px",
-          boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
-          padding: "28px 36px",
-          marginBottom: "32px",
+          background: "#ffffff",
+          borderRadius: "12px",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+          padding: "20px 24px",
+          marginBottom: "24px",
           border: "1px solid #e5e7eb"
         }}>
           <div style={{
@@ -985,83 +1361,119 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
             justifyContent: "space-between",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: "20px",
-            marginBottom: "24px"
+            gap: "16px",
+            marginBottom: "16px"
           }}>
-            <h1 style={{ margin: 0, fontSize: "1.9rem", fontWeight: 700, color: "#1d4ed8" }}>
+            <h1 style={{ margin: 0, fontSize: "1.6rem", fontWeight: 700, color: "#1d4ed8" }}>
               {formType}
             </h1>
-            <div style={{ display: "flex", gap: "12px" }}>
-              <button style={{ background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe", padding: "10px 18px", borderRadius: "10px", fontWeight: 600, cursor: "pointer" }}>
-                E-INVOICE ADVISORY
-              </button>
-              <button style={{ background: "#f3f4f6", color: "#4b5563", border: "1px solid #d1d5db", padding: "10px 18px", borderRadius: "10px", fontWeight: 600, cursor: "pointer" }}>
-                HELP
-              </button>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button
+  style={{
+    background: "#eff6ff",
+    color: "#1d4ed8",
+    border: "1px solid #bfdbfe",
+    padding: "8px 14px",
+    borderRadius: "8px",
+    fontWeight: 600,
+    cursor: "pointer",
+    boxShadow: "0 2px 6px rgba(37,99,235,0.25)"
+  }}
+>
+  E-INVOICE ADVISORY
+</button>
+
+              <button
+  style={{
+    background: "#1076f2ff",
+    color: "#e8edf4ff",
+    border: "1px solid #d1d5db",
+    padding: "8px 14px",
+    borderRadius: "8px",
+    fontWeight: 600,
+    cursor: "pointer",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.12)"
+  }}
+>
+  HELP
+</button>
+
             </div>
           </div>
-
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: "16px 24px",
-            fontSize: "1.02rem"
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "12px 18px",
+            fontSize: "0.95rem"
           }}>
             <div><strong>GSTIN:</strong> 09ACNPU2195H1ZY</div>
             <div><strong>Legal Name:</strong> Mohd Umair</div>
             <div><strong>Trade Name:</strong> U.A.F ENTERPRISE'S</div>
             <div><strong>Financial Year:</strong> {fy}</div>
             <div><strong>Tax Period:</strong> {period}</div>
-            <div><strong>Status:</strong> <span style={{ color: "#059669", fontWeight: 600 }}>Filed</span></div>
+            <div>
+  <strong>Status:</strong>
+  <span
+    style={{
+      color: "#059669",
+      fontWeight: 400,
+      padding: "1px 4px",
+      borderRadius: "4px",
+      background: "#ecfdf5",
+      boxShadow: " 2px 4px rgba(5,150,105,0.35)"
+    }}
+  >
+    Filed
+  </span>
+</div>
+
             <div><strong>Due Date:</strong> 11/02/2026</div>
           </div>
         </div>
-
         {/* Nil filing */}
         <div style={{
-          background: "white",
-          borderRadius: "16px",
-          padding: "20px 28px",
-          marginBottom: "32px",
-          boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
+          background: "#ffffff",
+          borderRadius: "12px",
+          padding: "14px 20px",
+          marginBottom: "24px",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
           border: "1px solid #e5e7eb",
           display: "flex",
           alignItems: "center",
-          gap: "14px"
+          gap: "10px"
         }}>
-          <input type="checkbox" style={{ width: "20px", height: "20px", accentColor: "#3b82f6" }} />
-          <span style={{ fontSize: "1.12rem", fontWeight: 600, color: "#1e293b" }}>
+          <input type="checkbox" style={{ width: "16px", height: "16px", accentColor: "#3b82f6" }} />
+          <span style={{ fontSize: "1rem", fontWeight: 600, color: "#1e293b" }}>
             File Nil {formType}
           </span>
         </div>
-
         {/* ADD RECORD DETAILS */}
         <div style={{
-          background: "white",
-          borderRadius: "16px",
+          background: "#ffffff",
+          borderRadius: "12px",
           overflow: "hidden",
-          boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
           border: "1px solid #e5e7eb"
         }}>
           <div style={{
-            background: "linear-gradient(90deg, #1e40af, #3b82f6)",
-            color: "white",
-            padding: "20px 32px",
-            fontSize: "1.32rem",
+            background: "#ffffff",
+            color: "#1e40af",
+            padding: "14px 24px",
+            fontSize: "1.2rem",
             fontWeight: 700,
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center"
+            alignItems: "center",
+            borderBottom: "1px solid #e5e7eb"
           }}>
             <span>ADD RECORD DETAILS</span>
-            <span style={{ fontSize: "1.5rem", cursor: "pointer" }}>▼</span>
+            <span style={{ fontSize: "1.3rem", cursor: "pointer" }}>▼</span>
           </div>
-
           <div style={{
-            padding: "32px",
+            padding: "24px",
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: "24px"
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: "16px"
           }}>
             {sections.map((item, index) => (
               <div
@@ -1070,15 +1482,15 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
                 style={{
                   background: "#f8fafc",
                   border: item.count > 0 ? "1px solid #86efac" : "1px solid #e5e7eb",
-                  borderRadius: "14px",
+                  borderRadius: "10px",
                   overflow: "hidden",
                   cursor: item.count > 0 ? "pointer" : "default",
                   transition: "transform 0.15s ease, box-shadow 0.15s ease"
                 }}
                 onMouseEnter={e => {
                   if (item.count > 0) {
-                    e.currentTarget.style.transform = "translateY(-4px)";
-                    e.currentTarget.style.boxShadow = "0 12px 28px rgba(0,0,0,0.12)";
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.1)";
                   }
                 }}
                 onMouseLeave={e => {
@@ -1086,239 +1498,329 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                <div style={{
-                  background: "#1e40af",
-                  color: "white",
-                  padding: "14px 16px",
-                  fontWeight: 600,
-                  fontSize: "1.05rem",
-                  minHeight: "80px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center"
-                }}>
-                  {item.title}
-                </div>
+<div
+  style={{
+    background: "linear-gradient(135deg, #e0f2fe, #f8fafc)",
+    color: "#0f172a",
+    padding: "12px 14px",
+    fontWeight: 600,
+    fontSize: "0.85rem",
+    minHeight: "60px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    borderBottom: "1px solid #e5e7eb",
+    letterSpacing: "0.2px"
+  }}
+>
+  {item.title}
+</div>
 
-                <div style={{
-                  padding: "28px 20px",
-                  fontSize: "3rem",
-                  fontWeight: 700,
-                  color: item.count > 0 ? "#16a34a" : "#9ca3af",
-                  textAlign: "center"
-                }}>
-                  ✓ {item.count}
-                </div>
+
+               <div style={{ padding: "18px", textAlign: "center" }}>
+  <span
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "36px",
+      height: "36px",
+      borderRadius: "50%",
+      background: item.count > 0 ? "#ecfdf5" : "#f3f4f6",
+      color: item.count > 0 ? "#16a34a" : "#9ca3af",
+      fontSize: "0.9rem",           // chhota text
+      fontWeight: 600,
+     background:
+  item.count > 0
+    ? "linear-gradient(135deg, #dcfce7, #f0fdf4)"
+    : "linear-gradient(135deg, #e0f2fe, #f8fafc)",
+
+    }}
+  >
+    {item.count}
+  </span>
+</div>
+
               </div>
             ))}
           </div>
         </div>
-
         {/* FIXED MODAL - Ab click pe khulega */}
-        {selectedSection && (
+      {selectedSection && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.55)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+      padding: "16px"
+    }}
+    onClick={() => setSelectedSection(null)}
+  >
+    <div
+      style={{
+        background: "#ffffff",
+        borderRadius: "14px",
+        width: "100%",
+        maxWidth: "880px",
+        maxHeight: "80vh",
+        overflowY: "auto",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.28)"
+      }}
+      onClick={e => e.stopPropagation()}
+    >
+      {/* ───── Header ───── */}
+      <div
+        style={{
+          padding: "10px 18px",
+          borderBottom: "1px solid #e5e7eb",
+          background: "linear-gradient(135deg,#f8fafc,#eef2ff)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <h2
+          style={{
+            margin: 0,
+            fontSize: "1rem",
+            fontWeight: 600,
+            color: "#0f172a"
+          }}
+        >
+          {selectedSection.title}
+        </h2>
+
+        <button
+          onClick={() => setSelectedSection(null)}
+          style={{
+            background: "#ffffff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "8px",
+            width: "32px",
+            height: "32px",
+            fontSize: "1.2rem",
+            color: "#475569",
+            cursor: "pointer",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.12)"
+          }}
+        >
+          <HiX />
+        </button>
+      </div>
+
+      {/* ───── Compact Info Grid ───── */}
+      <div
+        style={{
+          padding: "10px 18px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+          gap: "6px 14px",
+          fontSize: "0.8rem",
+          color: "#334155",
+          background: "#f8fafc",
+          borderBottom: "1px solid #e5e7eb"
+        }}
+      >
+        <div><strong>GSTIN:</strong> 09ACNPU2195H1ZY</div>
+        <div><strong>Legal:</strong> Mohd Umair</div>
+        <div><strong>Trade:</strong> U.A.F ENTERPRISE'S</div>
+        <div><strong>FY:</strong> {fy}</div>
+        <div><strong>Period:</strong> {period}</div>
+        <div>
+          <strong>Status:</strong>{" "}
+          <span
+            style={{
+              background: "#ecfdf5",
+              color: "#16a34a",
+              padding: "2px 6px",
+              borderRadius: "6px",
+              fontWeight: 600
+            }}
+          >
+            Filed
+          </span>
+        </div>
+      </div>
+
+      {/* ───── Teal Strip ───── */}
+      <div
+        style={{
+          background: "#0f766e",
+          color: "white",
+          padding: "8px 18px",
+          fontSize: "0.9rem",
+          fontWeight: 600,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <span>Recipient wise count</span>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <button
+            style={{
+              background: "rgba(255,255,255,0.25)",
+              border: "none",
+              color: "white",
+              padding: "3px 8px",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "0.75rem"
+            }}
+          >
+            HELP ?
+          </button>
+          <button
+            style={{
+              background: "rgba(255,255,255,0.25)",
+              border: "none",
+              color: "white",
+              padding: "3px 8px",
+              borderRadius: "6px",
+              cursor: "pointer"
+            }}
+          >
+            ↻
+          </button>
+        </div>
+      </div>
+
+      {/* ───── Action Buttons ───── */}
+      <div
+        style={{
+          padding: "10px 18px",
+          display: "flex",
+          justifyContent: "space-between",
+          borderBottom: "1px solid #e5e7eb",
+          background: "#ffffff"
+        }}
+      >
+        <button
+          style={{
+            background: "#f1f5f9",
+            border: "1px solid #e5e7eb",
+            padding: "7px 16px",
+            borderRadius: "8px",
+            fontWeight: 600,
+            cursor: "pointer",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.12)"
+          }}
+        >
+          ADD RECORD
+        </button>
+
+        <button
+          style={{
+            background: "linear-gradient(135deg,#3b82f6,#2563eb)",
+            color: "white",
+            border: "none",
+            padding: "7px 16px",
+            borderRadius: "8px",
+            fontWeight: 600,
+            cursor: "pointer",
+            boxShadow: "0 4px 14px rgba(37,99,235,0.45)"
+          }}
+        >
+          IMPORT EWB DATA
+        </button>
+      </div>
+
+      {/* ───── Table ───── */}
+      <div style={{ padding: "14px 18px" }}>
+        <h3 style={{ margin: "0 0 8px", fontSize: "0.9rem", fontWeight: 600 }}>
+          Record Details
+        </h3>
+
+        <div
+          style={{
+            border: "1px solid #e5e7eb",
+            borderRadius: "8px",
+            overflow: "hidden"
+          }}
+        >
           <div
             style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.6)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-              padding: "20px"
+              background: "#f1f5f9",
+              padding: "6px 12px",
+              fontWeight: 600,
+              display: "grid",
+              gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.6fr",
+              gap: "8px",
+              fontSize: "0.75rem"
             }}
-            onClick={() => setSelectedSection(null)}
           >
-            <div
-              style={{
-                background: "white",
-                borderRadius: "16px",
-                width: "100%",
-                maxWidth: "1100px",
-                maxHeight: "90vh",
-                overflowY: "auto",
-                boxShadow: "0 20px 60px rgba(0,0,0,0.3)"
-              }}
-              onClick={e => e.stopPropagation()}
-            >
-              {/* Modal Header */}
-              <div style={{
-                padding: "20px 32px",
-                borderBottom: "1px solid #e5e7eb",
-                background: "#f8fafc",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}>
-                <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 700, color: "#1e40af" }}>
-                  {selectedSection.title}
-                </h2>
-                <button
-                  onClick={() => setSelectedSection(null)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    fontSize: "1.8rem",
-                    color: "#6b7280",
-                    cursor: "pointer"
-                  }}
-                >
-                  <HiX />
-                </button>
-              </div>
-
-              {/* Info */}
-              <div style={{
-                padding: "16px 32px",
-                fontSize: "0.95rem",
-                color: "#4b5563",
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "16px"
-              }}>
-                <div><strong>GSTIN:</strong> 09ACNPU2195H1ZY</div>
-                <div><strong>Legal Name:</strong> Mohd Umair</div>
-                <div><strong>Trade Name:</strong> U.A.F ENTERPRISE'S</div>
-                <div><strong>FY:</strong> {fy}</div>
-                <div><strong>Tax Period:</strong> {period}</div>
-                <div><strong>Status:</strong> Filed</div>
-              </div>
-
-              {/* Teal Section */}
-              <div style={{
-                background: "#0d9488",
-                color: "white",
-                padding: "14px 32px",
-                fontSize: "1.15rem",
-                fontWeight: 600,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}>
-                <div>Recipient wise count</div>
-                <div style={{ display: "flex", gap: "12px" }}>
-                  <button style={{ background: "rgba(255,255,255,0.25)", border: "none", color: "white", padding: "6px 14px", borderRadius: "6px", cursor: "pointer" }}>
-                    HELP ?
-                  </button>
-                  <button style={{ background: "rgba(255,255,255,0.25)", border: "none", color: "white", padding: "6px 10px", borderRadius: "6px", cursor: "pointer" }}>
-                    ↻
-                  </button>
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div style={{
-                padding: "16px 32px",
-                display: "flex",
-                justifyContent: "space-between",
-                borderBottom: "1px solid #e5e7eb"
-              }}>
-                <button style={{
-                  background: "#e5e7eb",
-                  border: "none",
-                  padding: "10px 24px",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  cursor: "pointer"
-                }}>
-                  ADD RECORD
-                </button>
-                <button style={{
-                  background: "#3b82f6",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 24px",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  cursor: "pointer"
-                }}>
-                  IMPORT EWB DATA
-                </button>
-              </div>
-
-              {/* Table - simple example */}
-              <div style={{ padding: "20px 32px" }}>
-                <h3 style={{ margin: "0 0 12px 0", fontSize: "1.1rem", fontWeight: 600 }}>Record Details</h3>
-
-                <div style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  overflow: "hidden"
-                }}>
-                  <div style={{
-                    background: "#f1f5f9",
-                    padding: "12px 20px",
-                    fontWeight: 600,
-                    display: "grid",
-                    gridTemplateColumns: "2fr 2fr 1.2fr 1fr 1fr 0.8fr",
-                    gap: "12px",
-                    fontSize: "0.9rem"
-                  }}>
-                    <div>Recipient Details</div>
-                    <div>Trade/Legal Name</div>
-                    <div>Taxpayer Type</div>
-                    <div>Processed Records</div>
-                    <div>Pending/Errored</div>
-                    <div>Add</div>
-                  </div>
-
-                  <div style={{
-                    padding: "12px 20px",
-                    display: "grid",
-                    gridTemplateColumns: "2fr 2fr 1.2fr 1fr 1fr 0.8fr",
-                    gap: "12px",
-                    alignItems: "center",
-                    borderTop: "1px solid #e5e7eb"
-                  }}>
-                    <div>09AFYPA8613C2ZB</div>
-                    <div>JK STEEL TRADERS</div>
-                    <div>Regular</div>
-                    <div style={{ fontWeight: 600 }}>1</div>
-                    <div style={{ fontWeight: 600, color: "#dc2626" }}>0</div>
-                    <div>
-                      <button style={{
-                        background: "#10b981",
-                        color: "white",
-                        border: "none",
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        fontSize: "1.2rem"
-                      }}>
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div style={{
-                padding: "16px 32px",
-                borderTop: "1px solid #e5e7eb",
-                textAlign: "right"
-              }}>
-                <button
-                  onClick={() => setSelectedSection(null)}
-                  style={{
-                    background: "#6b7280",
-                    color: "white",
-                    border: "none",
-                    padding: "10px 32px",
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    cursor: "pointer"
-                  }}
-                >
-                  BACK
-                </button>
-              </div>
-            </div>
+            <div>Recipient</div>
+            <div>Name</div>
+            <div>Type</div>
+            <div>Processed</div>
+            <div>Pending</div>
+            <div>Add</div>
           </div>
-        )}
 
+          <div
+            style={{
+              padding: "6px 12px",
+              display: "grid",
+              gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.6fr",
+              gap: "8px",
+              alignItems: "center",
+              fontSize: "0.8rem",
+              borderTop: "1px solid #e5e7eb"
+            }}
+          >
+            <div>09AFYPA8613C2ZB</div>
+            <div>JK STEEL TRADERS</div>
+            <div>Regular</div>
+            <div style={{ fontWeight: 600 }}>1</div>
+            <div style={{ fontWeight: 600, color: "#dc2626" }}>0</div>
+            <button
+              style={{
+                background: "#10b981",
+                color: "white",
+                border: "none",
+                width: "26px",
+                height: "26px",
+                borderRadius: "6px",
+                cursor: "pointer"
+              }}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ───── Footer ───── */}
+      <div
+        style={{
+          padding: "10px 18px",
+          borderTop: "1px solid #e5e7eb",
+          textAlign: "right"
+        }}
+      >
+        <button
+          onClick={() => setSelectedSection(null)}
+          style={{
+            background: "#475569",
+            color: "white",
+            border: "none",
+            padding: "6px 18px",
+            borderRadius: "8px",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          BACK
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </div>
   );
@@ -1328,11 +1830,9 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
 const YourReturnsComponent = () => {
   const [step, setStep] = useState('selection');
   const [selectedForm, setSelectedForm] = useState(null);
-
   const [selectedFY, setSelectedFY] = useState("2025-26");
   const [selectedQuarter, setSelectedQuarter] = useState("Quarter 4 (Jan - Mar)");
   const [selectedPeriod, setSelectedPeriod] = useState("January");
-
   if (step === 'detail') {
     return (
       <DetailedGSTView
@@ -1343,7 +1843,6 @@ const YourReturnsComponent = () => {
       />
     );
   }
-
   if (step === 'summary') {
     return (
       <ReturnsSummaryScreen
@@ -1358,7 +1857,6 @@ const YourReturnsComponent = () => {
       />
     );
   }
-
   return (
     <GSTReturnPeriodSelection
       selectedFY={selectedFY}
@@ -1371,8 +1869,6 @@ const YourReturnsComponent = () => {
     />
   );
 };
-
-
   // Dummy data for GST Returns - sample clients with filing status
   const gstFilingData = [
     { sl: 1, name: "MODERN MASTER PUBLICATION", mobile: "8439393333", filingType: "Monthly", gstin: "09QACPS3544H1Z4", dateOfFiling: "2025-11-20"  },
@@ -1385,36 +1881,29 @@ const YourReturnsComponent = () => {
     { sl: 8, name: "META TRADING COMPANY", mobile: "8126645576", filingType: "Monthly", gstin: "09DQWPA8816B1ZL", dateOfFiling: ""  },
     // Add more dummy data to make it longer
   ];
-
   const [selectedReturnType, setSelectedReturnType] = useState("GSTR1");
   const [selectedMonth, setSelectedMonth] = useState("Nov-2025");
   const [filingList, setFilingList] = useState(gstFilingData);
   const [filterView, setFilterView] = useState("all");
-
   const handleGo = () => {
     // Simulate fetching data for selected month and return type
     toast.success(`Data loaded for ${selectedReturnType} - ${selectedMonth}`);
     // Here you can filter or load new data based on month/type
   };
-
   const handleGetLatest = () => {
     toast.success("Latest data fetched from GSTN!");
   };
-
   const handleDownloadPDF = () => {
     toast.success("PDF downloaded!");
     // Actual download logic can be added here
   };
-
   const filteredFilingList = filingList.filter(item => {
     if (filterView === "filed") return item.status === "Filed";
     if (filterView === "not_filed") return item.status === "Not Filed";
     return true;
   });
-
   const filedCount = filingList.filter(item => item.status === "Filed").length;
   const notFiledCount = filingList.filter(item => item.status === "Not Filed").length;
-
   const pendingVouchersData = [
     { id: 1, clientName: "Client A", company: "ABC Corp", gstin: "27AAACC1001Z1", pan: "ABCDE1234F", mobile: "9876543210", voucherName: "Voucher #001", pendingSince: "2025-12-20" },
     { id: 2, clientName: "Client B", company: "XYZ Ltd", gstin: "27AAACC1002Z2", pan: "ABCDE1235G", mobile: "9876543211", voucherName: "Voucher #002", pendingSince: "2025-12-22" },
@@ -1424,7 +1913,6 @@ const YourReturnsComponent = () => {
     { id: 6, clientName: "Client F", company: "Company 6", gstin: "27AAACC1006Z6", pan: "ABCDE1239K", mobile: "9876543215", voucherName: "Voucher #006", pendingSince: "2025-12-26" },
     { id: 7, clientName: "Client G", company: "Company 7", gstin: "27AAACC1007Z7", pan: "ABCDE1240L", mobile: "9876543216", voucherName: "Voucher #007", pendingSince: "2025-12-27" },
   ];
-
   const returnsDueData = [
     { id: 1, clientName: "Client A", company: "ABC Corp", gstin: "27AAACC1001Z1", returnType: "GSTR-3B", dueDate: "2025-12-28" },
     { id: 2, clientName: "Client B", company: "XYZ Ltd", gstin: "27AAACC1002Z2", returnType: "GSTR-1", dueDate: "2025-12-27" },
@@ -1434,7 +1922,6 @@ const YourReturnsComponent = () => {
     { id: 6, clientName: "Client F", company: "Company 6", gstin: "27AAACC1006Z6", returnType: "GSTR-7", dueDate: "2025-12-30" },
     { id: 7, clientName: "Client G", company: "Company 7", gstin: "27AAACC1007Z7", returnType: "GSTR-3B", dueDate: "2025-12-31" },
   ];
-
   const clientsNeedingAttentionData = [
     { id: 1, company: "ABC Corp", issue: "Missing documents for Q4" },
     { id: 2, company: "XYZ Ltd", issue: "Overdue payment" },
@@ -1449,7 +1936,6 @@ const YourReturnsComponent = () => {
     { id: 11, company: "Company 11", issue: "Bank reconciliation pending" },
     { id: 12, company: "Company 12", issue: "Expense report overdue" },
   ];
-
   const itcAvailableData = [
     { id: 1, clientName: "Client A", company: "ABC Corp", gstin: "27AAACC1001Z1", pan: "ABCDE1234F", mobile: "9876543210", amount: "₹1.2 Cr" },
     { id: 2, clientName: "Client B", company: "XYZ Ltd", gstin: "27AAACC1002Z2", pan: "ABCDE1235G", mobile: "9876543211", amount: "₹0.8 Cr" },
@@ -1459,7 +1945,6 @@ const YourReturnsComponent = () => {
     { id: 6, clientName: "Client F", company: "Company 6", gstin: "27AAACC1006Z6", pan: "ABCDE1239K", mobile: "9876543215", amount: "₹0.6 Cr" },
     { id: 7, clientName: "Client G", company: "Company 7", gstin: "27AAACC1007Z7", pan: "ABCDE1240L", mobile: "9876543216", amount: "₹0.7 Cr" },
   ];
-
   const [allClients, setAllClients] = useState(
   Array.from({ length: 25 }, (_, i) => ({
     id: i + 1,
@@ -1492,7 +1977,7 @@ const YourReturnsComponent = () => {
     pincode: "",
     registrationDate: todayDate,
   });
-  
+ 
 const addClient = (newClient) => {
   setAllClients((prev) => {
     const newId = prev.length > 0 ? Math.max(...prev.map(c => c.id)) + 1 : 1;
@@ -1510,7 +1995,6 @@ const addClient = (newClient) => {
   const handleClientChange = (e) => {
     setNewClientForm({ ...newClientForm, [e.target.name]: e.target.value });
   };
-
 const submitNewClient = () => {
   if (!newClientForm.name || !newClientForm.company || !newClientForm.gstin || !newClientForm.mobile) {
     toast.error("Please fill Name, Company, GSTIN and Mobile");
@@ -1524,7 +2008,6 @@ const submitNewClient = () => {
     toast.error("Mobile must be 10 digits");
     return;
   }
-
   addClient({newClientForm ,name: newClientForm.name.trim(),
     company: newClientForm.company.trim(),
     gstin: newClientForm.gstin.toUpperCase().trim(),
@@ -1536,7 +2019,6 @@ const submitNewClient = () => {
   setNewClientForm({
     name: "", company: "", gstin: "", pan: "", aadhaar: "", mobile: "", address: "", pincode: "", registrationDate: todayDate
   });
-
   // This fixes the navigation issue
   setTimeout(() => {
     navigate("/user/clients");
@@ -1548,13 +2030,7 @@ const handleClientSelect = () => {
     setPopupShownOnce(true);
   }
 };
-
-
-
-
-
   const activeClients = allClients.filter(c => c.status === "active");
-
   const [showActiveClientsModal, setShowActiveClientsModal] = useState(false);
   const [showPendingVouchersModal, setShowPendingVouchersModal] = useState(false);
   const [showReturnsDueModal, setShowReturnsDueModal] = useState(false);
@@ -1566,10 +2042,7 @@ const handleClientSelect = () => {
   const [showGenerateReportModal, setShowGenerateReportModal] = useState(false);
   const [showReturnsPopup, setShowReturnsPopup] = useState(false);
   const [popupShownOnce, setPopupShownOnce] = useState(false);
-  
-
-
-
+ 
   const modalOverlayStyle = {
     position: "fixed",
     top: 0,
@@ -1582,7 +2055,6 @@ const handleClientSelect = () => {
     alignItems: "center",
     zIndex: 9999,
   };
-
   const modalCardStyle = {
     background: "#ffffff",
     borderRadius: "12px",
@@ -1595,7 +2067,6 @@ const handleClientSelect = () => {
     display: "flex",
     flexDirection: "column",
   };
-
   const ContactModal = () => (
     <div style={modalOverlayStyle} onClick={() => setShowContactModal(false)}>
       <div style={{ ...modalCardStyle, width: "500px" }} onClick={(e) => e.stopPropagation()}>
@@ -1624,7 +2095,6 @@ const handleClientSelect = () => {
       </div>
     </div>
   );
-
   const EditProfileModal = () => (
     <div style={modalOverlayStyle} onClick={() => setShowEditProfileModal(false)}>
       <div style={{ ...modalCardStyle, width: "550px" }} onClick={(e) => e.stopPropagation()}>
@@ -1637,23 +2107,18 @@ const handleClientSelect = () => {
         <div style={{ overflowY: "auto", flex: 1 }}>
           <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Name</label>
           <input name="name" value={editProfileForm.name} onChange={handleEditProfileChange} style={{ width: "100%", padding: "12px", marginBottom: "15px", border: "1px solid #ddd", borderRadius: "8px" }} />
-
           <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Date of Birth</label>
           <input name="dob" type="date" value={editProfileForm.dob} onChange={handleEditProfileChange} style={{ width: "100%", padding: "12px", marginBottom: "15px", border: "1px solid #ddd", borderRadius: "8px" }} />
-
           <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Gender</label>
           <select name="gender" value={editProfileForm.gender} onChange={handleEditProfileChange} style={{ width: "100%", padding: "12px", marginBottom: "15px", border: "1px solid #ddd", borderRadius: "8px" }}>
             <option>Male</option>
             <option>Female</option>
             <option>Other</option>
           </select>
-
           <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Company</label>
           <input name="company" value={editProfileForm.company} onChange={handleEditProfileChange} style={{ width: "100%", padding: "12px", marginBottom: "15px", border: "1px solid #ddd", borderRadius: "8px" }} />
-
           <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Email</label>
           <input name="email" type="email" value={editProfileForm.email} onChange={handleEditProfileChange} style={{ width: "100%", padding: "12px", marginBottom: "20px", border: "1px solid #ddd", borderRadius: "8px" }} />
-
           <div style={{ display: "flex", gap: "15px", justifyContent: "flex-end" }}>
             <button onClick={saveEditedProfile} style={{ background: "#7c3aed", color: "white", padding: "12px 24px", border: "none", borderRadius: "8px", cursor: "pointer" }}>
               Save Changes
@@ -1666,7 +2131,6 @@ const handleClientSelect = () => {
       </div>
     </div>
   );
-
   const ActiveClientsModal = () => (
     <div style={modalOverlayStyle} onClick={() => setShowActiveClientsModal(false)}>
       <div style={modalCardStyle} onClick={(e) => e.stopPropagation()}>
