@@ -13,13 +13,14 @@ body {
 :root {
   --bg-color: #f0f4f8;
   --text-color: #333;
-  --primary: #7c3aed;
+  --primary: #7367f0; /* Changed primary to #7367f0 */
   --secondary: #a78bfa;
   --accent: #3b82f6;
   --card-bg: rgba(255, 255, 255, 0.8);
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   --glass-blur: blur(10px);
   --transition: all 0.3s ease;
+  --menu-bg: #25293c; /* New var for menu bar background */
 }
 
 .dark-mode {
@@ -30,6 +31,7 @@ body {
   --accent: #60a5fa;
   --card-bg: rgba(30, 31, 34, 0.8);
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  --menu-bg: #25293c; /* Keep same for dark mode */
 }
 
 .main { max-width: 1440px; margin: 0 auto; padding: 24px; }
@@ -488,20 +490,18 @@ td:last-child { text-align: right; font-weight: 600; }
   top: 0;
   height: 100vh;
   width: 280px;
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--menu-bg); /* Changed to #25293c */
   border-right: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
   transition: var(--transition);
   z-index: 100;
-  padding: 24px 0;
-  color: #333;
+  padding: 0; /* Removed top/bottom padding for full length */
+  color: #fff; /* Text color white */
   overflow-y: auto;
 }
 
 .dark-mode .sidebar {
-  background: rgba(20, 21, 30, 0.75);
+  background: var(--menu-bg); /* Keep #25293c */
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   color: #e0e0e0;
 }
@@ -511,11 +511,11 @@ td:last-child { text-align: right; font-weight: 600; }
 }
 
 .sidebar-header {
-  padding: 0 24px 32px;
+  padding: 20px 24px 20px; /* Reduced top padding, no extra space above logo */
   text-align: center;
   position: relative;
   border-bottom: 1px solid rgba(200, 181, 255, 0.3);
-  background-color: #0d048a;
+  background-color: var(--menu-bg); /* Match sidebar bg */
 }
 
 .sidebar-header .toggle-sidebar-btn {
@@ -537,7 +537,7 @@ td:last-child { text-align: right; font-weight: 600; }
 .sidebar-menu {
   list-style: none;
   padding: 0 16px;
-  background-color: #0d048a;
+  background-color: var(--menu-bg); /* Match sidebar bg */
 }
 
 .sidebar-item {
@@ -550,7 +550,7 @@ td:last-child { text-align: right; font-weight: 600; }
   align-items: center;
   padding: 14px 20px;
   border-radius: 16px;
-  color: inherit;
+  color: white; /* Changed to white */
   text-decoration: none;
   transition: var(--transition);
   font-weight: 500;
@@ -558,24 +558,24 @@ td:last-child { text-align: right; font-weight: 600; }
 
 .sidebar-link:hover,
 .sidebar-link.active {
-  background: rgba(124, 58, 237, 0.15);
+  background: #7367f0; /* Hover and active color #7367f0 */
   transform: translateX(6px);
 }
 
 .dark-mode .sidebar-link:hover,
 .dark-mode .sidebar-link.active {
-  background: rgba(167, 139, 250, 0.2);
+  background: #7367f0; /* Keep same for dark */
 }
 
 .sidebar-link svg {
   font-size: 1.6rem;
   margin-right: 16px;
   min-width: 30px;
-  color: whitesmoke;
+  color: white; /* Icons white */
 }
 
 .dark-mode .sidebar-link svg {
-  color: #a78bfa;
+  color: white; /* Icons white in dark */
 }
 
 .sidebar.collapsed .sidebar-text {
@@ -607,7 +607,7 @@ td:last-child { text-align: right; font-weight: 600; }
   min-height: 80px;
   flex-shrink: 0;
 
-  background: #0d048a;
+  background: var(--menu-bg); /* Changed to #25293c */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 
@@ -624,7 +624,7 @@ td:last-child { text-align: right; font-weight: 600; }
 }
 
 .dark-mode .dashboard-navbar {
-  background: rgba(30, 31, 40, 0.65);
+  background: var(--menu-bg); /* Keep #25293c */
 }
 
 
@@ -677,11 +677,11 @@ td:last-child { text-align: right; font-weight: 600; }
 }
 
 .company-info h2 {
-  color: #7c3aed; /* Your primary purple */
+  color: #7367f0; /* Changed to #7367f0 */
 }
 
 .dark-mode .company-info h2 {
-  color: #a78bfa;
+  color: #7367f0; /* Keep #7367f0 in dark */
 }
 /* Company Info in Navbar */
 .company-info {
@@ -691,11 +691,11 @@ td:last-child { text-align: right; font-weight: 600; }
 }
 
 .company-info h2 {
-  color: #7c3aed; /* Your primary purple */
+  color: #7367f0; /* Changed to #7367f0 */
 }
 
 .dark-mode .company-info h2 {
-  color: #0d048a;
+  color: #7367f0;
 }
 .page-wrapper {
   width: 100%;
