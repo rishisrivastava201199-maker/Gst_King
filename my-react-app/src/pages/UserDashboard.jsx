@@ -565,16 +565,15 @@ function UserDashboard() {
     setShowUserDropdown(false);
   };
 
-  const menuItems = [
-  { icon: <HiHome className="sidebar-icon" />, text: "Dashboard", link: "/user" },
-  { icon: <HiUserGroup className="sidebar-icon" />, text: "My Clients", link: "/user/clients" },
-  // { icon: <HiDocumentText className="sidebar-icon" />, text: "Vouchers", link: "/user/vouchers" },
-  { icon: <HiFolder className="sidebar-icon" />, text: "GSTR Filed", link: "/user/returns" },
-  { icon: <HiDocumentText className="sidebar-icon" />, text: "GST Return", link: "/user/gst-return" },
-  { icon: <HiNewspaper className="sidebar-icon" />, text: "News & Updates", link: "/user/news-updates" },
-  { icon: <HiBell className="sidebar-icon" />, text: "Notifications", link: "/user/notifications" },
+const menuItems = [
+  { text: "Dashboard", link: "/user", icon: HiHome },
+  { text: "My Clients", link: "/user/clients", icon: HiUserGroup },
+  { text: "GSTR Filed", link: "/user/gst-return", icon: HiCheckCircle },
+  { text: "GST Return", link: "/user/returns", icon: HiDocumentText },
+  { text: "News & Updates", link: "/user/news-updates", icon: HiNewspaper },
+  { text: "Notifications", link: "/user/notifications", icon: HiBell },
+  { text: "Settings", link: "/user/settings", icon: HiCog }, // agar hai to
 ];
-
 const GSTReturnPeriodSelection = ({
   selectedFY, setSelectedFY,
   selectedQuarter, setSelectedQuarter,
@@ -6453,19 +6452,27 @@ case "/user/gst-return":
             {sidebarCollapsed ? <HiMenu /> : <HiArrowLeft />}
           </button>
         </div>
-        <ul className="sidebar-menu">
-          {menuItems.map((item, index) => (
-            <li className="sidebar-item" key={index}>
-              <Link to={item.link} className="sidebar-link">
-                
-                <span className="sidebar-text">{item.text}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+       <ul className="sidebar-menu">
+  {menuItems.map((item, index) => (
+    <li className="sidebar-item" key={index}>
+      <Link to={item.link} className="sidebar-link">
+        {item.icon && (
+          <item.icon 
+            style={{ 
+              fontSize: '1.6rem', 
+              marginRight: '16px', 
+              minWidth: '30px' 
+            }} 
+          />
+        )}
+        <span className="sidebar-text">{item.text}</span>
+      </Link>
+    </li>
+  ))}
+</ul>
       </aside>
       <main className={`dashboard-main ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <header className="dashboard-navbar" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 30px", background: "#0d048a", borderBottom: "1px solid #eee" }}>
+        <header className="dashboard-navbar" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 30px", background: "#1E293B", borderBottom: "1px solid #eee" }}>
           <div className="company-info">
             <h2 style={{ margin: 0, fontWeight: 700, fontSize: "1.6rem" , color:"white" }}>{user.company}</h2>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>

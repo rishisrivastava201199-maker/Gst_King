@@ -489,14 +489,14 @@ td:last-child { text-align: right; font-weight: 600; }
   left: 0;
   top: 0;
   height: 100vh;
-  width: 280px;
-  background: var(--menu-bg); /* Changed to #25293c */
+  width: 220px;               /* ← yahan 280px se 220px ya 200px kar do (main change) */
+  background: var(--menu-bg);
   border-right: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
   transition: var(--transition);
   z-index: 100;
-  padding: 0; /* Removed top/bottom padding for full length */
-  color: #fff; /* Text color white */
+  padding: 0;
+  color: #fff;
   overflow-y: auto;
 }
 
@@ -507,20 +507,24 @@ td:last-child { text-align: right; font-weight: 600; }
 }
 
 .sidebar.collapsed {
-  width: 80px;
+  width: 72px;
 }
 
 .sidebar-header {
-  padding: 20px 24px 20px; /* Reduced top padding, no extra space above logo */
+  padding: 16px 20px;          /* pehle zyada padding tha – kam kar diya */
   text-align: center;
   position: relative;
   border-bottom: 1px solid rgba(200, 181, 255, 0.3);
-  background-color: var(--menu-bg); /* Match sidebar bg */
+  background-color: var(--menu-bg);
+  height: 80px;                /* fixed height daal di – navbar ke barabar feel aayega */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-header .toggle-sidebar-btn {
   position: absolute;
-  right: 10px;
+  right: 1px;
   top: 10px;
   background: none;
   border: none;
@@ -532,6 +536,12 @@ td:last-child { text-align: right; font-weight: 600; }
 
 .sidebar-header .toggle-sidebar-btn:hover {
   opacity: 1;
+}
+.sidebar-header img {
+  width: 110px;                /* ← logo size kam kar diya (pehle 140px tha) – yeh adjust kar sakte ho 90-120px ke beech */
+  max-height: 43px;            /* height limit daal di taaki stretch na ho */
+  object-fit: contain;
+  filter: brightness(1.3);
 }
 
 .sidebar-menu {
@@ -586,19 +596,18 @@ td:last-child { text-align: right; font-weight: 600; }
   width: 50px;
 }
 
-/* Main Content */
 .dashboard-main {
-  margin-left: 280px;
+  margin-left: 220px;         /* ← yahan bhi 280px → 220px kar do */
   transition: var(--transition);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  width: calc(100% - 280px);
+  width: calc(100% - 220px);  /* ← yahan bhi 280px → 220px */
 }
 
 .dashboard-main.collapsed {
-  margin-left: 80px;
-  width: calc(100% - 80px);
+  margin-left: 72px;          /* ← collapsed ke liye bhi update */
+  width: calc(100% - 72px);
 }
 
 /* ==================== FIXED DASHBOARD NAVBAR ==================== */
@@ -770,4 +779,67 @@ td:last-child { text-align: right; font-weight: 600; }
   margin-top: 15px;
   padding: 6px 14px;
   cursor: pointer;
+}
+/* Toggle Switch - Small size jo text ke saath fit ho */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+  margin-left: 12px;           /* text aur toggle ke beech space */
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #7367f0;     /* tumhara primary color */
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #7367f0;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(14px);
+  -ms-transform: translateX(14px);
+  transform: translateX(14px);
+}
+
+/* Jab sidebar collapse ho to toggle hide kar do */
+.sidebar.collapsed .switch {
+  display: none;
+}
+.sidebar-link svg {
+  color: white;
+  min-width: 30px;
 }
