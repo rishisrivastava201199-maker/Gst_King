@@ -2164,6 +2164,9 @@ const handleClientSelect = () => {
       </div>
     </div>
   );
+
+
+  
 const ClientGSTDashboardModal = ({ client, onClose }) => {
   const [activeMenu, setActiveMenu] = useState("Dashboard");
   const [hoveredMenu, setHoveredMenu] = useState(null);
@@ -2624,7 +2627,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                 fontWeight: "700",
               }}
             >
-              Returns / Ledger Status
+              Returns  Status
             </h2>
             <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
               <select
@@ -3440,13 +3443,12 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                       <div
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                          background: "white",
-                          borderRadius: "20px",
-                          width: "92%",
-                          maxWidth: "420px",
-                          overflow: "hidden",
-                          boxShadow: "0 20px 70px rgba(0,0,0,0.4)",
-                        }}
+    background: "#ffffff",
+    borderRadius: "20px",               // ⬅ smoother
+    padding: "26px",
+    boxShadow: "0 18px 40px rgba(0,0,0,0.08)",
+    border: "1px solid #e5e7eb",
+  }}
                       >
                         <div
                           style={{
@@ -3950,18 +3952,19 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       >
         {/* Premium Header with All Clients Button */}
         <div
-          style={{
-            background: "linear-gradient(135deg, #6d28d9, #7c3aed, #a78bfa)",
-            color: "white",
-            padding: "16px 28px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontSize: "1rem",
-            fontWeight: "600",
-            boxShadow: "0 4px 15px rgba(109,40,217,0.4)",
-          }}
-        >
+  style={{
+    background: "linear-gradient(135deg, #4f46e5, #4338ca)",
+    color: "white",
+    padding: "12px 22px",          // ⬅ reduced
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    fontSize: "0.92rem",           // ⬅ smaller text
+    fontWeight: "600",
+    boxShadow: "0 4px 12px rgba(79,70,229,0.35)",
+  }}
+>
+
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <button
               onClick={onClose}
@@ -4012,14 +4015,15 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
           </div>
         </div>
         {/* Premium Menu Bar */}
-        <div
-          style={{
-            background: "linear-gradient(to right, #4c1d95, #6d28d9)",
-            padding: "0 20px",
-            overflowX: "auto",
-            boxShadow: "0 4px 12px rgba(109,40,217,0.3)",
-          }}
-        >
+       <div
+  style={{
+    background: "#eef2ff",        // ⬅ light premium bg (like image)
+    padding: "0 20px",
+    borderBottom: "1px solid #e5e7eb",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
+  }}
+>
+
           <div style={{ display: "inline-flex", gap: "6px", padding: "14px 0" }}>
             {menuItems.map((item) => (
               <button
@@ -4034,14 +4038,14 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                 onMouseEnter={() => setHoveredMenu(item)}
                 onMouseLeave={() => setHoveredMenu(null)}
                 style={{
-                  padding: "12px 24px",
-                  background:
-                    activeMenu === item
-                      ? "#a78bfa"
-                      : hoveredMenu === item
-                      ? "rgba(167,139,250,0.25)"
-                      : "transparent",
-                  color: activeMenu === item || hoveredMenu === item ? "white" : "#e0e7ff",
+                  padding: "8px 16px",             // ⬅ nav height kam
+borderRadius: "10px",
+fontSize: "0.85rem",
+
+                 background: "#4f46e5",
+color: "#fff",
+boxShadow: "0 6px 14px rgba(79,70,229,0.35)",
+
                   border: "none",
                   borderRadius: "10px 10px 0 0",
                   fontSize: "0.96rem",
@@ -4272,6 +4276,7 @@ const ClientsPage = ({
   });
 
   return (
+    
     <div style={{ padding: "20px" }}>
       <div
         style={{
@@ -6446,12 +6451,25 @@ case "/user/gst-return":
     <>
       <ToastContainer position="top-right" autoClose={3000} />
       <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <div className="sidebar-header">
-          <img src="/tax.jpg" alt="SmartGST" style={{ width: "140px", filter: "brightness(1.3)" }} />
-          <button className="toggle-sidebar-btn" onClick={toggleSidebar}>
-            {sidebarCollapsed ? <HiMenu /> : <HiArrowLeft />}
-          </button>
-        </div>
+       <div className="sidebar-header">
+  {/* Logo ko conditionally dikhao – sirf expanded mode mein */}
+  {!sidebarCollapsed && (
+    <img 
+      src="/tax.jpg" 
+      alt="SmartGST" 
+      style={{ width: "110px", filter: "brightness(1.3)" }} 
+    />
+  )}
+
+  {/* Toggle button – icon dynamically change */}
+  <button 
+    className="toggle-sidebar-btn" 
+    onClick={toggleSidebar}
+  >
+    {sidebarCollapsed ? <HiMenu /> : <HiArrowLeft />}
+  </button>
+</div>
+        
        <ul className="sidebar-menu">
   {menuItems.map((item, index) => (
     <li className="sidebar-item" key={index}>
