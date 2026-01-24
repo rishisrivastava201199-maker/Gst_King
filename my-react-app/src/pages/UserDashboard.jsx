@@ -3123,347 +3123,616 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     )}
   
+{activeLedgerTab === "elb" && (
+  <div style={{
+    padding: "24px 32px",
+    background: "#ffffff",
+    borderRadius: "12px",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+    border: "1px solid #e2e8f0",
+    // width full rakha hai — shrink nahi kiya
+  }}>
 
-              {activeLedgerTab === "elb" && (
-                <div style={{ padding: "32px" }}>
-                  <div style={{ background: "#a21caf", color: "#fff", padding: "20px 32px", borderRadius: "12px 12px 0 0", fontWeight: "700", fontSize: "1.4rem" }}>
-                    Electronic Ledger Balances - Detailed View
-                  </div>
-                  <div style={{ padding: "32px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px", fontSize: "1.3rem", fontWeight: "600" }}>
-                      <span>Cash Balance</span>
-                      <strong>₹58,756.00</strong>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "32px", fontSize: "1.3rem", fontWeight: "600" }}>
-                      <span>Credit Balance</span>
-                      <strong>₹36,845.00</strong>
-                    </div>
-                    <div style={{ background: "#16a34a", color: "#fff", padding: "16px", textAlign: "center", fontWeight: "700", fontSize: "1.3rem" }}>
-                      Balance of Electronic Credit Ledger
-                    </div>
-                    <table style={{ width: "100%", borderCollapse: "collapse", background: "#ecfdf5" }}>
-                      <thead>
-                        <tr>
-                          <th style={{ padding: "16px", textAlign: "center" }}>IGST</th>
-                          <th style={{ padding: "16px", textAlign: "center" }}>CGST</th>
-                          <th style={{ padding: "16px", textAlign: "center" }}>SGST</th>
-                          <th style={{ padding: "16px", textAlign: "center" }}>CESS</th>
-                          <th style={{ padding: "16px", textAlign: "center" }}>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td style={{ padding: "16px", textAlign: "center" }}>₹25,165</td>
-                          <td style={{ padding: "16px", textAlign: "center" }}>₹12,324</td>
-                          <td style={{ padding: "16px", textAlign: "center" }}>₹5,632</td>
-                          <td style={{ padding: "16px", textAlign: "center" }}>₹15,635</td>
-                          <td style={{ padding: "16px", textAlign: "center", fontWeight: "700" }}>₹58,756</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
+    {/* Header - full width highlight with shadow */}
+    <div style={{
+      background: "linear-gradient(90deg, #4f46e5, #7c3aed)",
+      color: "white",
+      padding: "16px 28px",
+      borderRadius: "10px 10px 0 0",
+      fontSize: "1.35rem",
+      fontWeight: "700",
+      boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
+      margin: "-24px -32px 32px -32px",  // full bleed effect
+      textAlign: "center",
+    }}>
+      Electronic Ledger Balances - Detailed View
+    </div>
 
-              {/* ── TURNOVER TAB ── with year dropdown + ledger navigation ── */}
-              {activeLedgerTab === "turnover" && (
-                <div style={{ padding: "32px" }}>
-                  {/* Financial Year Dropdown */}
-                  <div style={{ marginBottom: "24px" }}>
-                    <label style={{ fontWeight: "600", display: "inline-block", marginRight: "12px" }}>
-                      Financial Year:
-                    </label>
-                    <select
-                      style={{
-                        padding: "10px 16px",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "8px",
-                        fontSize: "1rem",
-                        minWidth: "160px",
-                        background: "white",
-                      }}
-                    >
-                      <option>2017-18</option>
-                      <option>2018-19</option>
-                      <option>2019-20</option>
-                      <option>2020-21</option>
-                      <option>2021-22</option>
-                      <option>2022-23</option>
-                      <option>2023-24</option>
-                      <option>2024-25</option>
-                      <option selected>2025-26</option>
-                    </select>
-                  </div>
+    {/* Main Content */}
+    <div>
 
-                  {/* Ledger Navigation Tabs */}
-                  <div style={{ 
-                    display: "flex", 
-                    borderBottom: "2px solid #e2e8f0", 
-                    marginBottom: "24px" 
-                  }}>
-                    <button
-                      onClick={() => setActiveTurnoverView('overview')}
-                      style={{
-                        padding: "12px 28px",
-                        background: activeTurnoverView === 'overview' ? "#7c3aed" : "transparent",
-                        color: activeTurnoverView === 'overview' ? "white" : "#475569",
-                        border: "none",
-                        borderRadius: "10px 10px 0 0",
-                        fontWeight: activeTurnoverView === 'overview' ? "600" : "500",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Overview
-                    </button>
-                    <button
-                      onClick={() => setActiveTurnoverView('cash')}
-                      style={{
-                        padding: "12px 28px",
-                        background: activeTurnoverView === 'cash' ? "#10b981" : "transparent",
-                        color: activeTurnoverView === 'cash' ? "white" : "#475569",
-                        border: "none",
-                        borderRadius: "10px 10px 0 0",
-                        fontWeight: activeTurnoverView === 'cash' ? "600" : "500",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Electronic Cash Ledger
-                    </button>
-                    <button
-                      onClick={() => setActiveTurnoverView('credit')}
-                      style={{
-                        padding: "12px 28px",
-                        background: activeTurnoverView === 'credit' ? "#3b82f6" : "transparent",
-                        color: activeTurnoverView === 'credit' ? "white" : "#475569",
-                        border: "none",
-                        borderRadius: "10px 10px 0 0",
-                        fontWeight: activeTurnoverView === 'credit' ? "600" : "500",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Electronic Credit Ledger
-                    </button>
-                  </div>
+      {/* Cash & Credit Balances - full width, side by side */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: "32px",
+        marginBottom: "36px",
+        padding: "0 12px",
+      }}>
+        <div style={{
+          padding: "20px",
+          background: "#f0f9ff",
+          borderRadius: "10px",
+          border: "1px solid #bfdbfe",
+        }}>
+          <div style={{ color: "#64748b", fontSize: "1rem", marginBottom: "8px" }}>
+            Cash Ledger Balance
+          </div>
+          <div style={{
+            fontSize: "2.1rem",
+            fontWeight: "700",
+            color: "#1d4ed8",
+          }}>
+            ₹58,756.00
+          </div>
+        </div>
 
-                  {/* Content Area */}
-                  {activeTurnoverView === 'overview' && (
-                    <div>
-                      <div style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "16px" }}>
-                        Turnover Balances
-                      </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-                        <div style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px" }}>
-                          <div style={{ fontWeight: "600", marginBottom: "8px" }}>Turnover Estimated</div>
-                          <div style={{ fontSize: "1.4rem", fontWeight: "700" }}>₹1,25,65,635.00</div>
-                        </div>
-                        <div style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px" }}>
-                          <div style={{ fontWeight: "600", marginBottom: "8px" }}>Aggregate Turnover</div>
-                          <div style={{ fontSize: "1.4rem", fontWeight: "700" }}>₹1,25,65,635.00</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+        <div style={{
+          padding: "20px",
+          background: "#f0fdf4",
+          borderRadius: "10px",
+          border: "1px solid #a7f3d0",
+        }}>
+          <div style={{ color: "#64748b", fontSize: "1rem", marginBottom: "8px" }}>
+            Electronic Credit Ledger Balance
+          </div>
+          <div style={{
+            fontSize: "2.1rem",
+            fontWeight: "700",
+            color: "#059669",
+          }}>
+            ₹36,845.00
+          </div>
+        </div>
+      </div>
 
-                  {(activeTurnoverView === 'cash' || activeTurnoverView === 'credit') && (
-                    <div>
-                      {/* Date Range Selector */}
-                      <div style={{ 
-                        display: "flex", 
-                        alignItems: "center", 
-                        gap: "16px", 
-                        marginBottom: "24px",
-                        flexWrap: "wrap"
-                      }}>
-                        <div>
-                          <strong>From:</strong>
-                          <input 
-                            type="date" 
-                            defaultValue="2025-04-01"
-                            style={{ 
-                              marginLeft: "8px", 
-                              padding: "8px 12px", 
-                              border: "1px solid #ccc", 
-                              borderRadius: "6px" 
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <strong>To:</strong>
-                          <input 
-                            type="date" 
-                            defaultValue="2025-06-30"
-                            style={{ 
-                              marginLeft: "8px", 
-                              padding: "8px 12px", 
-                              border: "1px solid #ccc", 
-                              borderRadius: "6px" 
-                            }}
-                          />
-                        </div>
-                        <button
-                          style={{
-                            background: "#3b82f6",
-                            color: "white",
-                            padding: "10px 24px",
-                            border: "none",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                            fontWeight: "600"
-                          }}
-                        >
-                          GO
-                        </button>
-                      </div>
+      {/* Credit Ledger Table Section - full width */}
+      <div style={{
+        background: "#f8fafc",
+        borderRadius: "10px",
+        border: "1px solid #e2e8f0",
+        overflow: "hidden",
+        marginBottom: "24px",
+      }}>
+        <div style={{
+          background: "#059669",
+          color: "white",
+          padding: "14px 24px",
+          fontSize: "1.25rem",
+          fontWeight: "600",
+          textAlign: "center",
+        }}>
+          Balance of Electronic Credit Ledger
+        </div>
 
-                      {/* Table - similar to GST portal style */}
-                      <div style={{ overflowX: "auto" }}>
-                        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.95rem" }}>
-                          <thead>
-                            <tr style={{ background: "#f1f5f9" }}>
-                              <th style={{ padding: "12px", textAlign: "center" }}>Sr.No</th>
-                              <th style={{ padding: "12px" }}>Date</th>
-                              <th style={{ padding: "12px" }}>Reference No.</th>
-                              <th style={{ padding: "12px" }}>Description</th>
-                              <th style={{ padding: "12px", textAlign: "right" }}>Integrated Tax</th>
-                              <th style={{ padding: "12px", textAlign: "right" }}>Central Tax</th>
-                              <th style={{ padding: "12px", textAlign: "right" }}>State Tax</th>
-                              <th style={{ padding: "12px", textAlign: "right" }}>Cess</th>
-                              <th style={{ padding: "12px", textAlign: "right" }}>Total</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td style={{ padding: "12px", textAlign: "center" }}>1</td>
-                              <td style={{ padding: "12px" }}>-</td>
-                              <td style={{ padding: "12px" }}>-</td>
-                              <td style={{ padding: "12px" }}>Opening Balance</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>0.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>0.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>0.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>0.00</td>
-                              <td style={{ padding: "12px", textAlign: "right", fontWeight: "bold" }}>0.00</td>
-                            </tr>
+        <table style={{
+          width: "100%",
+          borderCollapse: "collapse",
+        }}>
+          <thead>
+            <tr style={{ background: "#f1f5f9" }}>
+              <th style={{ padding: "16px", fontWeight: "600", color: "#334155", textAlign: "center" }}>IGST</th>
+              <th style={{ padding: "16px", fontWeight: "600", color: "#334155", textAlign: "center" }}>CGST</th>
+              <th style={{ padding: "16px", fontWeight: "600", color: "#334155", textAlign: "center" }}>SGST</th>
+              <th style={{ padding: "16px", fontWeight: "600", color: "#334155", textAlign: "center" }}>CESS</th>
+              <th style={{ padding: "16px", fontWeight: "700", color: "#059669", textAlign: "center" }}>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style={{ borderTop: "1px solid #e5e7eb" }}>
+              <td style={{ padding: "18px", textAlign: "center", fontSize: "1.1rem", fontWeight: "500" }}>₹25,165</td>
+              <td style={{ padding: "18px", textAlign: "center", fontSize: "1.1rem", fontWeight: "500" }}>₹12,324</td>
+              <td style={{ padding: "18px", textAlign: "center", fontSize: "1.1rem", fontWeight: "500" }}>₹5,632</td>
+              <td style={{ padding: "18px", textAlign: "center", fontSize: "1.1rem", fontWeight: "500" }}>₹15,635</td>
+              <td style={{
+                padding: "18px",
+                textAlign: "center",
+                fontSize: "1.25rem",
+                fontWeight: "700",
+                color: "#059669"
+              }}>
+                ₹58,756
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-                            {/* Sample transaction rows */}
-                            <tr>
-                              <td style={{ padding: "12px", textAlign: "center" }}>2</td>
-                              <td style={{ padding: "12px" }}>03/04/2025</td>
-                              <td style={{ padding: "12px" }}>AC09253604536</td>
-                              <td style={{ padding: "12px" }}>ITC accrued through - Inputs</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>0.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>16,390.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>16,390.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>0.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>32,780.00</td>
-                            </tr>
+      {/* Small footer note */}
+      <div style={{
+        fontSize: "0.9rem",
+        color: "#6b7280",
+        textAlign: "center",
+        marginTop: "16px",
+      }}>
+        Values as per GST portal • Last updated: 24 Jan 2026
+      </div>
 
-                            <tr style={{ fontWeight: "bold", background: "#ecfdf5" }}>
-                              <td style={{ padding: "12px" }} colSpan="4">Closing Balance</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>52,671.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>2,68,221.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>19,809.00</td>
-                              <td style={{ padding: "12px", textAlign: "right" }}>0.00</td>
-                              <td style={{ padding: "12px", textAlign: "right", color: "#16a34a" }}>3,40,701.00</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+    </div>
+  </div>
+)}
+  {activeLedgerTab === "turnover" && (
+  <div style={{
+    padding: "24px 32px",
+    background: "#ffffff",
+    borderRadius: "12px",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+    border: "1px solid #e2e8f0",
+  }}>
 
-                      {/* Bottom buttons - similar to portal */}
-                      <div style={{ marginTop: "24px", textAlign: "right", display: "flex", gap: "12px", justifyContent: "flex-end" }}>
-                        <button
-                          style={{
-                            background: "#6b7280",
-                            color: "white",
-                            padding: "10px 24px",
-                            border: "none",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          BACK
-                        </button>
-                        <button
-                          style={{
-                            background: "#3b82f6",
-                            color: "white",
-                            padding: "10px 24px",
-                            border: "none",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          SAVE AS PDF
-                        </button>
-                        <button
-                          style={{
-                            background: "#10b981",
-                            color: "white",
-                            padding: "10px 24px",
-                            border: "none",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          SAVE AS EXCEL
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+    {/* Financial Year Dropdown - top aligned */}
+    <div style={{
+      marginBottom: "28px",
+      display: "flex",
+      alignItems: "center",
+      gap: "16px",
+      flexWrap: "wrap",
+    }}>
+      <label style={{
+        fontWeight: "600",
+        fontSize: "1.05rem",
+        color: "#334155",
+      }}>
+        Financial Year:
+      </label>
+      <select
+        style={{
+          padding: "10px 16px",
+          border: "1px solid #cbd5e1",
+          borderRadius: "8px",
+          fontSize: "1rem",
+          minWidth: "160px",
+          background: "white",
+          boxShadow: "inset 0 1px 3px rgba(0,0,0,0.05)",
+        }}
+      >
+        <option>2017-18</option>
+        <option>2018-19</option>
+        <option>2019-20</option>
+        <option>2020-21</option>
+        <option>2021-22</option>
+        <option>2022-23</option>
+        <option>2023-24</option>
+        <option>2024-25</option>
+        <option selected>2025-26</option>
+      </select>
+    </div>
 
-              {/* Liability Detailed Tab */}
-              {activeLedgerTab === "liability" && (
-                <div style={{ padding: "32px" }}>
-                  <div style={{ background: "#a21caf", color: "#fff", padding: "20px 32px", borderRadius: "12px 12px 0 0", fontWeight: "700", fontSize: "1.4rem" }}>
-                    Liability Ledger - Detailed View
-                  </div>
-                  <div style={{ padding: "32px" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "1.1rem" }}>
-                      <tbody>
-                        <tr>
-                          <td style={{ padding: "18px" }}>Liability (GSTR-1)</td>
-                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹10,25,365.25</td>
-                        </tr>
-                        <tr>
-                          <td style={{ padding: "18px" }}>Liability (GSTR-3B)</td>
-                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹10,20,365.25</td>
-                        </tr>
-                        <tr style={{ color: "red", fontWeight: "700", background: "#fee2e2" }}>
-                          <td style={{ padding: "18px" }}>Difference</td>
-                          <td style={{ padding: "18px", textAlign: "right" }}>₹5,000.00</td>
-                        </tr>
-                        <tr>
-                          <td style={{ padding: "18px" }}>ITC (GSTR-2B)</td>
-                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹11,11,265.50</td>
-                        </tr>
-                        <tr>
-                          <td style={{ padding: "18px" }}>ITC (GSTR-3B)</td>
-                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹11,10,265.50</td>
-                        </tr>
-                        <tr style={{ color: "#f97316", fontWeight: "700", background: "#fefce8" }}>
-                          <td style={{ padding: "18px" }}>Difference</td>
-                          <td style={{ padding: "18px", textAlign: "right" }}>-₹1,000.00</td>
-                        </tr>
-                        <tr>
-                          <td style={{ padding: "18px" }}>ITC (GSTR-2A)</td>
-                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹11,11,265.50</td>
-                        </tr>
-                        <tr>
-                          <td style={{ padding: "18px" }}>ITC (GSTR-3B)</td>
-                          <td style={{ padding: "18px", textAlign: "right", fontWeight: "700" }}>₹11,10,265.50</td>
-                        </tr>
-                        <tr style={{ color: "#16a34a", fontWeight: "700", background: "#ecfdf5" }}>
-                          <td style={{ padding: "18px" }}>Difference</td>
-                          <td style={{ padding: "18px", textAlign: "right" }}>₹0.00</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
+    {/* Ledger Navigation Tabs - compact size */}
+    <div style={{
+      display: "flex",
+      borderBottom: "2px solid #e2e8f0",
+      marginBottom: "32px",
+      gap: "4px",           // tabs ke beech kam gap
+    }}>
+      <button
+        onClick={() => setActiveTurnoverView('overview')}
+        style={{
+          padding: "10px 24px",          // ← padding kam kiya → compact
+          background: activeTurnoverView === 'overview' ? "#7c3aed" : "transparent",
+          color: activeTurnoverView === 'overview' ? "white" : "#475569",
+          border: "none",
+          borderRadius: "8px 8px 0 0",
+          fontWeight: activeTurnoverView === 'overview' ? "700" : "600",
+          fontSize: "0.98rem",           // ← font thoda chhota
+          cursor: "pointer",
+          transition: "all 0.2s",
+          minWidth: "140px",
+          boxShadow: activeTurnoverView === 'overview' ? "0 4px 12px rgba(124,58,237,0.25)" : "none",
+        }}
+      >
+        Overview
+      </button>
 
+      <button
+        onClick={() => setActiveTurnoverView('cash')}
+        style={{
+          padding: "10px 24px",
+          background: activeTurnoverView === 'cash' ? "#10b981" : "transparent",
+          color: activeTurnoverView === 'cash' ? "white" : "#475569",
+          border: "none",
+          borderRadius: "8px 8px 0 0",
+          fontWeight: activeTurnoverView === 'cash' ? "700" : "600",
+          fontSize: "0.98rem",
+          cursor: "pointer",
+          transition: "all 0.2s",
+          minWidth: "140px",
+          boxShadow: activeTurnoverView === 'cash' ? "0 4px 12px rgba(16,185,129,0.25)" : "none",
+        }}
+      >
+        Electronic Cash Ledger
+      </button>
+
+      <button
+        onClick={() => setActiveTurnoverView('credit')}
+        style={{
+          padding: "10px 24px",
+          background: activeTurnoverView === 'credit' ? "#3b82f6" : "transparent",
+          color: activeTurnoverView === 'credit' ? "white" : "#475569",
+          border: "none",
+          borderRadius: "8px 8px 0 0",
+          fontWeight: activeTurnoverView === 'credit' ? "700" : "600",
+          fontSize: "0.98rem",
+          cursor: "pointer",
+          transition: "all 0.2s",
+          minWidth: "140px",
+          boxShadow: activeTurnoverView === 'credit' ? "0 4px 12px rgba(59,130,246,0.25)" : "none",
+        }}
+      >
+        Electronic Credit Ledger
+      </button>
+    </div>
+
+    {/* Content Area */}
+    {activeTurnoverView === 'overview' && (
+      <div>
+        <div style={{
+          fontSize: "1.3rem",
+          fontWeight: "700",
+          marginBottom: "20px",
+          color: "#1e293b",
+        }}>
+          Turnover Summary
+        </div>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "24px",
+        }}>
+          <div style={{
+            padding: "24px",
+            background: "#f8fafc",
+            borderRadius: "10px",
+            border: "1px solid #e2e8f0",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          }}>
+            <div style={{ fontWeight: "600", marginBottom: "10px", color: "#475569" }}>
+              Turnover Estimated
+            </div>
+            <div style={{ fontSize: "1.6rem", fontWeight: "700", color: "#1d4ed8" }}>
+              ₹1,25,65,635.00
+            </div>
+          </div>
+
+          <div style={{
+            padding: "24px",
+            background: "#f8fafc",
+            borderRadius: "10px",
+            border: "1px solid #e2e8f0",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          }}>
+            <div style={{ fontWeight: "600", marginBottom: "10px", color: "#475569" }}>
+              Aggregate Turnover
+            </div>
+            <div style={{ fontSize: "1.6rem", fontWeight: "700", color: "#059669" }}>
+              ₹1,25,65,635.00
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {(activeTurnoverView === 'cash' || activeTurnoverView === 'credit') && (
+      <div>
+        {/* Date Range + Go Button */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "16px",
+          marginBottom: "28px",
+          flexWrap: "wrap",
+        }}>
+          <div>
+            <strong style={{ marginRight: "8px" }}>From:</strong>
+            <input
+              type="date"
+              defaultValue="2025-04-01"
+              style={{
+                padding: "10px 14px",
+                border: "1px solid #cbd5e1",
+                borderRadius: "8px",
+                fontSize: "1rem",
+              }}
+            />
+          </div>
+          <div>
+            <strong style={{ marginRight: "8px" }}>To:</strong>
+            <input
+              type="date"
+              defaultValue="2025-06-30"
+              style={{
+                padding: "10px 14px",
+                border: "1px solid #cbd5e1",
+                borderRadius: "8px",
+                fontSize: "1rem",
+              }}
+            />
+          </div>
+          <button
+            style={{
+              background: "#3b82f6",
+              color: "white",
+              padding: "11px 28px",
+              border: "none",
+              borderRadius: "8px",
+              fontWeight: "600",
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(59,130,246,0.25)",
+            }}
+          >
+            GO
+          </button>
+        </div>
+
+        {/* Table - GST portal style */}
+        <div style={{ overflowX: "auto", marginBottom: "28px" }}>
+          <table style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "0.97rem",
+          }}>
+            <thead>
+              <tr style={{ background: "#f1f5f9" }}>
+                <th style={{ padding: "14px 12px", textAlign: "center", fontWeight: "600" }}>Sr.No</th>
+                <th style={{ padding: "14px 12px", fontWeight: "600" }}>Date</th>
+                <th style={{ padding: "14px 12px", fontWeight: "600" }}>Reference No.</th>
+                <th style={{ padding: "14px 12px", fontWeight: "600" }}>Description</th>
+                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "600" }}>Integrated Tax</th>
+                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "600" }}>Central Tax</th>
+                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "600" }}>State Tax</th>
+                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "600" }}>Cess</th>
+                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "700" }}>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{ padding: "14px 12px", textAlign: "center" }}>1</td>
+                <td style={{ padding: "14px 12px" }}>-</td>
+                <td style={{ padding: "14px 12px" }}>-</td>
+                <td style={{ padding: "14px 12px" }}>Opening Balance</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right", fontWeight: "bold" }}>0.00</td>
+              </tr>
+
+              <tr>
+                <td style={{ padding: "14px 12px", textAlign: "center" }}>2</td>
+                <td style={{ padding: "14px 12px" }}>03/04/2025</td>
+                <td style={{ padding: "14px 12px" }}>AC09253604536</td>
+                <td style={{ padding: "14px 12px" }}>ITC accrued through - Inputs</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>16,390.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>16,390.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>32,780.00</td>
+              </tr>
+
+              <tr style={{ fontWeight: "700", background: "#ecfdf5" }}>
+                <td style={{ padding: "14px 12px" }} colSpan="4">Closing Balance</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>52,671.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>2,68,221.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>19,809.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
+                <td style={{ padding: "14px 12px", textAlign: "right", color: "#16a34a", fontSize: "1.1rem" }}>
+                  3,40,701.00
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Bottom Buttons with Down Arrow */}
+        <div style={{
+          marginTop: "28px",
+          textAlign: "right",
+          display: "flex",
+          gap: "12px",
+          justifyContent: "flex-end",
+        }}>
+          <button
+            style={{
+              background: "#6b7280",
+              color: "white",
+              padding: "10px 24px",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "600",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <span>BACK</span>
+          </button>
+
+          <button
+            style={{
+              background: "#3b82f6",
+              color: "white",
+              padding: "10px 24px",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "600",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              boxShadow: "0 2px 8px rgba(59,130,246,0.25)",
+            }}
+          >
+            <span>SAVE AS PDF</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+
+          <button
+            style={{
+              background: "#10b981",
+              color: "white",
+              padding: "10px 24px",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "600",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              boxShadow: "0 2px 8px rgba(16,185,129,0.25)",
+            }}
+          >
+            <span>SAVE AS EXCEL</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
+           {activeLedgerTab === "liability" && (
+  <div style={{
+    padding: "16px 24px",               // outer padding kam
+    background: "#ffffff",
+    borderRadius: "10px",
+    boxShadow: "0 3px 12px rgba(0,0,0,0.05)",
+    border: "1px solid #e5e7eb",
+  }}>
+
+    {/* Chhota Header */}
+    <div style={{
+      background: "linear-gradient(90deg, #ef4444, #f97316)",
+      color: "white",
+      padding: "10px 16px",
+      borderRadius: "8px 8px 0 0",
+      fontSize: "1.1rem",
+      fontWeight: "700",
+      margin: "-16px -24px 20px -24px",
+      textAlign: "center",
+    }}>
+      Liability Reconciliation
+    </div>
+
+    {/* Bahut Compact Table */}
+    <table style={{
+      width: "100%",
+      borderCollapse: "separate",
+      borderSpacing: "0 2px",           // rows ke beech almost zero space
+      fontSize: "0.95rem",              // font chhota
+    }}>
+      <tbody>
+        <tr style={{ background: "#f9fafb" }}>
+          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
+            Liability (GSTR-1)
+          </td>
+          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#1d4ed8" }}>
+            ₹10,25,365.25
+          </td>
+        </tr>
+
+        <tr style={{ background: "#f9fafb" }}>
+          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
+            Liability (GSTR-3B)
+          </td>
+          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#1d4ed8" }}>
+            ₹10,20,365.25
+          </td>
+        </tr>
+
+        <tr style={{ background: "#fee2e2" }}>
+          <td style={{ padding: "10px 14px", fontWeight: "700", color: "#dc2626" }}>
+            Diff
+          </td>
+          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#dc2626" }}>
+            ₹5,000.00
+          </td>
+        </tr>
+
+        <tr style={{ background: "#f0fdf4" }}>
+          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
+            ITC (GSTR-2B)
+          </td>
+          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#059669" }}>
+            ₹11,11,265.50
+          </td>
+        </tr>
+
+        <tr style={{ background: "#f0fdf4" }}>
+          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
+            ITC (GSTR-3B)
+          </td>
+          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#059669" }}>
+            ₹11,10,265.50
+          </td>
+        </tr>
+
+        <tr style={{ background: "#fefce8" }}>
+          <td style={{ padding: "10px 14px", fontWeight: "700", color: "#d97706" }}>
+            Diff
+          </td>
+          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#d97706" }}>
+            -₹1,000.00
+          </td>
+        </tr>
+
+        <tr style={{ background: "#f0fdf4" }}>
+          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
+            ITC (GSTR-2A)
+          </td>
+          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#059669" }}>
+            ₹11,11,265.50
+          </td>
+        </tr>
+
+        <tr style={{ background: "#f0fdf4" }}>
+          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
+            ITC (GSTR-3B)
+          </td>
+          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#059669" }}>
+            ₹11,10,265.50
+          </td>
+        </tr>
+
+        <tr style={{ background: "#ecfdf5" }}>
+          <td style={{ padding: "10px 14px", fontWeight: "700", color: "#16a34a" }}>
+            Diff
+          </td>
+          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#16a34a" }}>
+            ₹0.00
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    {/* Bahut chhota note */}
+    <div style={{
+      marginTop: "12px",
+      fontSize: "0.82rem",
+      color: "#9ca3af",
+      textAlign: "center",
+    }}>
+      GST portal • 24 Jan 2026
+    </div>
+  </div>
+)}
               {/* Payment Tab */}
               {activeLedgerTab === "payment" && (
                 <div>
