@@ -3122,131 +3122,139 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
 
       </div>
     )}
-  
-{activeLedgerTab === "elb" && (
+  {activeLedgerTab === "elb" && (
   <div style={{
-    padding: "24px 32px",
+    padding: "16px 24px",
+    margin: 0,
+    width: "100%",
     background: "#ffffff",
-    borderRadius: "12px",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-    border: "1px solid #e2e8f0",
-    // width full rakha hai — shrink nahi kiya
+    borderRadius: "10px",
+    boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
+    border: "1px solid #e5e7eb",
   }}>
 
-    {/* Header - full width highlight with shadow */}
+    {/* Header – already compact */}
     <div style={{
       background: "linear-gradient(90deg, #4f46e5, #7c3aed)",
       color: "white",
-      padding: "16px 28px",
-      borderRadius: "10px 10px 0 0",
-      fontSize: "1.35rem",
+      padding: "10px 20px",
+      fontSize: "1.18rem",
       fontWeight: "700",
-      boxShadow: "0 4px 12px rgba(79,70,229,0.25)",
-      margin: "-24px -32px 32px -32px",  // full bleed effect
       textAlign: "center",
+      margin: "-16px -24px 16px -24px",  // margin bhi kam
     }}>
-      Electronic Ledger Balances - Detailed View
+      Electronic Ledger Balances
     </div>
 
-    {/* Main Content */}
-    <div>
-
-      {/* Cash & Credit Balances - full width, side by side */}
+    {/* Ab andar ke cards ko bahut chhota kiya */}
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "12px",                      // gap bhi kam
+      marginBottom: "16px",             // niche space kam
+    }}>
+      {/* Cash Ledger Card – slim */}
       <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "32px",
-        marginBottom: "36px",
-        padding: "0 12px",
+        padding: "12px 14px",           // padding bahut kam
+        background: "#f0f9ff",
+        borderRadius: "8px",
+        border: "1px solid #bfdbfe",
+        minHeight: "90px",              // height control
       }}>
-        <div style={{
-          padding: "20px",
-          background: "#f0f9ff",
-          borderRadius: "10px",
-          border: "1px solid #bfdbfe",
+        <div style={{ 
+          fontSize: "0.88rem", 
+          color: "#64748b", 
+          marginBottom: "4px" 
         }}>
-          <div style={{ color: "#64748b", fontSize: "1rem", marginBottom: "8px" }}>
-            Cash Ledger Balance
-          </div>
-          <div style={{
-            fontSize: "2.1rem",
-            fontWeight: "700",
-            color: "#1d4ed8",
-          }}>
-            ₹58,756.00
-          </div>
+          Cash Ledger
         </div>
-
-        <div style={{
-          padding: "20px",
-          background: "#f0fdf4",
-          borderRadius: "10px",
-          border: "1px solid #a7f3d0",
+        <div style={{ 
+          fontSize: "1.45rem",          // amount bhi thoda chhota
+          fontWeight: "700", 
+          color: "#1d4ed8" 
         }}>
-          <div style={{ color: "#64748b", fontSize: "1rem", marginBottom: "8px" }}>
-            Electronic Credit Ledger Balance
-          </div>
-          <div style={{
-            fontSize: "2.1rem",
-            fontWeight: "700",
-            color: "#059669",
-          }}>
-            ₹36,845.00
-          </div>
+          ₹58,756.00
         </div>
       </div>
 
-      {/* Credit Ledger Table Section - full width */}
+      {/* Credit Ledger Card – slim */}
       <div style={{
-        background: "#f8fafc",
-        borderRadius: "10px",
-        border: "1px solid #e2e8f0",
-        overflow: "hidden",
-        marginBottom: "24px",
+        padding: "12px 14px",
+        background: "#f0fdf4",
+        borderRadius: "8px",
+        border: "1px solid #a7f3d0",
+        minHeight: "90px",
       }}>
-        <div style={{
-          background: "#059669",
-          color: "white",
-          padding: "14px 24px",
-          fontSize: "1.25rem",
-          fontWeight: "600",
-          textAlign: "center",
+        <div style={{ 
+          fontSize: "0.88rem", 
+          color: "#64748b", 
+          marginBottom: "4px" 
         }}>
-          Balance of Electronic Credit Ledger
+          Credit Ledger
         </div>
-
-        <table style={{
-          width: "100%",
-          borderCollapse: "collapse",
+        <div style={{ 
+          fontSize: "1.45rem", 
+          fontWeight: "700", 
+          color: "#059669" 
         }}>
-          <thead>
-            <tr style={{ background: "#f1f5f9" }}>
-              <th style={{ padding: "16px", fontWeight: "600", color: "#334155", textAlign: "center" }}>IGST</th>
-              <th style={{ padding: "16px", fontWeight: "600", color: "#334155", textAlign: "center" }}>CGST</th>
-              <th style={{ padding: "16px", fontWeight: "600", color: "#334155", textAlign: "center" }}>SGST</th>
-              <th style={{ padding: "16px", fontWeight: "600", color: "#334155", textAlign: "center" }}>CESS</th>
-              <th style={{ padding: "16px", fontWeight: "700", color: "#059669", textAlign: "center" }}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style={{ borderTop: "1px solid #e5e7eb" }}>
-              <td style={{ padding: "18px", textAlign: "center", fontSize: "1.1rem", fontWeight: "500" }}>₹25,165</td>
-              <td style={{ padding: "18px", textAlign: "center", fontSize: "1.1rem", fontWeight: "500" }}>₹12,324</td>
-              <td style={{ padding: "18px", textAlign: "center", fontSize: "1.1rem", fontWeight: "500" }}>₹5,632</td>
-              <td style={{ padding: "18px", textAlign: "center", fontSize: "1.1rem", fontWeight: "500" }}>₹15,635</td>
-              <td style={{
-                padding: "18px",
-                textAlign: "center",
-                fontSize: "1.25rem",
-                fontWeight: "700",
-                color: "#059669"
-              }}>
-                ₹58,756
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          ₹36,845.00
+        </div>
       </div>
+    </div>
+
+    {/* Table – already compact tha, thoda aur tight */}
+    <div style={{
+      background: "#f8fafc",
+      borderRadius: "8px",
+      border: "1px solid #e2e8f0",
+      overflow: "hidden",
+    }}>
+      <div style={{
+        background: "#059669",
+        color: "white",
+        padding: "8px 16px",            // header padding kam
+        fontSize: "1rem",
+        fontWeight: "600",
+        textAlign: "center",
+      }}>
+        Credit Ledger Balance
+      </div>
+
+      <table style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        fontSize: "0.94rem",
+      }}>
+        <thead>
+          <tr style={{ background: "#f1f5f9" }}>
+            <th style={{ padding: "8px 10px", fontWeight: "600", textAlign: "center" }}>IGST</th>
+            <th style={{ padding: "8px 10px", fontWeight: "600", textAlign: "center" }}>CGST</th>
+            <th style={{ padding: "8px 10px", fontWeight: "600", textAlign: "center" }}>SGST</th>
+            <th style={{ padding: "8px 10px", fontWeight: "600", textAlign: "center" }}>CESS</th>
+            <th style={{ padding: "8px 10px", fontWeight: "700", textAlign: "center" }}>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: "500" }}>₹25,165</td>
+            <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: "500" }}>₹12,324</td>
+            <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: "500" }}>₹5,632</td>
+            <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: "500" }}>₹15,635</td>
+            <td style={{
+              padding: "10px 10px",
+              textAlign: "center",
+              fontWeight: "700",
+              fontSize: "1.02rem",
+              color: "#059669"
+            }}>
+              ₹58,756
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  
 
       {/* Small footer note */}
       <div style={{
