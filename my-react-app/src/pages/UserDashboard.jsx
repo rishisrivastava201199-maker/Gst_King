@@ -2786,204 +2786,343 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               })}
             </div>
           ))}
-          <div style={{ display: "flex", justifyContent: "center", gap: "48px", margin: "32px 0", flexWrap: "wrap" }}>
-            <div style={{ textAlign: "center" }}>
-              <strong>GSTR-9:</strong>{" "}
-              <span
-                style={{
-                  background: "#fde68a",
-                  color: "#92400e",
-                  padding: "8px 20px",
-                  borderRadius: "30px",
-                  fontWeight: "600",
-                  fontSize: "1rem",
-                }}
-              >
-                Due
-              </span>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <strong>GSTR-9C:</strong>{" "}
-              <span
-                style={{
-                  background: "#fde68a",
-                  color: "#92400e",
-                  padding: "8px 20px",
-                  borderRadius: "30px",
-                  fontWeight: "600",
-                  fontSize: "1rem",
-                }}
-              >
-                Due
-              </span>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <strong>IMS:</strong>
-              <button
-                style={{
-                  marginLeft: "12px",
-                  background: "#3b82f6",
-                  color: "white",
-                  padding: "10px 20px",
-                  borderRadius: "10px",
-                  fontWeight: "600",
-                  fontSize: "1rem",
-                }}
-              >
-                File
-              </button>
-            </div>
+          <div
+  style={{
+    position: "absolute",
+    right: "28px",
+    bottom: "28px",
+    display: "flex",
+    gap: "10px",
+    zIndex: 10,
+  }}
+>
+  {[
+    { label: "GSTR-9", color: "#f59e0b" },
+    { label: "GSTR-9C", color: "#f97316" },
+    { label: "IMS", color: "#3b82f6" },
+  ].map((item) => (
+    <div
+      key={item.label}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        background: "#ffffff",
+        border: `1px solid ${item.color}`,
+        color: item.color,
+        padding: "6px 12px",
+        borderRadius: "999px",
+        fontSize: "0.78rem",
+        fontWeight: "600",
+        boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+      }}
+    >
+      <span>{item.label}</span>
+      <span
+        style={{
+          background: item.color,
+          color: "white",
+          padding: "2px 8px",
+          borderRadius: "999px",
+          fontSize: "0.7rem",
+        }}
+      >
+        DUE
+      </span>
+    </div>
+  ))}
+</div>
+     <div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: "12px",
+  }}
+>
+  <div style={{ display: "flex", gap: "12px" }}>
+    {/* PDF */}
+    <button
+      title="Download PDF"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "10px 16px",
+        borderRadius: "10px",
+        border: "none",
+        background: "#fef2f2",
+        color: "#dc2626",
+        fontSize: "14px",
+        fontWeight: "600",
+        cursor: "pointer",
+        boxShadow: "0 4px 14px rgba(220, 38, 38, 0.2)",
+        transition: "all 0.25s ease",
+      }}
+      onMouseEnter={(e) => Object.assign(e.currentTarget.style, {
+        transform: "translateY(-2px)",
+        boxShadow: "0 10px 24px rgba(220, 38, 38, 0.3)",
+        background: "#fee2e2",
+      })}
+      onMouseLeave={(e) => Object.assign(e.currentTarget.style, {
+        transform: "translateY(0)",
+        boxShadow: "0 4px 14px rgba(220, 38, 38, 0.2)",
+        background: "#fef2f2",
+      })}
+    >
+      <span style={{ fontSize: "18px" }}>↓</span>
+      PDF
+    </button>
+
+    {/* Excel */}
+    <button
+      title="Download Excel"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "10px 16px",
+        borderRadius: "10px",
+        border: "none",
+        background: "#f0fdf4",
+        color: "#15803d",
+        fontSize: "14px",
+        fontWeight: "600",
+        cursor: "pointer",
+        boxShadow: "0 4px 14px rgba(22, 163, 74, 0.2)",
+        transition: "all 0.25s ease",
+      }}
+      onMouseEnter={(e) => Object.assign(e.currentTarget.style, {
+        transform: "translateY(-2px)",
+        boxShadow: "0 10px 24px rgba(22, 163, 74, 0.3)",
+        background: "#dcfce7",
+      })}
+      onMouseLeave={(e) => Object.assign(e.currentTarget.style, {
+        transform: "translateY(0)",
+        boxShadow: "0 4px 14px rgba(22, 163, 74, 0.2)",
+        background: "#f0fdf4",
+      })}
+    >
+      <span style={{ fontSize: "18px" }}>↓</span>
+      Excel
+    </button>
+  </div>
+</div>
+{/* LEDGER SUMMARY SECTION */}
+<div style={{ marginTop: "48px" }}>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "24px",
+    }}
+  >
+    <h2 style={{ margin: 0, fontSize: "1.75rem", fontWeight: "800", color: "#111827" }}>
+      Ledger Summary
+    </h2>
+    <button
+      style={{
+        background: "#16a34a",
+        color: "#fff",
+        padding: "10px 24px",
+        borderRadius: "10px",
+        border: "none",
+        fontWeight: "700",
+        fontSize: "1rem",
+        boxShadow: "0 4px 12px rgba(22,163,74,0.3)",
+      }}
+    >
+      Update
+    </button>
+  </div>
+
+  {/* Tabs - same rakha, bas thoda premium shadow */}
+  <div style={{ display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap" }}>
+    {ledgerTabs.map((tab) => (
+      <button
+        key={tab.id}
+        onClick={() => setActiveLedgerTab(tab.id)}
+        style={{
+          padding: "10px 24px",
+          background: activeLedgerTab === tab.id ? "#7c3aed" : "#f9fafb",
+          color: activeLedgerTab === tab.id ? "white" : "#4b5563",
+          border: "none",
+          borderRadius: "10px",
+          fontWeight: activeLedgerTab === tab.id ? "700" : "600",
+          fontSize: "1rem",
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+          boxShadow: activeLedgerTab === tab.id 
+            ? "0 6px 20px rgba(124,58,237,0.35)" 
+            : "0 2px 8px rgba(0,0,0,0.06)",
+          transform: activeLedgerTab === tab.id ? "translateY(-2px)" : "translateY(0)",
+        }}
+      >
+        {tab.label}
+      </button>
+    ))}
+  </div>
+
+  <div style={{ background: "#ffffff", borderRadius: "20px", boxShadow: "0 12px 40px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+    {activeLedgerTab === "summary" && (
+      <div style={{ padding: "32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
+
+        {/* Left Card - Electronic Ledger Balances */}
+        <div style={{ 
+          borderRadius: "16px", 
+          overflow: "hidden", 
+          boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+          background: "#ffffff",
+        }}>
+          <div
+            style={{
+              background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+              color: "#ffffff",
+              padding: "12px 24px",
+              fontWeight: "700",
+              fontSize: "1.2rem",              // chhota kiya
+              textAlign: "center",
+              borderTopLeftRadius: "16px",
+              borderTopRightRadius: "16px",
+              boxShadow: "0 4px 15px rgba(124,58,237,0.4)",   // premium glow
+              letterSpacing: "0.5px",
+            }}
+          >
+            Electronic Ledger Balances
           </div>
-          <div style={{ textAlign: "center", margin: "32px 0" }}>
-            <button
-              style={{
-                background: "#f97316",
-                color: "#fff",
-                padding: "14px 40px",
-                border: "none",
-                borderRadius: "10px",
-                fontSize: "1.1rem",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              PDF Download
-            </button>
-            <button
-              style={{
-                background: "#16a34a",
-                color: "#fff",
-                padding: "14px 40px",
-                border: "none",
-                borderRadius: "10px",
-                fontSize: "1.1rem",
-                fontWeight: "600",
-                cursor: "pointer",
-                marginLeft: "24px",
-              }}
-            >
-              Excel Download
-            </button>
-          </div>
-          {/* LEDGER SUMMARY SECTION */}
-          <div style={{ marginTop: "48px" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "24px",
-              }}
-            >
-              <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "700", color: "#1f2937" }}>
-                Ledger Summary
-              </h2>
-              <button
+
+          <div style={{ padding: "20px 24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontWeight: "600", fontSize: "1.15rem" }}>
+              <span>Cash Balance</span>
+              <strong
                 style={{
-                  background: "#16a34a",
-                  color: "#fff",
-                  padding: "10px 20px",
-                  borderRadius: "8px",
-                  border: "none",
-                  fontWeight: "600",
-                  fontSize: "1rem",
+                  color: "#7c3aed",
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  transition: "all 0.2s",
+                }}
+                onClick={() => {
+                  setShowCreditLedger((prev) => {
+                    const newValue = !prev;
+                    if (newValue) {
+                      setTimeout(() => {
+                        const creditSection = document.getElementById("credit-ledger-section");
+                        if (creditSection) {
+                          creditSection.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                      }, 100);
+                    }
+                    return newValue;
+                  });
                 }}
               >
-                Update
-              </button>
+                ₹58,756.00
+              </strong>
             </div>
-            <div style={{ display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap" }}>
-              {ledgerTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveLedgerTab(tab.id)}
+
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px", fontWeight: "600", fontSize: "1.15rem" }}>
+              <span>Credit Balance</span>
+              <strong>₹36,845.00</strong>
+            </div>
+
+            {showCreditLedger && (
+              <div
+                id="credit-ledger-section"
+                style={{
+                  marginTop: "24px",
+                  paddingTop: "24px",
+                  borderTop: "2px dashed #d1d5db",
+                  scrollMarginTop: "120px",
+                }}
+              >
+                <div
                   style={{
-                    padding: "12px 28px",
-                    background: activeLedgerTab === tab.id ? "#7c3aed" : "#f3f4f6",
-                    color: activeLedgerTab === tab.id ? "white" : "#444",
-                    border: "none",
-                    borderRadius: "10px",
-                    fontWeight: activeLedgerTab === tab.id ? "700" : "600",
-                    fontSize: "1.1rem",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                    boxShadow: activeLedgerTab === tab.id ? "0 6px 20px rgba(124,58,237,0.4)" : "none",
-                    transform: activeLedgerTab === tab.id ? "translateY(-3px)" : "translateY(0)",
+                    background: "linear-gradient(135deg, #15803d, #166534)",
+                    color: "#ffffff",
+                    padding: "10px 20px",
+                    textAlign: "center",
+                    fontWeight: "700",
+                    fontSize: "1.15rem",           // chhota + premium
+                    borderRadius: "12px",
+                    marginBottom: "20px",
+                    boxShadow: "0 4px 16px rgba(22,163,74,0.35)",  // halka highlight glow
                   }}
                 >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-            <div style={{ background: "#ffffff", borderRadius: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.1)", overflow: "hidden" }}>
-              {activeLedgerTab === "summary" && (
-                <div style={{ padding: "32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
-                  <div style={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
-                    <div style={{ background: "#a21caf", color: "#fff", padding: "16px 24px", fontWeight: "700", fontSize: "1.3rem" }}>
-                      Electronic Ledger Balances
-                    </div>
-                    <div style={{ padding: "24px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", fontWeight: "600", fontSize: "1.2rem" }}>
-                        <span>Cash Balance</span>
-                        <strong
-                          style={{ color: "#7c3aed", cursor: "pointer", textDecoration: "underline" }}
-                          onClick={() => setShowCreditLedger(!showCreditLedger)}
-                        >
-                          ₹58,756.00
-                        </strong>
-                      </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px", fontWeight: "600", fontSize: "1.2rem" }}>
-                        <span>Credit Balance</span>
-                        <strong>₹36,845.00</strong>
-                      </div>
-                      {showCreditLedger && (
-                        <div style={{ marginTop: "24px", paddingTop: "24px", borderTop: "1px solid #e5e7eb" }}>
-                          <div style={{ background: "#16a34a", color: "#fff", padding: "14px", textAlign: "center", fontWeight: "700", fontSize: "1.2rem" }}>
-                            Balance of Electronic Credit Ledger
-                          </div>
-                          <table style={{ width: "100%", borderCollapse: "collapse", background: "#ecfdf5" }}>
-                            <thead>
-                              <tr>
-                                <th style={{ padding: "12px", textAlign: "center" }}>IGST</th>
-                                <th style={{ padding: "12px", textAlign: "center" }}>CGST</th>
-                                <th style={{ padding: "12px", textAlign: "center" }}>SGST</th>
-                                <th style={{ padding: "12px", textAlign: "center" }}>CESS</th>
-                                <th style={{ padding: "12px", textAlign: "center" }}>Total</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td style={{ padding: "12px", textAlign: "center" }}>₹25,165</td>
-                                <td style={{ padding: "12px", textAlign: "center" }}>₹12,324</td>
-                                <td style={{ padding: "12px", textAlign: "center" }}>₹5,632</td>
-                                <td style={{ padding: "12px", textAlign: "center" }}>₹15,635</td>
-                                <td style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>₹58,756</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div style={{ borderRadius: "12px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
-                    <div style={{ background: "#a21caf", color: "#fff", padding: "16px 24px", fontWeight: "700", fontSize: "1.3rem" }}>
-                      Turnover Balances
-                    </div>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <tbody>
-                        <tr>
-                          <td style={{ padding: "16px", fontWeight: "600" }}>Turnover Estimated</td>
-                          <td style={{ padding: "16px", textAlign: "right", fontWeight: "700" }}>₹1,25,65,635.00</td>
-                        </tr>
-                        <tr style={{ background: "#f3f4f6" }}>
-                          <td style={{ padding: "16px", fontWeight: "600" }}>Aggregate Turnover</td>
-                          <td style={{ padding: "16px", textAlign: "right", fontWeight: "700" }}>₹1,25,65,635.00</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                  Balance of Electronic Credit Ledger
                 </div>
-              )}
+
+                <table style={{ width: "100%", borderCollapse: "collapse", background: "#f0fdf4", borderRadius: "12px", overflow: "hidden" }}>
+                  <thead>
+                    <tr style={{ background: "#dcfce7" }}>
+                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>IGST</th>
+                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>CGST</th>
+                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>SGST</th>
+                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>CESS</th>
+                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: "12px", textAlign: "center" }}>₹25,165</td>
+                      <td style={{ padding: "12px", textAlign: "center" }}>₹12,324</td>
+                      <td style={{ padding: "12px", textAlign: "center" }}>₹5,632</td>
+                      <td style={{ padding: "12px", textAlign: "center" }}>₹15,635</td>
+                      <td style={{ padding: "12px", textAlign: "center", fontWeight: "800", color: "#15803d" }}>
+                        ₹58,756
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Card - Turnover Balances */}
+        <div style={{ 
+          borderRadius: "16px", 
+          overflow: "hidden", 
+          boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+          background: "#ffffff",
+        }}>
+          <div
+            style={{
+              background: "linear-gradient(135deg, #1e40af, #1e3a8a)",
+              color: "#ffffff",
+              padding: "12px 24px",
+              fontWeight: "700",
+              fontSize: "1.2rem",               // chhota kiya
+              textAlign: "center",
+              borderTopLeftRadius: "16px",
+              borderTopRightRadius: "16px",
+              boxShadow: "0 4px 15px rgba(30,64,175,0.4)",   // premium glow
+              letterSpacing: "0.5px",
+            }}
+          >
+            Turnover Balances
+          </div>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <tbody>
+              <tr>
+                <td style={{ padding: "14px 20px", fontWeight: "600", fontSize: "1.1rem" }}>Turnover Estimated</td>
+                <td style={{ padding: "14px 20px", textAlign: "right", fontWeight: "800", fontSize: "1.15rem" }}>
+                  ₹1,25,65,635.00
+                </td>
+              </tr>
+              <tr style={{ background: "#eff6ff" }}>
+                <td style={{ padding: "14px 20px", fontWeight: "600", fontSize: "1.1rem" }}>Aggregate Turnover</td>
+                <td style={{ padding: "14px 20px", textAlign: "right", fontWeight: "800", fontSize: "1.15rem" }}>
+                  ₹1,25,65,635.00
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    )}
+  
 
               {activeLedgerTab === "elb" && (
                 <div style={{ padding: "32px" }}>
