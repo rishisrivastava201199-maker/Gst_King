@@ -3896,17 +3896,30 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       }}
     >
       {/* HEADER */}
-      <div
-        style={{
-          background: "linear-gradient(135deg,#2563eb,#3b82f6)",
-          color: "#ffffff",
-          padding: "12px 18px",
-          fontSize: "1.05rem",
-          fontWeight: "600",
-        }}
-      >
-        Outstanding Demand
-      </div>
+     <div
+  style={{
+    padding: "18px 20px",
+    borderBottom: "1px solid #e5e7eb",
+    background: "#ffffff",
+  }}
+>
+<span
+  style={{
+    display: "inline-block",
+    padding: "4px 12px",                 // ⬅ height kam
+    background: "linear-gradient(135deg,#2563eb,#1e40af)",
+    color: "#ffffff",
+    fontSize: "0.95rem",                 // ⬅ thoda chhota
+    fontWeight: "700",
+    borderRadius: "8px",                 // ⬅ curve kam (pill nahi)
+    boxShadow: "0 4px 10px rgba(37,99,235,0.30)", // ⬅ subtle premium shadow
+    letterSpacing: "0.2px",
+  }}
+>
+  Outstanding Demand
+</span>
+</div>
+
 
       {/* TABLE */}
       <div style={{ overflowX: "auto" }}>
