@@ -23,6 +23,7 @@ body {
   --menu-bg: #25293c; /* New var for menu bar background */
 }
 
+
 .dark-mode {
   --bg-color: #1a1b1e;
   --text-color: #e0e0e0;

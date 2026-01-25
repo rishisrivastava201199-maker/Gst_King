@@ -2246,7 +2246,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     { id: "elb", label: "ELB" },
     { id: "turnover", label: "Turnover" },
     { id: "liability", label: "Liability Ledger" },
-    { id: "payment", label: "Payment" },
+    { id: "payment", label: "Demand" },
   ];
   // Dummy data for Outstanding Demand (as per your screenshot + extra rows)
   const outstandingDemands = [
@@ -2605,60 +2605,99 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
   const [activeTurnoverView, setActiveTurnoverView] = useState('overview'); // 'overview' | 'cash' | 'credit'
 
   // Main content rendering function
-  const renderContent = () => {
-    if (activeMenu === "Dashboard") {
-      return (
-        <div style={{ padding: "24px 32px", background: "#f8fafc" }}>
+ const renderContent = () => {
+  if (activeMenu === "Dashboard") {
+    return (
+      <div style={{ padding: "20px 28px", background: "#f8fafc" }}>
+        {/* ───────── HEADER ROW ───────── */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+            flexWrap: "wrap",
+            gap: "14px",
+          }}
+        >
+          {/* LEFT : TITLE */}
+          <h2
+            style={{
+              margin: 0,
+              color: "#0f766e",
+              fontSize: "1.6rem",
+              fontWeight: "700",
+            }}
+          >
+            Returns Status
+          </h2>
+
+          {/* RIGHT : CONTROLS */}
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: "24px",
+              gap: "12px",
               flexWrap: "wrap",
-              gap: "16px",
             }}
           >
-            <h2
+            {/* YEAR SELECT (SMALL & CLEAN) */}
+            <select
+             style={{
+  padding: "8px 1px",  
+  margin :"12px" ,       // ⬅ compact height
+  borderRadius: "8px",
+  border: "1px solid #cbd5e1",  // ⬅ softer border
+  fontSize: "0.9rem",
+  background: "#ffffff",
+  width: "110px",               // ⬅ same small width
+  outline: "none",
+  boxShadow: "0 1px 4px rgba(0,0,0,0.08)", // ⬅ premium depth
+  cursor: "pointer",
+}}
+
+            >
+              <option>2024-25</option>
+              <option>2025-26</option>
+            </select>
+
+            {/* UPDATE BUTTON (PREMIUM) */}
+            <button
               style={{
-                margin: 0,
-                color: "#0d9488",
-                fontSize: "1.8rem",
-                fontWeight: "700",
+                background: "linear-gradient(135deg,#10b981,#059669)",
+                color: "white",
+                padding: "8px 18px",
+                border: "none",
+                borderRadius: "10px",
+                fontWeight: "600",
+                fontSize: "0.95rem",
+                cursor: "pointer",
+                boxShadow: "0 6px 14px rgba(16,185,129,0.35)",
+                transition: "all 0.25s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-1px)";
+                e.currentTarget.style.boxShadow =
+                  "0 8px 18px rgba(16,185,129,0.45)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 6px 14px rgba(16,185,129,0.35)";
               }}
             >
-              Returns  Status
-            </h2>
-            <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
-              <select
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: "10px",
-                  border: "1px solid #d1d5db",
-                  fontSize: "1rem",
-                  background: "white",
-                }}
-              >
-                <option>2024-25</option>
-                <option>2025-26</option>
-              </select>
-              <div style={{ fontSize: "0.95rem", color: "#059669", fontWeight: "600" }}>
-                Last Update: 03-Jan-2026
-              </div>
-              <button
-                style={{
-                  background: "#10b981",
-                  color: "white",
-                  padding: "10px 20px",
-                  border: "none",
-                  borderRadius: "10px",
-                  fontWeight: "600",
-                  fontSize: "1rem",
-                  cursor: "pointer",
-                }}
-              >
                 Update
               </button>
+               <div
+              style={{
+                fontSize: "0.9rem",
+                color: "#059669",
+                fontWeight: "600",
+                whiteSpace: "nowrap",
+              }}
+            >
+              03-Jan-2026
+            </div>
             </div>
           </div>
           <div
@@ -2835,705 +2874,745 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
      <div
   style={{
     display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
+    justifyContent: "flex-end",
     gap: "12px",
+    marginBottom: "12px",
   }}
 >
-  <div style={{ display: "flex", gap: "12px" }}>
-    {/* PDF */}
-    <button
-      title="Download PDF"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        padding: "10px 16px",
-        borderRadius: "10px",
-        border: "none",
-        background: "#fef2f2",
-        color: "#dc2626",
-        fontSize: "14px",
-        fontWeight: "600",
-        cursor: "pointer",
-        boxShadow: "0 4px 14px rgba(220, 38, 38, 0.2)",
-        transition: "all 0.25s ease",
-      }}
-      onMouseEnter={(e) => Object.assign(e.currentTarget.style, {
-        transform: "translateY(-2px)",
-        boxShadow: "0 10px 24px rgba(220, 38, 38, 0.3)",
-        background: "#fee2e2",
-      })}
-      onMouseLeave={(e) => Object.assign(e.currentTarget.style, {
-        transform: "translateY(0)",
-        boxShadow: "0 4px 14px rgba(220, 38, 38, 0.2)",
-        background: "#fef2f2",
-      })}
-    >
-      <span style={{ fontSize: "18px" }}>↓</span>
-      PDF
-    </button>
-
-    {/* Excel */}
-    <button
-      title="Download Excel"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        padding: "10px 16px",
-        borderRadius: "10px",
-        border: "none",
-        background: "#f0fdf4",
-        color: "#15803d",
-        fontSize: "14px",
-        fontWeight: "600",
-        cursor: "pointer",
-        boxShadow: "0 4px 14px rgba(22, 163, 74, 0.2)",
-        transition: "all 0.25s ease",
-      }}
-      onMouseEnter={(e) => Object.assign(e.currentTarget.style, {
-        transform: "translateY(-2px)",
-        boxShadow: "0 10px 24px rgba(22, 163, 74, 0.3)",
-        background: "#dcfce7",
-      })}
-      onMouseLeave={(e) => Object.assign(e.currentTarget.style, {
-        transform: "translateY(0)",
-        boxShadow: "0 4px 14px rgba(22, 163, 74, 0.2)",
-        background: "#f0fdf4",
-      })}
-    >
-      <span style={{ fontSize: "18px" }}>↓</span>
-      Excel
-    </button>
-  </div>
-</div>
-{/* LEDGER SUMMARY SECTION */}
-<div style={{ marginTop: "48px" }}>
-  <div
+  {/* PDF */}
+  <button
     style={{
       display: "flex",
-      justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: "24px",
+      gap: "8px",
+      padding: "10px 20px",
+      borderRadius: "14px",
+      border: "none",
+      background: "#fff5f5",
+      color: "#dc2626",
+      fontSize: "15px",
+      fontWeight: "600",
+      cursor: "pointer",
+      boxShadow: "0 8px 20px rgba(220,38,38,0.18)",
     }}
   >
-    <h2 style={{ margin: 0, fontSize: "1.75rem", fontWeight: "800", color: "#111827" }}>
-      Ledger Summary
-    </h2>
-    <button
-      style={{
-        background: "#16a34a",
-        color: "#fff",
-        padding: "10px 24px",
-        borderRadius: "10px",
-        border: "none",
-        fontWeight: "700",
-        fontSize: "1rem",
-        boxShadow: "0 4px 12px rgba(22,163,74,0.3)",
-      }}
-    >
-      Update
-    </button>
-  </div>
+    <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span>
+    PDF
+  </button>
 
-  {/* Tabs - same rakha, bas thoda premium shadow */}
-  <div style={{ display: "flex", gap: "12px", marginBottom: "32px", flexWrap: "wrap" }}>
-    {ledgerTabs.map((tab) => (
+  {/* EXCEL */}
+  <button
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      padding: "10px 20px",
+      borderRadius: "14px",
+      border: "none",
+      background: "#ecfdf5",
+      color: "#15803d",
+      fontSize: "15px",
+      fontWeight: "600",
+      cursor: "pointer",
+      boxShadow: "0 8px 20px rgba(22,163,74,0.22)",
+    }}
+  >
+    <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span>
+    Excel
+  </button>
+</div>
+
+
+          {/* LEDGER SUMMARY SECTION */}
+          <div style={{ marginTop: "48px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "24px",
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "700", color: "#1f2937" }}>
+                Ledger Summary
+              </h2>
+             <button
+  style={{
+    background:
+      "linear-gradient(180deg, #34d399 0%, #22c55e 45%, #16a34a 100%)",
+    color: "#ffffff",
+    padding: "10px 26px",       // size same
+    borderRadius: "999px",
+    border: "none",
+    fontWeight: "700",
+    fontSize: "1rem",
+    cursor: "pointer",
+    boxShadow:
+      "0 14px 30px rgba(22,163,74,0.55), inset 0 2px 4px rgba(255,255,255,0.35)",
+    transition: "all 0.25s ease",
+  }}
+  onMouseEnter={e => {
+    e.currentTarget.style.transform = "translateY(-1px)";
+    e.currentTarget.style.boxShadow =
+      "0 18px 38px rgba(22,163,74,0.65), inset 0 2px 6px rgba(255,255,255,0.45)";
+  }}
+  onMouseLeave={e => {
+    e.currentTarget.style.transform = "translateY(0)";
+    e.currentTarget.style.boxShadow =
+      "0 14px 30px rgba(22,163,74,0.55), inset 0 2px 4px rgba(255,255,255,0.35)";
+  }}
+>
+  Update
+</button>
+
+            </div>
+
+
+
+<div
+  style={{
+    display: "flex",
+    gap: "16px",
+    marginBottom: "36px",
+    flexWrap: "wrap",
+    alignItems: "center",
+  }}
+>
+  {ledgerTabs.map((tab) => {
+    const isActive = activeLedgerTab === tab.id;
+
+    return (
       <button
         key={tab.id}
         onClick={() => setActiveLedgerTab(tab.id)}
+        onMouseEnter={(e) => {
+          if (!isActive) {
+            e.currentTarget.style.background = "#f1f5ff";
+            e.currentTarget.style.boxShadow =
+              "0 6px 18px rgba(37,99,235,0.18), inset 0 0 0 1px rgba(37,99,235,0.35)";
+            e.currentTarget.style.color = "#1e40af";
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isActive) {
+            e.currentTarget.style.background = "#ffffff";
+            e.currentTarget.style.boxShadow =
+              "0 4px 14px rgba(0,0,0,0.06)";
+            e.currentTarget.style.color = "#334155";
+          }
+        }}
         style={{
-          padding: "10px 24px",
-          background: activeLedgerTab === tab.id ? "#7c3aed" : "#f9fafb",
-          color: activeLedgerTab === tab.id ? "white" : "#4b5563",
-          border: "none",
-          borderRadius: "10px",
-          fontWeight: activeLedgerTab === tab.id ? "700" : "600",
-          fontSize: "1rem",
+          padding: "14px 36px",
+          background: isActive
+            ? "linear-gradient(135deg, #1e40af, #2563eb)"
+            : "#ffffff",
+          color: isActive ? "#ffffff" : "#334155",
+          border: "1px solid",
+          borderColor: isActive ? "transparent" : "#e5e7eb",
+          borderRadius: "999px",
+          fontWeight: isActive ? "700" : "600",
+          fontSize: "1.05rem",
           cursor: "pointer",
-          transition: "all 0.3s ease",
-          boxShadow: activeLedgerTab === tab.id 
-            ? "0 6px 20px rgba(124,58,237,0.35)" 
-            : "0 2px 8px rgba(0,0,0,0.06)",
-          transform: activeLedgerTab === tab.id ? "translateY(-2px)" : "translateY(0)",
+          transition: "all 0.25s ease",
+          boxShadow: isActive
+            ? "0 14px 32px rgba(30,64,175,0.45)"
+            : "0 4px 14px rgba(0,0,0,0.06)",
         }}
       >
         {tab.label}
       </button>
-    ))}
-  </div>
+    );
+  })}
+</div>
 
-  <div style={{ background: "#ffffff", borderRadius: "20px", boxShadow: "0 12px 40px rgba(0,0,0,0.08)", overflow: "hidden" }}>
-    {activeLedgerTab === "summary" && (
-      <div style={{ padding: "32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
 
-        {/* Left Card - Electronic Ledger Balances */}
-        <div style={{ 
-          borderRadius: "16px", 
-          overflow: "hidden", 
-          boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
-          background: "#ffffff",
-        }}>
-          <div
-            style={{
-              background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
-              color: "#ffffff",
-              padding: "12px 24px",
-              fontWeight: "700",
-              fontSize: "1.2rem",              // chhota kiya
-              textAlign: "center",
-              borderTopLeftRadius: "16px",
-              borderTopRightRadius: "16px",
-              boxShadow: "0 4px 15px rgba(124,58,237,0.4)",   // premium glow
-              letterSpacing: "0.5px",
-            }}
-          >
-            Electronic Ledger Balances
-          </div>
 
-          <div style={{ padding: "20px 24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontWeight: "600", fontSize: "1.15rem" }}>
-              <span>Cash Balance</span>
-              <strong
-                style={{
-                  color: "#7c3aed",
-                  cursor: "pointer",
-                  textDecoration: "underline",
-                  transition: "all 0.2s",
-                }}
-                onClick={() => {
-                  setShowCreditLedger((prev) => {
-                    const newValue = !prev;
-                    if (newValue) {
-                      setTimeout(() => {
-                        const creditSection = document.getElementById("credit-ledger-section");
-                        if (creditSection) {
-                          creditSection.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }
-                      }, 100);
-                    }
-                    return newValue;
-                  });
-                }}
-              >
-                ₹58,756.00
-              </strong>
-            </div>
-
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px", fontWeight: "600", fontSize: "1.15rem" }}>
-              <span>Credit Balance</span>
-              <strong>₹36,845.00</strong>
-            </div>
-
-            {showCreditLedger && (
-              <div
-                id="credit-ledger-section"
-                style={{
-                  marginTop: "24px",
-                  paddingTop: "24px",
-                  borderTop: "2px dashed #d1d5db",
-                  scrollMarginTop: "120px",
-                }}
-              >
-                <div
-                  style={{
-                    background: "linear-gradient(135deg, #15803d, #166534)",
-                    color: "#ffffff",
-                    padding: "10px 20px",
-                    textAlign: "center",
-                    fontWeight: "700",
-                    fontSize: "1.15rem",           // chhota + premium
-                    borderRadius: "12px",
-                    marginBottom: "20px",
-                    boxShadow: "0 4px 16px rgba(22,163,74,0.35)",  // halka highlight glow
-                  }}
-                >
-                  Balance of Electronic Credit Ledger
-                </div>
-
-                <table style={{ width: "100%", borderCollapse: "collapse", background: "#f0fdf4", borderRadius: "12px", overflow: "hidden" }}>
-                  <thead>
-                    <tr style={{ background: "#dcfce7" }}>
-                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>IGST</th>
-                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>CGST</th>
-                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>SGST</th>
-                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>CESS</th>
-                      <th style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td style={{ padding: "12px", textAlign: "center" }}>₹25,165</td>
-                      <td style={{ padding: "12px", textAlign: "center" }}>₹12,324</td>
-                      <td style={{ padding: "12px", textAlign: "center" }}>₹5,632</td>
-                      <td style={{ padding: "12px", textAlign: "center" }}>₹15,635</td>
-                      <td style={{ padding: "12px", textAlign: "center", fontWeight: "800", color: "#15803d" }}>
-                        ₹58,756
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Card - Turnover Balances */}
-        <div style={{ 
-          borderRadius: "16px", 
-          overflow: "hidden", 
-          boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
-          background: "#ffffff",
-        }}>
-          <div
-            style={{
-              background: "linear-gradient(135deg, #1e40af, #1e3a8a)",
-              color: "#ffffff",
-              padding: "12px 24px",
-              fontWeight: "700",
-              fontSize: "1.2rem",               // chhota kiya
-              textAlign: "center",
-              borderTopLeftRadius: "16px",
-              borderTopRightRadius: "16px",
-              boxShadow: "0 4px 15px rgba(30,64,175,0.4)",   // premium glow
-              letterSpacing: "0.5px",
-            }}
-          >
-            Turnover Balances
-          </div>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <tbody>
-              <tr>
-                <td style={{ padding: "14px 20px", fontWeight: "600", fontSize: "1.1rem" }}>Turnover Estimated</td>
-                <td style={{ padding: "14px 20px", textAlign: "right", fontWeight: "800", fontSize: "1.15rem" }}>
-                  ₹1,25,65,635.00
-                </td>
-              </tr>
-              <tr style={{ background: "#eff6ff" }}>
-                <td style={{ padding: "14px 20px", fontWeight: "600", fontSize: "1.1rem" }}>Aggregate Turnover</td>
-                <td style={{ padding: "14px 20px", textAlign: "right", fontWeight: "800", fontSize: "1.15rem" }}>
-                  ₹1,25,65,635.00
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-      </div>
-    )}
-  {activeLedgerTab === "elb" && (
-  <div style={{
-    padding: "16px 24px",
-    margin: 0,
-    width: "100%",
+<div
+  style={{
     background: "#ffffff",
-    borderRadius: "10px",
-    boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
-    border: "1px solid #e5e7eb",
-  }}>
-
-    {/* Header – already compact */}
-    <div style={{
-      background: "linear-gradient(90deg, #4f46e5, #7c3aed)",
-      color: "white",
-      padding: "10px 20px",
-      fontSize: "1.18rem",
-      fontWeight: "700",
-      textAlign: "center",
-      margin: "-16px -24px 16px -24px",  // margin bhi kam
-    }}>
-      Electronic Ledger Balances
-    </div>
-
-    {/* Ab andar ke cards ko bahut chhota kiya */}
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: "12px",                      // gap bhi kam
-      marginBottom: "16px",             // niche space kam
-    }}>
-      {/* Cash Ledger Card – slim */}
-      <div style={{
-        padding: "12px 14px",           // padding bahut kam
-        background: "#f0f9ff",
-        borderRadius: "8px",
-        border: "1px solid #bfdbfe",
-        minHeight: "90px",              // height control
-      }}>
-        <div style={{ 
-          fontSize: "0.88rem", 
-          color: "#64748b", 
-          marginBottom: "4px" 
-        }}>
-          Cash Ledger
+    borderRadius: "14px",
+    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+    overflow: "hidden",
+  }}
+>
+  {activeLedgerTab === "summary" && (
+    <div
+      style={{
+        padding: "24px",
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: "24px",
+      }}
+    >
+      {/* ───────── ELECTRONIC LEDGER CARD ───────── */}
+      <div
+        style={{
+          borderRadius: "12px",
+          background: "#ffffff",
+          boxShadow: "0 3px 14px rgba(0,0,0,0.07)",
+          padding: "20px",
+        }}
+      >
+        {/* HEADER – SMALL & PREMIUM */}
+        <div
+          style={{
+            display: "inline-block",
+            background: "linear-gradient(135deg, #1e3a8a, #2563eb)",
+            color: "#ffffff",
+            padding: "6px 14px",          // ⬅ smaller nav
+            borderRadius: "8px",
+            fontWeight: "600",
+            fontSize: "0.95rem",          // ⬅ reduced size
+            marginBottom: "18px",
+            boxShadow: "0 4px 10px rgba(37,99,235,0.35)",
+          }}
+        >
+          Electronic Ledger Balances
         </div>
-        <div style={{ 
-          fontSize: "1.45rem",          // amount bhi thoda chhota
-          fontWeight: "700", 
-          color: "#1d4ed8" 
-        }}>
-          ₹58,756.00
+
+        <div>
+          {/* CASH BALANCE */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "16px",
+              fontWeight: "600",
+              fontSize: "1.05rem",
+            }}
+          >
+            <span>Cash Balance</span>
+            <strong
+              style={{
+                color: "#2563eb",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+              onClick={() => setShowCreditLedger(!showCreditLedger)}
+            >
+              ₹58,756.00
+            </strong>
+          </div>
+
+          {/* CREDIT BALANCE */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "18px",
+              fontWeight: "600",
+              fontSize: "1.05rem",
+            }}
+          >
+            <span>Credit Balance</span>
+            <strong>₹36,845.00</strong>
+          </div>
+
+          {/* CREDIT LEDGER */}
+          {showCreditLedger && (
+            <div
+              style={{
+                marginTop: "18px",
+                paddingTop: "18px",
+                borderTop: "1px solid #e5e7eb",
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-block",
+                  background:
+                    "linear-gradient(135deg, #16a34a, #22c55e)",
+                  color: "#fff",
+                  padding: "6px 14px",     // ⬅ compact
+                  borderRadius: "8px",
+                  fontWeight: "600",
+                  fontSize: "0.9rem",
+                  marginBottom: "10px",
+                  boxShadow: "0 3px 8px rgba(34,197,94,0.35)",
+                }}
+              >
+                Balance of Electronic Credit Ledger
+              </div>
+
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  background: "#ecfdf5",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                  fontSize: "0.9rem",
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={{ padding: "10px", textAlign: "center" }}>IGST</th>
+                    <th style={{ padding: "10px", textAlign: "center" }}>CGST</th>
+                    <th style={{ padding: "10px", textAlign: "center" }}>SGST</th>
+                    <th style={{ padding: "10px", textAlign: "center" }}>CESS</th>
+                    <th style={{ padding: "10px", textAlign: "center" }}>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ padding: "10px", textAlign: "center" }}>₹25,165</td>
+                    <td style={{ padding: "10px", textAlign: "center" }}>₹12,324</td>
+                    <td style={{ padding: "10px", textAlign: "center" }}>₹5,632</td>
+                    <td style={{ padding: "10px", textAlign: "center" }}>₹15,635</td>
+                    <td style={{ padding: "10px", textAlign: "center", fontWeight: "700" }}>
+                      ₹58,756
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Credit Ledger Card – slim */}
-      <div style={{
-        padding: "12px 14px",
-        background: "#f0fdf4",
-        borderRadius: "8px",
-        border: "1px solid #a7f3d0",
-        minHeight: "90px",
-      }}>
-        <div style={{ 
-          fontSize: "0.88rem", 
-          color: "#64748b", 
-          marginBottom: "4px" 
-        }}>
-          Credit Ledger
+      {/* ───────── TURNOVER CARD ───────── */}
+      <div
+        style={{
+          borderRadius: "12px",
+          background: "#ffffff",
+          boxShadow: "0 3px 14px rgba(0,0,0,0.07)",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            display: "inline-block",
+            background: "linear-gradient(135deg, #1e3a8a, #2563eb)",
+            color: "#ffffff",
+            padding: "6px 14px",
+            borderRadius: "8px",
+            fontWeight: "600",
+            fontSize: "0.95rem",
+            marginBottom: "18px",
+            boxShadow: "0 4px 10px rgba(37,99,235,0.35)",
+          }}
+        >
+          Turnover Balances
         </div>
-        <div style={{ 
-          fontSize: "1.45rem", 
-          fontWeight: "700", 
-          color: "#059669" 
-        }}>
-          ₹36,845.00
-        </div>
+
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <tbody>
+            <tr>
+              <td style={{ padding: "14px", fontWeight: "600" }}>
+                Turnover Estimated
+              </td>
+              <td style={{ padding: "14px", textAlign: "right", fontWeight: "700" }}>
+                ₹1,25,65,635.00
+              </td>
+            </tr>
+            <tr style={{ background: "#f8fafc" }}>
+              <td style={{ padding: "14px", fontWeight: "600" }}>
+                Aggregate Turnover
+              </td>
+              <td style={{ padding: "14px", textAlign: "right", fontWeight: "700" }}>
+                ₹1,25,65,635.00
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
+  )}
 
-    {/* Table – already compact tha, thoda aur tight */}
-    <div style={{
-      background: "#f8fafc",
-      borderRadius: "8px",
-      border: "1px solid #e2e8f0",
-      overflow: "hidden",
-    }}>
-      <div style={{
-        background: "#059669",
-        color: "white",
-        padding: "8px 16px",            // header padding kam
-        fontSize: "1rem",
+            
+            
+            
+            
+            
+            
+            {activeLedgerTab === "elb" && (
+  <div style={{ padding: "28px" }}>
+    {/* ───── HEADER (SLIM PILL STYLE) ───── */}
+    <div
+      style={{
+        display: "inline-block",
+        background: "linear-gradient(135deg,#1e40af,#2563eb)",
+        color: "#ffffff",
+        padding: "6px 14px",        // 👈 height kam
+        borderRadius: "8px",
         fontWeight: "600",
-        textAlign: "center",
-      }}>
-        Credit Ledger Balance
+        fontSize: "0.95rem",
+        marginBottom: "22px",
+      }}
+    >
+      Electronic Ledger Balances – Detailed View
+    </div>
+
+    <div
+      style={{
+        background: "#ffffff",
+        borderRadius: "12px",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+        padding: "24px",
+      }}
+    >
+      {/* BALANCES */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "18px",
+          fontSize: "1.05rem",
+          fontWeight: "600",
+        }}
+      >
+        <span>Cash Balance</span>
+        <strong>₹58,756.00</strong>
       </div>
 
-      <table style={{
-        width: "100%",
-        borderCollapse: "collapse",
-        fontSize: "0.94rem",
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "22px",
+          fontSize: "1.05rem",
+          fontWeight: "600",
+        }}
+      >
+        <span>Credit Balance</span>
+        <strong>₹36,845.00</strong>
+      </div>
+
+      {/* ───── CREDIT LEDGER HEADER (MATCHING NAV STYLE) ───── */}
+      <div
+        style={{
+          display: "inline-block",
+          background: "linear-gradient(135deg,#16a34a,#22c55e)",
+          color: "#ffffff",
+          padding: "6px 14px",     // 👈 slim
+          borderRadius: "8px",
+          fontWeight: "600",
+          fontSize: "0.9rem",
+          marginBottom: "14px",
+        }}
+      >
+        Balance of Electronic Credit Ledger
+      </div>
+
+      {/* TABLE */}
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          background: "#ecfdf5",
+          borderRadius: "10px",
+          overflow: "hidden",
+        }}
+      >
         <thead>
-          <tr style={{ background: "#f1f5f9" }}>
-            <th style={{ padding: "8px 10px", fontWeight: "600", textAlign: "center" }}>IGST</th>
-            <th style={{ padding: "8px 10px", fontWeight: "600", textAlign: "center" }}>CGST</th>
-            <th style={{ padding: "8px 10px", fontWeight: "600", textAlign: "center" }}>SGST</th>
-            <th style={{ padding: "8px 10px", fontWeight: "600", textAlign: "center" }}>CESS</th>
-            <th style={{ padding: "8px 10px", fontWeight: "700", textAlign: "center" }}>Total</th>
+          <tr>
+            <th style={{ padding: "12px", textAlign: "center" }}>IGST</th>
+            <th style={{ padding: "12px", textAlign: "center" }}>CGST</th>
+            <th style={{ padding: "12px", textAlign: "center" }}>SGST</th>
+            <th style={{ padding: "12px", textAlign: "center" }}>CESS</th>
+            <th style={{ padding: "12px", textAlign: "center" }}>Total</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: "500" }}>₹25,165</td>
-            <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: "500" }}>₹12,324</td>
-            <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: "500" }}>₹5,632</td>
-            <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: "500" }}>₹15,635</td>
-            <td style={{
-              padding: "10px 10px",
-              textAlign: "center",
-              fontWeight: "700",
-              fontSize: "1.02rem",
-              color: "#059669"
-            }}>
+            <td style={{ padding: "12px", textAlign: "center" }}>₹25,165</td>
+            <td style={{ padding: "12px", textAlign: "center" }}>₹12,324</td>
+            <td style={{ padding: "12px", textAlign: "center" }}>₹5,632</td>
+            <td style={{ padding: "12px", textAlign: "center" }}>₹15,635</td>
+            <td
+              style={{
+                padding: "12px",
+                textAlign: "center",
+                fontWeight: "700",
+              }}
+            >
               ₹58,756
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
-  
-
-      {/* Small footer note */}
-      <div style={{
-        fontSize: "0.9rem",
-        color: "#6b7280",
-        textAlign: "center",
-        marginTop: "16px",
-      }}>
-        Values as per GST portal • Last updated: 24 Jan 2026
-      </div>
-
-    </div>
   </div>
 )}
-  {activeLedgerTab === "turnover" && (
-  <div style={{
-    padding: "24px 32px",
-    background: "#ffffff",
-    borderRadius: "12px",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-    border: "1px solid #e2e8f0",
-  }}>
-
-    {/* Financial Year Dropdown - top aligned */}
-    <div style={{
-      marginBottom: "28px",
-      display: "flex",
-      alignItems: "center",
-      gap: "16px",
-      flexWrap: "wrap",
-    }}>
-      <label style={{
-        fontWeight: "600",
-        fontSize: "1.05rem",
-        color: "#334155",
-      }}>
-        Financial Year:
-      </label>
-      <select
+{/* ── TURNOVER TAB ── */}
+{activeLedgerTab === "turnover" && (
+  <div style={{ padding: "20px" }}>
+    {/* ── TOP BAR : LEFT EMPTY | RIGHT YEAR SELECT ── */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        marginBottom: "14px",
+      }}
+    >
+      <div
         style={{
-          padding: "10px 16px",
-          border: "1px solid #cbd5e1",
-          borderRadius: "8px",
-          fontSize: "1rem",
-          minWidth: "160px",
-          background: "white",
-          boxShadow: "inset 0 1px 3px rgba(0,0,0,0.05)",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
         }}
       >
-        <option>2017-18</option>
-        <option>2018-19</option>
-        <option>2019-20</option>
-        <option>2020-21</option>
-        <option>2021-22</option>
-        <option>2022-23</option>
-        <option>2023-24</option>
-        <option>2024-25</option>
-        <option selected>2025-26</option>
-      </select>
+        <span
+          style={{
+            fontWeight: "600",
+            fontSize: "0.85rem",
+            color: "#475569",
+          }}
+        >
+          Financial Year
+        </span>
+
+        <select
+          style={{
+            padding: "5px 10px",
+            border: "1px solid #d1d5db",
+            borderRadius: "8px",
+            fontSize: "0.8rem",
+            minWidth: "110px",
+            background: "#ffffff",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+            cursor: "pointer",
+          }}
+        >
+          <option>2017-18</option>
+          <option>2018-19</option>
+          <option>2019-20</option>
+          <option>2020-21</option>
+          <option>2021-22</option>
+          <option>2022-23</option>
+          <option>2023-24</option>
+          <option>2024-25</option>
+          <option selected>2025-26</option>
+        </select>
+      </div>
     </div>
 
-    {/* Ledger Navigation Tabs - compact size */}
-    <div style={{
-      display: "flex",
-      borderBottom: "2px solid #e2e8f0",
-      marginBottom: "32px",
-      gap: "4px",           // tabs ke beech kam gap
-    }}>
-      <button
-        onClick={() => setActiveTurnoverView('overview')}
-        style={{
-          padding: "10px 24px",          // ← padding kam kiya → compact
-          background: activeTurnoverView === 'overview' ? "#7c3aed" : "transparent",
-          color: activeTurnoverView === 'overview' ? "white" : "#475569",
-          border: "none",
-          borderRadius: "8px 8px 0 0",
-          fontWeight: activeTurnoverView === 'overview' ? "700" : "600",
-          fontSize: "0.98rem",           // ← font thoda chhota
-          cursor: "pointer",
-          transition: "all 0.2s",
-          minWidth: "140px",
-          boxShadow: activeTurnoverView === 'overview' ? "0 4px 12px rgba(124,58,237,0.25)" : "none",
-        }}
-      >
-        Overview
-      </button>
+    {/* ── Ledger Navigation Tabs ── */}
+    <div
+      style={{
+        display: "flex",
+        gap: "8px",
+        marginBottom: "18px",
+      }}
+    >
+      {[
+        { id: "overview", label: "Overview", color: "#2563eb" },
+        { id: "cash", label: "Electronic Cash Ledger", color: "#10b981" },
+        { id: "credit", label: "Electronic Credit Ledger", color: "#3b82f6" },
+      ].map((tab) => {
+        const active = activeTurnoverView === tab.id;
 
-      <button
-        onClick={() => setActiveTurnoverView('cash')}
-        style={{
-          padding: "10px 24px",
-          background: activeTurnoverView === 'cash' ? "#10b981" : "transparent",
-          color: activeTurnoverView === 'cash' ? "white" : "#475569",
-          border: "none",
-          borderRadius: "8px 8px 0 0",
-          fontWeight: activeTurnoverView === 'cash' ? "700" : "600",
-          fontSize: "0.98rem",
-          cursor: "pointer",
-          transition: "all 0.2s",
-          minWidth: "140px",
-          boxShadow: activeTurnoverView === 'cash' ? "0 4px 12px rgba(16,185,129,0.25)" : "none",
-        }}
-      >
-        Electronic Cash Ledger
-      </button>
-
-      <button
-        onClick={() => setActiveTurnoverView('credit')}
-        style={{
-          padding: "10px 24px",
-          background: activeTurnoverView === 'credit' ? "#3b82f6" : "transparent",
-          color: activeTurnoverView === 'credit' ? "white" : "#475569",
-          border: "none",
-          borderRadius: "8px 8px 0 0",
-          fontWeight: activeTurnoverView === 'credit' ? "700" : "600",
-          fontSize: "0.98rem",
-          cursor: "pointer",
-          transition: "all 0.2s",
-          minWidth: "140px",
-          boxShadow: activeTurnoverView === 'credit' ? "0 4px 12px rgba(59,130,246,0.25)" : "none",
-        }}
-      >
-        Electronic Credit Ledger
-      </button>
+        return (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTurnoverView(tab.id)}
+            style={{
+              padding: "6px 14px",
+              background: active
+                ? `linear-gradient(135deg, ${tab.color}, ${tab.color}cc)`
+                : "#ffffff",
+              color: active ? "#ffffff" : "#475569",
+              border: "1px solid #e5e7eb",
+              borderRadius: "999px",
+              fontWeight: "600",
+              fontSize: "0.8rem",
+              cursor: "pointer",
+              boxShadow: active
+                ? "0 4px 14px rgba(0,0,0,0.25)"
+                : "0 2px 5px rgba(0,0,0,0.08)",
+            }}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
     </div>
 
-    {/* Content Area */}
-    {activeTurnoverView === 'overview' && (
+    {/* ── OVERVIEW ── */}
+    {activeTurnoverView === "overview" && (
       <div>
-        <div style={{
-          fontSize: "1.3rem",
-          fontWeight: "700",
-          marginBottom: "20px",
-          color: "#1e293b",
-        }}>
-          Turnover Summary
+        <div
+          style={{
+            fontWeight: "600",
+            marginBottom: "12px",
+            color: "#334155",
+          }}
+        >
+          Turnover Balances
         </div>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "24px",
-        }}>
-          <div style={{
-            padding: "24px",
-            background: "#f8fafc",
-            borderRadius: "10px",
-            border: "1px solid #e2e8f0",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-          }}>
-            <div style={{ fontWeight: "600", marginBottom: "10px", color: "#475569" }}>
-              Turnover Estimated
-            </div>
-            <div style={{ fontSize: "1.6rem", fontWeight: "700", color: "#1d4ed8" }}>
-              ₹1,25,65,635.00
-            </div>
-          </div>
 
-          <div style={{
-            padding: "24px",
-            background: "#f8fafc",
-            borderRadius: "10px",
-            border: "1px solid #e2e8f0",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-          }}>
-            <div style={{ fontWeight: "600", marginBottom: "10px", color: "#475569" }}>
-              Aggregate Turnover
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "14px",
+          }}
+        >
+          {[
+            { label: "Turnover Estimated", value: "₹1,25,65,635.00" },
+            { label: "Aggregate Turnover", value: "₹1,25,65,635.00" },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                padding: "14px",
+                background: "#f8fafc",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              }}
+            >
+              <div
+                style={{
+                  fontWeight: "600",
+                  fontSize: "0.85rem",
+                  color: "#475569",
+                }}
+              >
+                {item.label}
+              </div>
+              <div
+                style={{
+                  fontSize: "1.1rem",
+                  fontWeight: "700",
+                  color: "#0f172a",
+                }}
+              >
+                {item.value}
+              </div>
             </div>
-            <div style={{ fontSize: "1.6rem", fontWeight: "700", color: "#059669" }}>
-              ₹1,25,65,635.00
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     )}
 
-    {(activeTurnoverView === 'cash' || activeTurnoverView === 'credit') && (
+    {/* ── CASH / CREDIT LEDGER ── */}
+    {(activeTurnoverView === "cash" ||
+      activeTurnoverView === "credit") && (
       <div>
-        {/* Date Range + Go Button */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "16px",
-          marginBottom: "28px",
-          flexWrap: "wrap",
-        }}>
+        {/* Date Range + GO */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            marginBottom: "16px",
+            flexWrap: "wrap",
+          }}
+        >
           <div>
-            <strong style={{ marginRight: "8px" }}>From:</strong>
+            <strong>From:</strong>
             <input
               type="date"
               defaultValue="2025-04-01"
               style={{
-                padding: "10px 14px",
-                border: "1px solid #cbd5e1",
-                borderRadius: "8px",
-                fontSize: "1rem",
+                marginLeft: "6px",
+                padding: "6px 8px",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+                fontSize: "0.8rem",
               }}
             />
           </div>
+
           <div>
-            <strong style={{ marginRight: "8px" }}>To:</strong>
+            <strong>To:</strong>
             <input
               type="date"
               defaultValue="2025-06-30"
               style={{
-                padding: "10px 14px",
-                border: "1px solid #cbd5e1",
-                borderRadius: "8px",
-                fontSize: "1rem",
+                marginLeft: "6px",
+                padding: "6px 8px",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+                fontSize: "0.8rem",
               }}
             />
           </div>
+
           <button
             style={{
-              background: "#3b82f6",
-              color: "white",
-              padding: "11px 28px",
+              background: "linear-gradient(135deg,#2563eb,#3b82f6)",
+              color: "#fff",
+              padding: "6px 18px",
               border: "none",
               borderRadius: "8px",
               fontWeight: "600",
+              fontSize: "0.85rem",
               cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(59,130,246,0.25)",
+              boxShadow: "0 4px 12px rgba(37,99,235,0.35)",
             }}
           >
             GO
           </button>
         </div>
 
-        {/* Table - GST portal style */}
-        <div style={{ overflowX: "auto", marginBottom: "28px" }}>
-          <table style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            fontSize: "0.97rem",
-          }}>
+        {/* Table */}
+        <div style={{ overflowX: "auto" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "0.85rem",
+            }}
+          >
             <thead>
               <tr style={{ background: "#f1f5f9" }}>
-                <th style={{ padding: "14px 12px", textAlign: "center", fontWeight: "600" }}>Sr.No</th>
-                <th style={{ padding: "14px 12px", fontWeight: "600" }}>Date</th>
-                <th style={{ padding: "14px 12px", fontWeight: "600" }}>Reference No.</th>
-                <th style={{ padding: "14px 12px", fontWeight: "600" }}>Description</th>
-                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "600" }}>Integrated Tax</th>
-                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "600" }}>Central Tax</th>
-                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "600" }}>State Tax</th>
-                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "600" }}>Cess</th>
-                <th style={{ padding: "14px 12px", textAlign: "right", fontWeight: "700" }}>Total</th>
+                {[
+                  "Sr.No",
+                  "Date",
+                  "Reference No.",
+                  "Description",
+                  "Integrated Tax",
+                  "Central Tax",
+                  "State Tax",
+                  "Cess",
+                  "Total",
+                ].map((h) => (
+                  <th key={h} style={{ padding: "10px" }}>
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td style={{ padding: "14px 12px", textAlign: "center" }}>1</td>
-                <td style={{ padding: "14px 12px" }}>-</td>
-                <td style={{ padding: "14px 12px" }}>-</td>
-                <td style={{ padding: "14px 12px" }}>Opening Balance</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right", fontWeight: "bold" }}>0.00</td>
+                <td align="center">1</td>
+                <td>-</td>
+                <td>-</td>
+                <td>Opening Balance</td>
+                <td align="right">0.00</td>
+                <td align="right">0.00</td>
+                <td align="right">0.00</td>
+                <td align="right">0.00</td>
+                <td align="right" style={{ fontWeight: "700" }}>
+                  0.00
+                </td>
               </tr>
 
               <tr>
-                <td style={{ padding: "14px 12px", textAlign: "center" }}>2</td>
-                <td style={{ padding: "14px 12px" }}>03/04/2025</td>
-                <td style={{ padding: "14px 12px" }}>AC09253604536</td>
-                <td style={{ padding: "14px 12px" }}>ITC accrued through - Inputs</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>16,390.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>16,390.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>32,780.00</td>
+                <td align="center">2</td>
+                <td>03/04/2025</td>
+                <td>AC09253604536</td>
+                <td>ITC accrued through - Inputs</td>
+                <td align="right">0.00</td>
+                <td align="right">16,390.00</td>
+                <td align="right">16,390.00</td>
+                <td align="right">0.00</td>
+                <td align="right">32,780.00</td>
               </tr>
 
-              <tr style={{ fontWeight: "700", background: "#ecfdf5" }}>
-                <td style={{ padding: "14px 12px" }} colSpan="4">Closing Balance</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>52,671.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>2,68,221.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>19,809.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right" }}>0.00</td>
-                <td style={{ padding: "14px 12px", textAlign: "right", color: "#16a34a", fontSize: "1.1rem" }}>
+              <tr
+                style={{
+                  background: "#ecfdf5",
+                  fontWeight: "700",
+                }}
+              >
+                <td colSpan="4">Closing Balance</td>
+                <td align="right">52,671.00</td>
+                <td align="right">2,68,221.00</td>
+                <td align="right">19,809.00</td>
+                <td align="right">0.00</td>
+                <td align="right" style={{ color: "#16a34a" }}>
                   3,40,701.00
                 </td>
               </tr>
@@ -3541,423 +3620,503 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
           </table>
         </div>
 
-        {/* Bottom Buttons with Down Arrow */}
-        <div style={{
-          marginTop: "28px",
-          textAlign: "right",
-          display: "flex",
-          gap: "12px",
-          justifyContent: "flex-end",
-        }}>
+        {/* PDF / EXCEL */}
+        <div
+          style={{
+            marginTop: "18px",
+            display: "flex",
+            gap: "12px",
+            justifyContent: "flex-end",
+          }}
+        >
           <button
             style={{
-              background: "#6b7280",
-              color: "white",
-              padding: "10px 24px",
-              border: "none",
+              background: "#ffffff",
+              padding: "8px 18px",
               borderRadius: "8px",
-              cursor: "pointer",
+              border: "1px solid #d1d5db",
               fontWeight: "600",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
+              fontSize: "0.85rem",
+              cursor: "pointer",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.18)",
             }}
           >
-            <span>BACK</span>
+            SAVE AS PDF ↓
           </button>
 
           <button
             style={{
-              background: "#3b82f6",
-              color: "white",
-              padding: "10px 24px",
-              border: "none",
+              background: "#ffffff",
+              padding: "8px 18px",
               borderRadius: "8px",
-              cursor: "pointer",
+              border: "1px solid #a7f3d0",
               fontWeight: "600",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              boxShadow: "0 2px 8px rgba(59,130,246,0.25)",
+              fontSize: "0.85rem",
+              cursor: "pointer",
+              boxShadow: "0 4px 14px rgba(16,185,129,0.3)",
             }}
           >
-            <span>SAVE AS PDF</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-          </button>
-
-          <button
-            style={{
-              background: "#10b981",
-              color: "white",
-              padding: "10px 24px",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontWeight: "600",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              boxShadow: "0 2px 8px rgba(16,185,129,0.25)",
-            }}
-          >
-            <span>SAVE AS EXCEL</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
+            SAVE AS EXCEL ↓
           </button>
         </div>
       </div>
     )}
   </div>
 )}
-           {activeLedgerTab === "liability" && (
-  <div style={{
-    padding: "16px 24px",               // outer padding kam
-    background: "#ffffff",
-    borderRadius: "10px",
-    boxShadow: "0 3px 12px rgba(0,0,0,0.05)",
-    border: "1px solid #e5e7eb",
-  }}>
 
-    {/* Chhota Header */}
-    <div style={{
-      background: "linear-gradient(90deg, #ef4444, #f97316)",
-      color: "white",
-      padding: "10px 16px",
-      borderRadius: "8px 8px 0 0",
-      fontSize: "1.1rem",
-      fontWeight: "700",
-      margin: "-16px -24px 20px -24px",
-      textAlign: "center",
-    }}>
-      Liability Reconciliation
+
+
+
+{/* ── LIABILITY DETAILED TAB ── */}
+{activeLedgerTab === "liability" && (
+  <div style={{ padding: "20px" }}>
+    {/* ── HEADER ── */}
+    <div
+      style={{
+        display: "inline-block",
+        background: "linear-gradient(135deg,#1e40af,#2563eb)",
+        color: "#ffffff",
+        padding: "6px 14px",
+        borderRadius: "8px",
+        fontWeight: "600",
+        fontSize: "0.95rem",
+        marginBottom: "16px",
+        boxShadow: "0 4px 12px rgba(37,99,235,0.35)",
+      }}
+    >
+      Liability Ledger – Detailed View
     </div>
 
-    {/* Bahut Compact Table */}
-    <table style={{
-      width: "100%",
-      borderCollapse: "separate",
-      borderSpacing: "0 2px",           // rows ke beech almost zero space
-      fontSize: "0.95rem",              // font chhota
-    }}>
-      <tbody>
-        <tr style={{ background: "#f9fafb" }}>
-          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
-            Liability (GSTR-1)
-          </td>
-          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#1d4ed8" }}>
-            ₹10,25,365.25
-          </td>
-        </tr>
+    {/* ── CONTENT CARD ── */}
+    <div
+      style={{
+        background: "#ffffff",
+        borderRadius: "14px",
+        boxShadow: "0 8px 26px rgba(0,0,0,0.12)",
+        padding: "18px",
+      }}
+    >
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          fontSize: "0.95rem",
+        }}
+      >
+        <tbody>
+          {/* Liability Section */}
+          <tr>
+            <td style={{ padding: "12px", fontWeight: "600" }}>
+              Liability (GSTR-1)
+            </td>
+            <td
+              style={{
+                padding: "12px",
+                textAlign: "right",
+                fontWeight: "700",
+              }}
+            >
+              ₹10,25,365.25
+            </td>
+          </tr>
 
-        <tr style={{ background: "#f9fafb" }}>
-          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
-            Liability (GSTR-3B)
-          </td>
-          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#1d4ed8" }}>
-            ₹10,20,365.25
-          </td>
-        </tr>
+          <tr style={{ background: "#f8fafc" }}>
+            <td style={{ padding: "12px", fontWeight: "600" }}>
+              Liability (GSTR-3B)
+            </td>
+            <td
+              style={{
+                padding: "12px",
+                textAlign: "right",
+                fontWeight: "700",
+              }}
+            >
+              ₹10,20,365.25
+            </td>
+          </tr>
 
-        <tr style={{ background: "#fee2e2" }}>
-          <td style={{ padding: "10px 14px", fontWeight: "700", color: "#dc2626" }}>
-            Diff
-          </td>
-          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#dc2626" }}>
-            ₹5,000.00
-          </td>
-        </tr>
+          <tr
+            style={{
+              background: "#fee2e2",
+              color: "#b91c1c",
+              fontWeight: "700",
+            }}
+          >
+            <td style={{ padding: "12px" }}>Difference</td>
+            <td style={{ padding: "12px", textAlign: "right" }}>
+              ₹5,000.00
+            </td>
+          </tr>
 
-        <tr style={{ background: "#f0fdf4" }}>
-          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
-            ITC (GSTR-2B)
-          </td>
-          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#059669" }}>
-            ₹11,11,265.50
-          </td>
-        </tr>
+          {/* ITC Section */}
+          <tr>
+            <td style={{ padding: "12px", fontWeight: "600" }}>
+              ITC (GSTR-2B)
+            </td>
+            <td
+              style={{
+                padding: "12px",
+                textAlign: "right",
+                fontWeight: "700",
+              }}
+            >
+              ₹11,11,265.50
+            </td>
+          </tr>
 
-        <tr style={{ background: "#f0fdf4" }}>
-          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
-            ITC (GSTR-3B)
-          </td>
-          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#059669" }}>
-            ₹11,10,265.50
-          </td>
-        </tr>
+          <tr style={{ background: "#f8fafc" }}>
+            <td style={{ padding: "12px", fontWeight: "600" }}>
+              ITC (GSTR-3B)
+            </td>
+            <td
+              style={{
+                padding: "12px",
+                textAlign: "right",
+                fontWeight: "700",
+              }}
+            >
+              ₹11,10,265.50
+            </td>
+          </tr>
 
-        <tr style={{ background: "#fefce8" }}>
-          <td style={{ padding: "10px 14px", fontWeight: "700", color: "#d97706" }}>
-            Diff
-          </td>
-          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#d97706" }}>
-            -₹1,000.00
-          </td>
-        </tr>
+          <tr
+            style={{
+              background: "#fef3c7",
+              color: "#b45309",
+              fontWeight: "700",
+            }}
+          >
+            <td style={{ padding: "12px" }}>Difference</td>
+            <td style={{ padding: "12px", textAlign: "right" }}>
+              -₹1,000.00
+            </td>
+          </tr>
 
-        <tr style={{ background: "#f0fdf4" }}>
-          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
-            ITC (GSTR-2A)
-          </td>
-          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#059669" }}>
-            ₹11,11,265.50
-          </td>
-        </tr>
+          {/* Final ITC Match */}
+          <tr>
+            <td style={{ padding: "12px", fontWeight: "600" }}>
+              ITC (GSTR-2A)
+            </td>
+            <td
+              style={{
+                padding: "12px",
+                textAlign: "right",
+                fontWeight: "700",
+              }}
+            >
+              ₹11,11,265.50
+            </td>
+          </tr>
 
-        <tr style={{ background: "#f0fdf4" }}>
-          <td style={{ padding: "10px 14px", fontWeight: "600", color: "#374151" }}>
-            ITC (GSTR-3B)
-          </td>
-          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#059669" }}>
-            ₹11,10,265.50
-          </td>
-        </tr>
+          <tr style={{ background: "#f8fafc" }}>
+            <td style={{ padding: "12px", fontWeight: "600" }}>
+              ITC (GSTR-3B)
+            </td>
+            <td
+              style={{
+                padding: "12px",
+                textAlign: "right",
+                fontWeight: "700",
+              }}
+            >
+              ₹11,10,265.50
+            </td>
+          </tr>
 
-        <tr style={{ background: "#ecfdf5" }}>
-          <td style={{ padding: "10px 14px", fontWeight: "700", color: "#16a34a" }}>
-            Diff
-          </td>
-          <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: "700", color: "#16a34a" }}>
-            ₹0.00
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    {/* Bahut chhota note */}
-    <div style={{
-      marginTop: "12px",
-      fontSize: "0.82rem",
-      color: "#9ca3af",
-      textAlign: "center",
-    }}>
-      GST portal • 24 Jan 2026
+          <tr
+            style={{
+              background: "#ecfdf5",
+              color: "#166534",
+              fontWeight: "700",
+            }}
+          >
+            <td style={{ padding: "12px" }}>Difference</td>
+            <td style={{ padding: "12px", textAlign: "right" }}>
+              ₹0.00
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 )}
-              {/* Payment Tab */}
-              {activeLedgerTab === "payment" && (
-                <div>
-                  <div
+
+
+
+{/* ───────── PAYMENT TAB ───────── */}
+{activeLedgerTab === "payment" && (
+  <div style={{ padding: "20px" }}>
+    {/* ── TAXPAYER INFO BAR ── */}
+    <div
+      style={{
+        background: "#ffffff",
+        padding: "16px 20px",
+        display: "grid",
+        gridTemplateColumns: "1fr 2fr 2fr",
+        gap: "16px",
+        fontWeight: "600",
+        borderRadius: "14px",
+        boxShadow: "0 6px 20px rgba(37,99,235,0.15)",
+        marginBottom: "20px",
+      }}
+    >
+      <div>
+        <div style={{ fontSize: "0.85rem", color: "#475569" }}>
+          GSTIN / TEMP ID
+        </div>
+        <div style={{ fontSize: "0.95rem", fontFamily: "monospace" }}>
+          09ACNPU2195H1ZY
+        </div>
+      </div>
+
+      <div>
+        <div style={{ fontSize: "0.85rem", color: "#475569" }}>
+          Legal Name
+        </div>
+        <div style={{ fontSize: "0.95rem" }}>Mohd Umair</div>
+      </div>
+
+      <div>
+        <div style={{ fontSize: "0.85rem", color: "#475569" }}>
+          Trade Name
+        </div>
+        <div style={{ fontSize: "0.95rem" }}>
+          U.A.F ENTERPRISE'S
+        </div>
+      </div>
+    </div>
+
+    {/* ── OUTSTANDING DEMAND CARD ── */}
+    <div
+      style={{
+        background: "#ffffff",
+        borderRadius: "16px",
+        boxShadow: "0 10px 28px rgba(0,0,0,0.12)",
+        overflow: "hidden",
+      }}
+    >
+      {/* HEADER */}
+      <div
+        style={{
+          background: "linear-gradient(135deg,#2563eb,#3b82f6)",
+          color: "#ffffff",
+          padding: "12px 18px",
+          fontSize: "1.05rem",
+          fontWeight: "600",
+        }}
+      >
+        Outstanding Demand
+      </div>
+
+      {/* TABLE */}
+      <div style={{ overflowX: "auto" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "0.9rem",
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#f1f5f9", color: "#334155" }}>
+              <th style={{ padding: "10px", textAlign: "center" }}>Sr.No</th>
+              <th style={{ padding: "10px" }}>Demand Date</th>
+              <th style={{ padding: "10px" }}>Demand ID</th>
+              <th style={{ padding: "10px", textAlign: "right" }}>Integrated Tax</th>
+              <th style={{ padding: "10px", textAlign: "right" }}>Central Tax</th>
+              <th style={{ padding: "10px", textAlign: "right" }}>State / UT Tax</th>
+              <th style={{ padding: "10px", textAlign: "right" }}>Cess</th>
+              <th style={{ padding: "10px", textAlign: "center" }}>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {outstandingDemands.map((item) => (
+              <tr
+                key={item.sr}
+                style={{
+                  borderBottom: "1px solid #e5e7eb",
+                  background: "#ffffff",
+                }}
+              >
+                <td style={{ padding: "10px", textAlign: "center" }}>
+                  {item.sr}
+                </td>
+                <td style={{ padding: "10px" }}>{item.date}</td>
+                <td style={{ padding: "10px", fontFamily: "monospace" }}>
+                  {item.demandId}
+                </td>
+                <td style={{ padding: "10px", textAlign: "right" }}>
+                  {item.integrated.toLocaleString()}
+                </td>
+                <td style={{ padding: "10px", textAlign: "right" }}>
+                  {item.central.toLocaleString()}
+                </td>
+                <td style={{ padding: "10px", textAlign: "right" }}>
+                  {item.state.toLocaleString()}
+                </td>
+                <td style={{ padding: "10px", textAlign: "right" }}>
+                  {item.cess.toLocaleString()}
+                </td>
+                <td style={{ padding: "10px", textAlign: "center" }}>
+                  <button
+                    onClick={() => setSelectedDemand(item)}
                     style={{
-                      background: "linear-gradient(to right, #fefcbf, #fde68a)",
-                      padding: "16px 24px",
-                      display: "grid",
-                      gridTemplateColumns: "1fr 2fr 2fr",
-                      gap: "16px",
+                      background: "linear-gradient(135deg,#2563eb,#3b82f6)",
+                      color: "#ffffff",
+                      border: "none",
+                      padding: "6px 18px",
+                      borderRadius: "8px",
                       fontWeight: "600",
-                      borderBottom: "2px solid #d97706",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 14px rgba(37,99,235,0.35)",
                     }}
                   >
-                    <div>
-                      <div style={{ fontSize: "0.9rem", color: "#7c2d12" }}>GSTIN/TEMP ID:</div>
-                      <div style={{ fontSize: "1.1rem" }}>09ACNPU2195H1ZY</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "0.9rem", color: "#7c2d12" }}>Legal Name:</div>
-                      <div style={{ fontSize: "1.1rem" }}>Mohd Umair</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "0.9rem", color: "#7c2d12" }}>Trade Name:</div>
-                      <div style={{ fontSize: "1.1rem" }}>U.A.F ENTERPRISE'S</div>
-                    </div>
-                  </div>
+                    SELECT
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-                  <div style={{ padding: "24px" }}>
-                    <div
-                      style={{
-                        background: "#0ea5e9",
-                        color: "white",
-                        padding: "14px 20px",
-                        fontSize: "1.3rem",
-                        fontWeight: "700",
-                        borderRadius: "10px 10px 0 0",
-                      }}
-                    >
-                      Outstanding Demand
-                    </div>
+    {/* ── PAYMENT MODAL ── */}
+    {selectedDemand && (
+      <div
+        onClick={() => setSelectedDemand(null)}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.45)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 2000,
+        }}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            width: "420px",
+            background: "#ffffff",
+            borderRadius: "18px",
+            boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
+            overflow: "hidden",
+          }}
+        >
+          {/* MODAL HEADER */}
+          <div
+            style={{
+              background: "linear-gradient(135deg,#2563eb,#3b82f6)",
+              color: "#ffffff",
+              padding: "14px",
+              textAlign: "center",
+              fontSize: "1rem",
+              fontWeight: "600",
+            }}
+          >
+            Payment towards Demand
+          </div>
 
-                    <div style={{ overflowX: "auto" }}>
-                      <table
-                        style={{
-                          width: "100%",
-                          borderCollapse: "collapse",
-                          background: "#fff",
-                          fontSize: "0.98rem",
-                        }}
-                      >
-                        <thead>
-                          <tr style={{ background: "#ecfeff", color: "#0e7490" }}>
-                            <th style={{ padding: "14px 10px", textAlign: "center" }}>Sr.No</th>
-                            <th style={{ padding: "14px 10px" }}>Demand Date</th>
-                            <th style={{ padding: "14px 10px" }}>Demand ID</th>
-                            <th style={{ padding: "14px 10px", textAlign: "right" }}>Integrated Tax</th>
-                            <th style={{ padding: "14px 10px", textAlign: "right" }}>Central Tax</th>
-                            <th style={{ padding: "14px 10px", textAlign: "right" }}>State/UT Tax</th>
-                            <th style={{ padding: "14px 10px", textAlign: "right" }}>Cess</th>
-                            <th style={{ padding: "14px 10px", textAlign: "center" }}>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {outstandingDemands.map((item) => (
-                            <tr
-                              key={item.sr}
-                              style={{
-                                borderBottom: "1px solid #e5e7eb",
-                                background: item.integrated > 0 ? "#fefce8" : "#ffffff",
-                              }}
-                            >
-                              <td style={{ padding: "14px 10px", textAlign: "center" }}>{item.sr}</td>
-                              <td style={{ padding: "14px 10px" }}>{item.date}</td>
-                              <td style={{ padding: "14px 10px", fontFamily: "monospace" }}>{item.demandId}</td>
-                              <td style={{ padding: "14px 10px", textAlign: "right" }}>{item.integrated.toLocaleString()}</td>
-                              <td style={{ padding: "14px 10px", textAlign: "right" }}>{item.central.toLocaleString()}</td>
-                              <td style={{ padding: "14px 10px", textAlign: "right" }}>{item.state.toLocaleString()}</td>
-                              <td style={{ padding: "14px 10px", textAlign: "right" }}>{item.cess.toLocaleString()}</td>
-                              <td style={{ padding: "14px 10px", textAlign: "center" }}>
-                                <button
-                                  onClick={() => setSelectedDemand(item)}
-                                  style={{
-                                    background: "#3b82f6",
-                                    color: "white",
-                                    border: "none",
-                                    padding: "8px 22px",
-                                    borderRadius: "6px",
-                                    fontWeight: "600",
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  SELECT
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+          {/* BODY */}
+          <div style={{ padding: "20px" }}>
+            <div style={{ marginBottom: "12px" }}>
+              <strong>GSTIN</strong>
+              <div style={{ fontFamily: "monospace" }}>
+                09ACNPU2195H1ZY
+              </div>
+            </div>
 
-                  {selectedDemand && (
-                    <div
-                      style={{
-                        position: "fixed",
-                        inset: 0,
-                        background: "rgba(0,0,0,0.45)",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        zIndex: 2000,
-                      }}
-                      onClick={() => setSelectedDemand(null)}
-                    >
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-    background: "#ffffff",
-    borderRadius: "20px",               // ⬅ smoother
-    padding: "26px",
-    boxShadow: "0 18px 40px rgba(0,0,0,0.08)",
-    border: "1px solid #e5e7eb",
-  }}
-                      >
-                        <div
-                          style={{
-                            background: "#f1f1f1",
-                            padding: "16px",
-                            textAlign: "center",
-                            fontSize: "1.15rem",
-                            fontWeight: "600",
-                            borderBottom: "1px solid #d1d1d6",
-                          }}
-                        >
-                          Payment towards Demand
-                        </div>
+            <div style={{ marginBottom: "12px" }}>
+              <strong>Trade Name</strong>
+              <div>U.A.F ENTERPRISE'S</div>
+            </div>
 
-                        <div style={{ padding: "24px 20px" }}>
-                          <div style={{ marginBottom: "20px" }}>
-                            <div style={{ fontWeight: 600 }}>GSTIN</div>
-                            <div style={{ fontFamily: "monospace", marginTop: 4 }}>09ACNPU2195H1ZY</div>
-                          </div>
+            <div style={{ marginBottom: "18px" }}>
+              <strong>Demand ID</strong>
+              <div style={{ color: "#2563eb" }}>
+                {selectedDemand.demandId}
+              </div>
+            </div>
 
-                          <div style={{ marginBottom: "20px" }}>
-                            <div style={{ fontWeight: 600 }}>Trade Name</div>
-                            <div style={{ marginTop: 4 }}>U.A.F ENTERPRISE'S</div>
-                          </div>
-
-                          <div style={{ marginBottom: "24px" }}>
-                            <div style={{ fontWeight: 600 }}>Demand ID</div>
-                            <div style={{ color: "#2563eb", marginTop: 4 }}>{selectedDemand.demandId}</div>
-                          </div>
-
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "28px" }}>
-                            <div>
-                              <div style={{ color: "#666", fontSize: "0.9rem" }}>Central Tax</div>
-                              <div style={{ fontSize: "1.4rem", fontWeight: 700 }}>
-                                ₹{selectedDemand.central.toLocaleString()}
-                              </div>
-                            </div>
-                            <div>
-                              <div style={{ color: "#666", fontSize: "0.9rem" }}>State/UT Tax</div>
-                              <div style={{ fontSize: "1.4rem", fontWeight: 700 }}>
-                                ₹{selectedDemand.state.toLocaleString()}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div style={{ textAlign: "center" }}>
-                            <button
-                              onClick={() => {
-                                alert("Payment initiation simulation...");
-                                setSelectedDemand(null);
-                              }}
-                              style={{
-                                background: "#007aff",
-                                color: "white",
-                                border: "none",
-                                padding: "14px 56px",
-                                fontSize: "1.1rem",
-                                fontWeight: 600,
-                                borderRadius: "12px",
-                                cursor: "pointer",
-                              }}
-                            >
-                              Proceed to Pay
-                            </button>
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            borderTop: "1px solid #d1d1d6",
-                            padding: "16px",
-                            textAlign: "center",
-                          }}
-                        >
-                          <button
-                            onClick={() => setSelectedDemand(null)}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              color: "#007aff",
-                              fontSize: "1.1rem",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                            }}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "14px",
+                marginBottom: "22px",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: "0.85rem", color: "#64748b" }}>
+                  Central Tax
                 </div>
-              )}
+                <div style={{ fontSize: "1.15rem", fontWeight: 700 }}>
+                  ₹{selectedDemand.central.toLocaleString()}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: "0.85rem", color: "#64748b" }}>
+                  State / UT Tax
+                </div>
+                <div style={{ fontSize: "1.15rem", fontWeight: 700 }}>
+                  ₹{selectedDemand.state.toLocaleString()}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ textAlign: "center" }}>
+              <button
+                onClick={() => {
+                  alert("Payment initiation simulation...");
+                  setSelectedDemand(null);
+                }}
+                style={{
+                  background: "linear-gradient(135deg,#2563eb,#3b82f6)",
+                  color: "#ffffff",
+                  border: "none",
+                  padding: "12px 44px",
+                  fontSize: "0.95rem",
+                  fontWeight: "600",
+                  borderRadius: "12px",
+                  cursor: "pointer",
+                  boxShadow: "0 6px 20px rgba(37,99,235,0.4)",
+                }}
+              >
+                Proceed to Pay
+              </button>
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <div
+            style={{
+              borderTop: "1px solid #e5e7eb",
+              padding: "12px",
+              textAlign: "center",
+            }}
+          >
+            <button
+              onClick={() => setSelectedDemand(null)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#2563eb",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+)}
             </div>
           </div>
         </div>
@@ -4417,9 +4576,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
-            <span style={{ background: "#dc2626", padding: "6px 14px", borderRadius: "30px", fontWeight: "600", fontSize: "0.9rem" }}>
-              Regular
-            </span>
+           
             <a
               href="https://services.gst.gov.in/services/login"
               target="_blank"
@@ -4486,6 +4643,9 @@ boxShadow: "0 6px 14px rgba(79,70,229,0.35)",
     </div>
   );
 };
+
+
+
   const PendingVouchersModal = () => (
     <div style={modalOverlayStyle} onClick={() => setShowPendingVouchersModal(false)}>
       <div style={modalCardStyle} onClick={(e) => e.stopPropagation()}>
