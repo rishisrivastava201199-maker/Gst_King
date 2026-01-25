@@ -4610,44 +4610,45 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
   }}
 >
 
-          <div style={{ display: "inline-flex", gap: "6px", padding: "14px 0" }}>
-            {menuItems.map((item) => (
-              <button
-                key={item}
-                onClick={() => {
-                  setActiveMenu(item);
-                  setActiveSubTab("Manually");
-                  if (item === "Annual Return") {
-                    setActiveAnnualSubTab("GSTR-9");
-                  }
-                }}
-                onMouseEnter={() => setHoveredMenu(item)}
-                onMouseLeave={() => setHoveredMenu(null)}
-                style={{
-                  padding: "8px 16px",             // ⬅ nav height kam
-borderRadius: "10px",
-fontSize: "0.85rem",
+        <div style={{ display: "inline-flex", gap: "8px", padding: "14px 0" }}>
+  {menuItems.map((item) => {
+    const isActive = activeMenu === item;
 
-                 background: "#4f46e5",
-color: "#fff",
-boxShadow: "0 6px 14px rgba(79,70,229,0.35)",
-
-                  border: "none",
-                  borderRadius: "10px 10px 0 0",
-                  fontSize: "0.96rem",
-                  fontWeight: activeMenu === item ? "700" : "600",
-                  cursor: "pointer",
-                  minWidth: "115px",
-                  transition: "all 0.3s ease",
-                  boxShadow: activeMenu === item ? "0 6px 20px rgba(167,139,250,0.5)" : "none",
-                  transform: hoveredMenu === item ? "translateY(-3px)" : "translateY(0)",
-                }}
-              >
-                {item.toUpperCase().replace(/-/g, " ")}
-              </button>
-            ))}
-          </div>
-        </div>
+    return (
+      <button
+        key={item}
+        onClick={() => {
+          setActiveMenu(item);
+          setActiveSubTab("Manually");
+          if (item === "Annual Return") {
+            setActiveAnnualSubTab("GSTR-9");
+          }
+        }}
+        onMouseEnter={() => setHoveredMenu(item)}
+        onMouseLeave={() => setHoveredMenu(null)}
+        style={{
+          padding:          "10px 20px",               // pill ke liye balanced padding
+          borderRadius:     "9999px",                  // ← yeh line se full curve/pill shape banega
+          fontSize:         "0.92rem",
+          fontWeight:       isActive ? "700" : "600",
+          background:       isActive ? "#4f46e5" : "#ffffff",
+          color:            isActive ? "#ffffff" : "#1e293b",
+          border:           isActive ? "none" : "1px solid #d1d5db",
+          boxShadow:        isActive 
+                              ? "0 4px 12px rgba(79, 70, 229, 0.3)"
+                              : "0 2px 6px rgba(0,0,0,0.08)",
+          cursor:           "pointer",
+          transition:       "all 0.25s ease",
+          minWidth:         "115px",
+          transform:        hoveredMenu === item ? "translateY(-2px)" : "translateY(0)",
+        }}
+      >
+        {item.toUpperCase().replace(/-/g, " ")}
+      </button>
+    );
+  })}
+</div>
+</div>
         {/* Main Content Area */}
         <div style={{ flex: 1, overflowY: "auto", background: "#f9fafb" }}>
           {renderContent()}
