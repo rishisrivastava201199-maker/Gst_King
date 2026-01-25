@@ -1060,3 +1060,50 @@ input:checked + .slider:before {
   transition: background 0.18s ease;
 }
 
+.smartgst-overlay {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+
+  padding: 80px;   /* screen edge se thoda gap */
+  color: white;
+
+  display: block;
+  text-align: left;
+}
+
+/* MAIN TITLE — SMARTGST */
+.smartgst-title {
+  margin-top: 30px;
+ 
+ 
+  padding: 35px;
+
+  background: none;
+  font-weight: 300;
+  font-size: 1.9rem;        /* ⬅ chhota but visible */
+  color: #1e3a8a;
+
+  text-shadow:
+    12px 3px 10px rgba(37, 99, 235, 0.35),
+    12px 1px 0 rgba(255,255,255,0.4);
+
+  text-align: left;
+}
+
+/* POWERED BY */
+.smartgst-powered {
+  margin-top: 1px;
+  font-size: 0.85rem;       /* ⬅ chhota */
+  font-weight: 400;
+  color: #0e2789;
+}
+
+/* DESCRIPTION — LONG PARAGRAPH STYLE */
+.smartgst-desc {
+  margin-top: 18px;
+  font-size: 0.72rem;       /* ⬅ kaafi chhota */
+  line-height: 1.35;        /* ⬅ tight but readable */
+  color: rgba(30, 58, 138, 0.75);
+  max-width: 900px;         /* ⬅ paragraph feel */
+}

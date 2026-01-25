@@ -116,10 +116,16 @@ export default function Login() {
   <div className="image-wrapper">   {/* ← yeh naya div add kar */}
     <img src="/tax.jpg" alt="SmartGST" className="smartgst-bg-image" />
   </div>
-  <div className="smartgst-overlay">
-    <h1>SmartGST</h1>
-    <p>Powered by Sharma & Co Chartered Accountants</p>
-  </div>
+<div class="smartgst-overlay">
+  <h1 class="smartgst-title">SmartGST</h1>
+  <div class="smartgst-powered">Powered by Sharma & Co</div>
+  <p class="smartgst-desc">
+   Secure, compliant, and enterprise-grade GST & accounting platform designed
+      for professionals and growing businesses.
+  </p>
+</div>
+
+
 </div>
 
 
