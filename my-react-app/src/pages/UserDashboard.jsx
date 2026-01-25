@@ -1562,14 +1562,13 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
   >
     <div
       style={{
-        background: "#ffffff",
-        borderRadius: "14px",
-        width: "100%",
-        maxWidth: "880px",
-        maxHeight: "80vh",
-        overflowY: "auto",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.28)"
-      }}
+    background: "#ffffff",
+    width: "100vw",                // ← full screen width
+    height: "100vh",               // ← full screen height
+    overflowY: "auto",
+    boxShadow: "none",             // shadow nahi chahiye full screen mein
+    borderRadius: "0",             // corners bilkul nahi
+  }}
       onClick={e => e.stopPropagation()}
     >
       {/* ───── Header ───── */}
@@ -5678,14 +5677,6 @@ const handleSubmitClient = () => {
           ))}
         </div>
       </div>
-
-      {/* Charts */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "20px", marginTop: "20px" }}>
-        <div style={chartCard}><h4>Business Growth</h4><div style={chartWrap}><Line data={growthData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} /></div></div>
-        <div style={chartCard}><h4 style={{ textAlign: "center" }}>Client Types</h4><div style={chartWrap}><Pie data={pieData} options={{ maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }} /></div></div>
-        <div style={chartCard}><h4 style={{ textAlign: "center" }}>Growth Trend</h4><div style={chartWrap}><Bar data={trendData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} /></div></div>
-      </div>
-
       {/* Types of Clients Table */}
       <div style={{ ...card, marginTop: "30px" }}>
         <h2 style={{ marginBottom: "16px", color: "#1f2a70" }}>Types of Clients</h2>
@@ -5732,6 +5723,8 @@ const handleSubmitClient = () => {
     Open List
   </button>
 </div>
+
+
             <div style={{ textAlign: "center" }}>
               <button
                 onClick={() => setShowAddClientModal(true)}
@@ -5841,9 +5834,22 @@ const handleSubmitClient = () => {
             </div>
           </div>
         )}
+        
+      {/* Charts */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "20px", marginTop: "20px" }}>
+        <div style={chartCard}><h4>Business Growth</h4><div style={chartWrap}><Line data={growthData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} /></div></div>
+        <div style={chartCard}><h4 style={{ textAlign: "center" }}>Client Types</h4><div style={chartWrap}><Pie data={pieData} options={{ maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }} /></div></div>
+        <div style={chartCard}><h4 style={{ textAlign: "center" }}>Growth Trend</h4><div style={chartWrap}><Bar data={trendData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} /></div></div>
+      </div>
+
+
     </div>
+
+    
   );
 };
+
+
     const VouchersPage = () => {
     const [activeTab, setActiveTab] = useState("vouchers"); // default tab
 
