@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../style.css";
 
+
 export default function Login() {
   const navigate = useNavigate();
   const [isSignup, setIsSignup] = useState(false);
@@ -25,16 +26,18 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const navigateToDashboard = () => {
-    const userData = {
-      name: isSignup ? name : loginEmail.split("@")[0],
-      email: isSignup ? email : loginEmail,
-      role: isSignup ? "New User" : "User",
-      company: "Raj & Company",
-    };
-    localStorage.setItem("token", "smartgst-user-token");
-    localStorage.setItem("user", JSON.stringify(userData));
-    navigate("/user");
+  const userData = {
+    name: isSignup ? name : loginEmail.split("@")[0],
+    email: isSignup ? email : loginEmail,
+    role: isSignup ? "New User" : "User",
+    company: "Raj & Company",
   };
+
+  localStorage.setItem("token", "smartgst-user-token");
+  localStorage.setItem("user", JSON.stringify(userData));
+  navigate("/user");
+};
+
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -45,61 +48,46 @@ export default function Login() {
     navigateToDashboard();
   };
 
-  const handleSendOtp = async () => {
-    if (!email || !email.includes("@")) {
-      alert("Please enter a valid email address.");
-      return;
+ const handleSendOtp = async () => {
+  if (!email || !email.includes("@")) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  setGeneratedOtp(otp);
+  setLoading(true);
+
+  try {
+    // Yeh line sabse important hai – full backend URL use karo
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+    const res = await fetch(`${API_URL}/send-otp`, {   // ← /send-otp add kiya + full URL
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`);
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(otp);
-    setLoading(true);
+    const data = await res.json();
 
-    try {
-      // ────────────────────────────────────────────────
-      // MOST IMPORTANT FIX: Use only the environment variable
-      // No localhost fallback anymore!
-      const API_URL = import.meta.env.VITE_API_URL;
-
-      if (!API_URL) {
-        throw new Error("Backend URL is not set! Please add VITE_API_URL in Vercel Environment Variables.");
-      }
-
-      console.log("Sending OTP request to:", `${API_URL}/send-otp`); // helps you see the real URL in console
-
-      const res = await fetch(`${API_URL}/send-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text().catch(() => "");
-        throw new Error(`Backend responded with error ${res.status}: ${errorText || "No message"}`);
-      }
-
-      const data = await res.json();
-
-      if (data.success) {
-        setOtpSent(true);
-        setShowOtpSection(true);
-        alert("OTP sent successfully! Check your email.");
-      } else {
-        alert("Failed to send OTP: " + (data.message || "Unknown error from backend"));
-      }
-    } catch (err) {
-      console.error("OTP Send Error:", err);
-      alert(
-        "Failed to send OTP!\n\n" +
-        `Error: ${err.message}\n` +
-        `URL tried: ${import.meta.env.VITE_API_URL || "not set"}/send-otp\n` +
-        "Check Vercel env var VITE_API_URL and backend logs."
-      );
-    } finally {
-      setLoading(false);
+    if (data.success) {
+      setOtpSent(true);
+      setShowOtpSection(true);
+      alert("OTP sent successfully! Check your email.");
+    } else {
+      alert("Failed to send OTP: " + (data.message || "Unknown error"));
     }
-  };
-
+  } catch (err) {
+    console.error("OTP Send Error:", err);
+    alert("Server error. Make sure backend is running on port 5000.");
+  } finally {
+    setLoading(false);
+  }
+};
   const handleVerifyOtp = (e) => {
     e.preventDefault();
     if (enteredOtp !== generatedOtp) {
@@ -125,18 +113,21 @@ export default function Login() {
     <div className="smartgst-login-container">
       {/* Left Side - Image */}
       <div className="smartgst-image-half">
-        <div className="image-wrapper">
-          <img src="/tax.jpg" alt="SmartGST" className="smartgst-bg-image" />
-        </div>
-        <div className="smartgst-overlay">
-          <h1 className="smartgst-title">SmartGST</h1>
-          <div className="smartgst-powered">Powered by Sharma & Co</div>
-          <p className="smartgst-desc">
-            Secure, compliant, and enterprise-grade GST & accounting platform designed
-            for professionals and growing businesses.
-          </p>
-        </div>
-      </div>
+  <div className="image-wrapper">   {/* ← yeh naya div add kar */}
+    <img src="/tax.jpg" alt="SmartGST" className="smartgst-bg-image" />
+  </div>
+<div class="smartgst-overlay">
+  <h1 class="smartgst-title">SmartGST</h1>
+  <div class="smartgst-powered">Powered by Sharma & Co</div>
+  <p class="smartgst-desc">
+   Secure, compliant, and enterprise-grade GST & accounting platform designed
+      for professionals and growing businesses.
+  </p>
+</div>
+
+
+</div>
+
 
       {/* Right Side - Form */}
       <div className="smartgst-form-half">
@@ -166,6 +157,7 @@ export default function Login() {
               <button type="submit" className="smartgst-btn">
                 LOGIN
               </button>
+
               <div className="smartgst-links">
                 <a
                   href="#"
