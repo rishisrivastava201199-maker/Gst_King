@@ -97,6 +97,7 @@ function NewsAndUpdates() {
 
   const years = Array.from({ length: 2026 - 2017 + 1 }, (_, i) => 2026 - i);
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  
 
   const types = ['All', 'Notification', 'Advisory', 'Revenue Update', 'Circular', 'Update', 'Press Release'];
 
@@ -2171,23 +2172,21 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
   const [hoveredMenu, setHoveredMenu] = useState(null);
   const [activeSubTab, setActiveSubTab] = useState("Manually");
   const [activeAnnualSubTab, setActiveAnnualSubTab] = useState("GSTR-9");
-  // Import flow states (future use ke liye rakha hai, remove mat karna)
   const [importStep, setImportStep] = useState("list"); // "list" | "upload"
   const [selectedImportType, setSelectedImportType] = useState(null);
-  // NEW STATES FOR LEDGER SUMMARY TABS & ACCORDIONS
-  const [activeLedgerTab, setActiveLedgerTab] = useState("summary"); // summary, elb, turnover, liability, payment
+
+  const [activeLedgerTab, setActiveLedgerTab] = useState("summary");
   const [showCreditLedger, setShowCreditLedger] = useState(false);
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
-  // NEW STATE FOR DEMAND POPUP
   const [selectedDemand, setSelectedDemand] = useState(null);
-  // Dynamic client header data
+
   const [dynamicClient, setDynamicClient] = useState({
     gstin: client?.gstin || "09ABMCS5888A1ZU",
     company: client?.company || "SALVIA GRAFIX PRIVATE LIMITED",
     registrationDate: "10-Feb-2020",
     status: "Active",
   });
-  // Editable form state for Client Detail tab
+
   const [formData, setFormData] = useState({
     name: "SALVIA GRAFIX PRIVATE LIMITED",
     address: "Shop No. 13, First Floor, Royal Plaza, Haj...",
@@ -2214,10 +2213,12 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     uploadType: "GST",
     lutNumber: "",
   });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
   const handleUpdate = () => {
     setDynamicClient({
       gstin: formData.gstin,
@@ -2227,8 +2228,9 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     });
     toast.success("Client details updated successfully! Changes are now visible in the header card.");
   };
+
   const months = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
-  // UPDATED MENU - sirf ye items rakhe hain (cmp-08, 2A, 2B, 2, Refund, Payment sab hata diye)
+
   const menuItems = [
     "Dashboard",
     "Client Detail",
@@ -2239,7 +2241,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     "Annual Return",
     "Reports",
   ];
-  // Ledger Tabs List
+
   const ledgerTabs = [
     { id: "summary", label: "Ledger Summary" },
     { id: "elb", label: "ELB" },
@@ -2247,7 +2249,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     { id: "liability", label: "Liability Ledger" },
     { id: "payment", label: "Demand" },
   ];
-  // Dummy data for Outstanding Demand (as per your screenshot + extra rows)
+
   const outstandingDemands = [
     {
       sr: 1,
@@ -2295,7 +2297,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       cess: 0,
     },
   ];
-  // Excel Template Download function (same as original)
+
   const downloadClientTemplate = () => {
     const notes = [
       ["Note"],
@@ -2363,7 +2365,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     XLSX.writeFile(wb, "Client_Master_Template.xlsx");
     toast.success("Client Master Template Downloaded!");
   };
-  // Import Options List Component
+
   const ImportOptionsList = () => {
     const options = [
       { title: "Bulk New File Creation for GST", hasTemplate: true },
@@ -2390,22 +2392,10 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                 border: "1px solid #e2e8f0",
               }}
             >
-              <div style={{ fontSize: "1.1rem", fontWeight: "600", color: "#1e293b" }}>
-                {opt.title}
-              </div>
+              <div style={{ fontSize: "1.1rem", fontWeight: "600", color: "#1e293b" }}>{opt.title}</div>
               <div style={{ display: "flex", gap: "12px" }}>
                 {opt.singleButton ? (
-                  <button
-                    style={{
-                      background: "#2dd4bf",
-                      color: "white",
-                      padding: "10px 28px",
-                      border: "none",
-                      borderRadius: "8px",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                    }}
-                  >
+                  <button style={{ background: "#2dd4bf", color: "white", padding: "10px 28px", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}>
                     TRANSFER
                   </button>
                 ) : (
@@ -2415,30 +2405,14 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                         setSelectedImportType(opt.title);
                         setImportStep("upload");
                       }}
-                      style={{
-                        background: "#2dd4bf",
-                        color: "white",
-                        padding: "10px 28px",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                      }}
+                      style={{ background: "#2dd4bf", color: "white", padding: "10px 28px", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}
                     >
                       IMPORT
                     </button>
                     {opt.hasTemplate && (
                       <button
                         onClick={downloadClientTemplate}
-                        style={{
-                          background: "#1e40af",
-                          color: "white",
-                          padding: "10px 28px",
-                          border: "none",
-                          borderRadius: "8px",
-                          fontWeight: "600",
-                          cursor: "pointer",
-                        }}
+                        style={{ background: "#1e40af", color: "white", padding: "10px 28px", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}
                       >
                         TEMPLATE
                       </button>
@@ -2452,77 +2426,31 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     );
   };
-  // File Upload Screen Component
+
   const FileUploadScreen = () => {
     return (
       <div style={{ padding: "20px", background: "#f8fafc" }}>
         <div style={{ background: "#ffffff", borderRadius: "12px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
-          <h2 style={{ margin: "0 0 32px 0", fontSize: "1.6rem", fontWeight: "700", color: "#1e293b" }}>
-            Import Template
-          </h2>
-          <div style={{ marginBottom: "32px", color: "#475569", fontSize: "1rem" }}>
-            Step 1 : Upload File
-          </div>
-          <div
-            style={{
-              border: "2px dashed #cbd5e1",
-              borderRadius: "12px",
-              padding: "80px 40px",
-              textAlign: "center",
-              background: "#f8fafc",
-              marginBottom: "32px",
-            }}
-          >
-            <p style={{ color: "#14b8a6", fontSize: "1.2rem", margin: "0 0 20px 0" }}>
-              Browse or Drag and Drop File here
-            </p>
+          <h2 style={{ margin: "0 0 32px 0", fontSize: "1.6rem", fontWeight: "700", color: "#1e293b" }}>Import Template</h2>
+          <div style={{ marginBottom: "32px", color: "#475569", fontSize: "1rem" }}>Step 1 : Upload File</div>
+          <div style={{ border: "2px dashed #cbd5e1", borderRadius: "12px", padding: "80px 40px", textAlign: "center", background: "#f8fafc", marginBottom: "32px" }}>
+            <p style={{ color: "#14b8a6", fontSize: "1.2rem", margin: "0 0 20px 0" }}>Browse or Drag and Drop File here</p>
             <div style={{ fontSize: "2.5rem", color: "#94a3b8" }}>↓</div>
           </div>
           <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
-            <button
-              style={{
-                background: "#1e40af",
-                color: "white",
-                padding: "12px 40px",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: "600",
-                fontSize: "1rem",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              ↻ UPLOAD
-            </button>
-            <button
-              style={{
-                background: "#f59e0b",
-                color: "white",
-                padding: "12px 40px",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: "600",
-                fontSize: "1rem",
-                cursor: "pointer",
-              }}
-            >
-              CLEAR
-            </button>
+            <button style={{ background: "#1e40af", color: "white", padding: "12px 40px", border: "none", borderRadius: "8px", fontWeight: "600", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>↻ UPLOAD</button>
+            <button style={{ background: "#f59e0b", color: "white", padding: "12px 40px", border: "none", borderRadius: "8px", fontWeight: "600", fontSize: "1rem", cursor: "pointer" }}>CLEAR</button>
           </div>
         </div>
       </div>
     );
   };
-  // Reusable GSTR Layout Component
+
   const GSTRLayout = ({ title }) => (
     <div style={{ padding: "20px", background: "#f8fafc" }}>
       <div style={{ background: "#ffffff", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-          <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "700", color: "#7c3aed" }}>
-            {title}
-          </h2>
+          <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "700", color: "#7c3aed" }}>{title}</h2>
           <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
             <select style={{ padding: "10px 16px", borderRadius: "8px", border: "1px solid #ccc", fontSize: "1rem" }}>
               <option>FY 2024-25</option>
@@ -2600,1911 +2528,728 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     </div>
   );
-  // NEW STATE for sub-ledger view inside Turnover tab
-  const [activeTurnoverView, setActiveTurnoverView] = useState('overview'); // 'overview' | 'cash' | 'credit'
 
-  // Main content rendering function
- const renderContent = () => {
-  if (activeMenu === "Dashboard") {
+  const [activeTurnoverView, setActiveTurnoverView] = useState('overview');
+
+  const renderContent = () => {
+    if (activeMenu !== "Dashboard") {
+      if (activeMenu === "Client Detail") {
+        return (
+          <div style={{ padding: "24px", background: "#f8fafc" }}>
+            <div style={{ marginBottom: "40px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", padding: "16px", background: "#f0f9ff", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                <h3 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700", color: "#1f2937" }}>Client Details</h3>
+                <button style={{ background: "#10b981", color: "white", padding: "10px 20px", border: "none", borderRadius: "8px", fontSize: "0.95rem", fontWeight: "600", cursor: "pointer" }}>Get Data From GSTN</button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
+                <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                  <h4 style={{ margin: "0 0 20px 0", color: "#0d9488", fontWeight: "700", fontSize: "1.1rem" }}>Personal Details</h4>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Name <span style={{ color: "red" }}>(required)</span></label>
+                    <input name="name" value={formData.name} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Address</label>
+                    <input name="address" value={formData.address} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Place</label>
+                    <input name="place" value={formData.place} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>PIN</label>
+                    <input name="pin" value={formData.pin} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>State <span style={{ color: "red" }}>(required)</span></label>
+                    <select name="state" value={formData.state} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>Uttar Pradesh</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Mobile Number</label>
+                    <input name="mobile" value={formData.mobile} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Email Id</label>
+                    <input name="email" value={formData.email} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Phone Number</label>
+                    <input name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Phone Number" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                </div>
+                <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                  <h4 style={{ margin: "0 0 20px 0", color: "#0d9488", fontWeight: "700", fontSize: "1.1rem" }}>Business Details</h4>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Trade Name</label>
+                    <input name="tradeName" value={formData.tradeName} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Business Type</label>
+                    <select name="businessType" value={formData.businessType} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>Proprietorship</option>
+                      <option>Partnership</option>
+                      <option>Private Limited</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Status</label>
+                    <select name="status" value={formData.status} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>Select</option>
+                      <option>Active</option>
+                      <option>Inactive</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>GSTIN <span style={{ color: "red" }}>(required)</span></label>
+                    <input name="gstin" value={formData.gstin} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Registration Date <span style={{ color: "red" }}>(required)</span></label>
+                    <input name="regDate" value={formData.regDate} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>TAN</label>
+                    <input name="tan" value={formData.tan} onChange={handleInputChange} placeholder="TAN" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>PAN</label>
+                    <input name="pan" value={formData.pan} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>CIN Number</label>
+                    <input name="cin" value={formData.cin} onChange={handleInputChange} placeholder="CIN Number" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                </div>
+                <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                  <h4 style={{ margin: "0 0 20px 0", color: "#0d9488", fontWeight: "700", fontSize: "1.1rem" }}>Other Details</h4>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>File No</label>
+                    <input name="fileNo" value={formData.fileNo} onChange={handleInputChange} placeholder="File No" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Responsible Person</label>
+                    <input name="responsiblePerson" value={formData.responsiblePerson} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Designation</label>
+                    <input name="designation" value={formData.designation} onChange={handleInputChange} placeholder="Designation" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Alternate Mobile</label>
+                    <input name="alternateMobile" value={formData.alternateMobile} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>GST User ID <span style={{ color: "red" }}>(required)</span></label>
+                    <input name="gstUserId" value={formData.gstUserId} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Tax Payer Type <span style={{ color: "red" }}>(required)</span></label>
+                    <select name="taxPayerType" value={formData.taxPayerType} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>Normal</option>
+                      <option>Composition</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Upload Type <span style={{ color: "red" }}>(required)</span></label>
+                    <select name="uploadType" value={formData.uploadType} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>GST</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>LUT Number</label>
+                    <input name="lutNumber" value={formData.lutNumber} onChange={handleInputChange} placeholder="LUT Number" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                </div>
+              </div>
+              <div style={{ textAlign: "right", marginTop: "30px" }}>
+                <button onClick={handleUpdate} style={{ background: "#16a34a", color: "white", padding: "12px 36px", border: "none", borderRadius: "8px", fontSize: "1rem", fontWeight: "600", cursor: "pointer" }}>Update</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      const regularGstrTabs = ["gstr-1", "gstr-1A", "gstr 3b", "IMS"];
+      if (regularGstrTabs.includes(activeMenu)) {
+        const displayTitle = activeMenu.toUpperCase().replace("GSTR ", "GSTR-").replace(" 3B", " 3B");
+        return <GSTRLayout title={displayTitle} />;
+      }
+
+      if (activeMenu === "Annual Return") {
+        return (
+          <div style={{ padding: "20px", background: "#f8fafc" }}>
+            <div style={{ background: "#ffffff", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
+              <div style={{ display: "flex", gap: "12px", marginBottom: "32px", borderBottom: "2px solid #e2e8f0" }}>
+                {["GSTR-9", "GSTR-9C"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveAnnualSubTab(tab)}
+                    style={{
+                      padding: "12px 28px",
+                      background: activeAnnualSubTab === tab ? "#7c3aed" : "transparent",
+                      color: activeAnnualSubTab === tab ? "white" : "#475569",
+                      border: "none",
+                      borderRadius: "10px 10px 0 0",
+                      fontSize: "1.1rem",
+                      fontWeight: activeAnnualSubTab === tab ? "600" : "500",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+              <GSTRLayout title={activeAnnualSubTab} />
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div style={{ padding: "80px 40px", textAlign: "center", color: "#64748b" }}>
+          <h2 style={{ fontSize: "2rem", color: "#7c3aed", marginBottom: "20px" }}>{activeMenu.toUpperCase().replace(/-/g, " ")}</h2>
+          <p style={{ fontSize: "1.3rem" }}>This section is under development.</p>
+        </div>
+      );
+    }
+
+    // ───────── DASHBOARD ─────────
     return (
       <div style={{ padding: "20px 28px", background: "#f8fafc" }}>
-        {/* ───────── HEADER ROW ───────── */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "20px",
-            flexWrap: "wrap",
-            gap: "14px",
-          }}
-        >
-          {/* LEFT : TITLE */}
-          <h2
-            style={{
-              margin: 0,
-              color: "#0f766e",
-              fontSize: "1.6rem",
-              fontWeight: "700",
-            }}
-          >
-            Returns Status
-          </h2>
 
-          {/* RIGHT : CONTROLS */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              flexWrap: "wrap",
-            }}
-          >
-            {/* YEAR SELECT (SMALL & CLEAN) */}
-            <select
-             style={{
-  padding: "8px 1px",  
-  margin :"12px" ,       // ⬅ compact height
-  borderRadius: "8px",
-  border: "1px solid #cbd5e1",  // ⬅ softer border
-  fontSize: "0.9rem",
-  background: "#ffffff",
-  width: "110px",               // ⬅ same small width
-  outline: "none",
-  boxShadow: "0 1px 4px rgba(0,0,0,0.08)", // ⬅ premium depth
-  cursor: "pointer",
-}}
+        {/* ───────── Returns Status + Ledger Tabs in one row ───────── */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "16px" }}>
+          {/* Left: Returns Status Title */}
+          <h2 style={{ margin: 0, color: "#0f766e", fontSize: "1.6rem", fontWeight: "700" }}>Returns Status</h2>
 
-            >
-              <option>2024-25</option>
-              <option>2025-26</option>
-            </select>
-
-            {/* UPDATE BUTTON (PREMIUM) */}
-            <button
-              style={{
-                background: "linear-gradient(135deg,#10b981,#059669)",
-                color: "white",
-                padding: "8px 18px",
-                border: "none",
-                borderRadius: "10px",
-                fontWeight: "600",
-                fontSize: "0.95rem",
-                cursor: "pointer",
-                boxShadow: "0 6px 14px rgba(16,185,129,0.35)",
-                transition: "all 0.25s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-1px)";
-                e.currentTarget.style.boxShadow =
-                  "0 8px 18px rgba(16,185,129,0.45)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow =
-                  "0 6px 14px rgba(16,185,129,0.35)";
-              }}
-            >
-                Update
-              </button>
-               <div
-              style={{
-                fontSize: "0.9rem",
-                color: "#059669",
-                fontWeight: "600",
-                whiteSpace: "nowrap",
-              }}
-            >
-              03-Jan-2026
-            </div>
-            </div>
-          </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "120px repeat(12, 1fr)",
-              gap: "8px",
-              marginBottom: "16px",
-              fontWeight: "700",
-              fontSize: "0.9rem",
-              minWidth: "1000px",
-              overflowX: "auto",
-            }}
-          >
-            <div style={{ paddingLeft: "8px" }}>Return</div>
-            {months.map((m) => (
-              <div
-                key={m}
-                style={{
-                  textAlign: "center",
-                  padding: "8px 0",
-                  background: "#e0e7ff",
-                  borderRadius: "8px",
-                  color: "#4338ca",
-                }}
-              >
-                {m}
-              </div>
-            ))}
-          </div>
-          {[
-            { name: "GSTR-1", filed: 9 },
-            { name: "GSTR-1A", filed: 0 },
-            { name: "GSTR-3B", filed: 8 },
-            { name: "TDS/TCS", filed: 8 },
-          ].map((ret) => (
-            <div
-              key={ret.name}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "120px repeat(12, 1fr)",
-                gap: "8px",
-                alignItems: "center",
-                marginBottom: "12px",
-                minWidth: "1000px",
-                overflowX: "auto",
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: "700",
-                  color: "#0d9488",
-                  fontSize: "1rem",
-                  paddingLeft: "8px",
-                }}
-              >
-                {ret.name}
-                <br />
-                <a
-                  href="#"
-                  style={{ fontSize: "0.8rem", color: "#2563eb", textDecoration: "underline" }}
+          {/* Right: Ledger Tabs + Update button */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            {ledgerTabs.map((tab) => {
+              const isActive = activeLedgerTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveLedgerTab(tab.id)}
+                  style={{
+                    padding: "10px 24px",
+                    background: isActive ? "linear-gradient(135deg, #1e40af, #2563eb)" : "#ffffff",
+                    color: isActive ? "white" : "#334155",
+                    border: isActive ? "none" : "1px solid #e5e7eb",
+                    borderRadius: "999px",
+                    fontWeight: isActive ? "700" : "600",
+                    fontSize: "1rem",
+                    cursor: "pointer",
+                    boxShadow: isActive ? "0 8px 20px rgba(30,64,175,0.4)" : "0 3px 10px rgba(0,0,0,0.08)",
+                    transition: "all 0.25s ease",
+                  }}
                 >
-                  All Download →
-                </a>
-              </div>
-              {Array.from({ length: 12 }, (_, i) => {
-                const filed = i < ret.filed;
-                const isCurrentPeriod = i >= 9;
-                const arn = filed
-                  ? `AA09${String(i + 4).padStart(2, "0")}24R${String(i + 1).padStart(3, "0")}`
-                  : isCurrentPeriod
-                  ? ""
-                  : "Pending";
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      background: "#ffffff",
-                      borderRadius: "8px",
-                      boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
-                      padding: "10px 6px",
-                      textAlign: "center",
-                      fontSize: "0.85rem",
-                      minHeight: "80px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      gap: "4px",
-                    }}
-                  >
-                    {filed ? (
-                      <>
-                        <span style={{ color: "#059669", fontWeight: "700", fontSize: "0.9rem" }}>
-                          Filed
-                        </span>
-                        <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN:</span>
-                        <span style={{ color: "#333", fontWeight: "600", fontSize: "0.8rem" }}>
-                          {arn}
-                        </span>
-                        <a
-                          href="#"
-                          style={{
-                            color: "#2563eb",
-                            fontSize: "0.75rem",
-                            textDecoration: "underline",
-                            marginTop: "4px",
-                          }}
-                        >
-                          Download
-                        </a>
-                      </>
-                    ) : isCurrentPeriod ? (
-                      <>
-                        <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Due</span>
-                        <span style={{ color: "#999", fontSize: "0.75rem" }}>Not Filed</span>
-                      </>
-                    ) : (
-                      <>
-                        <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Not Filed</span>
-                        <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN: {arn}</span>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-          <div
-  style={{
-    position: "absolute",
-    right: "28px",
-    bottom: "28px",
-    display: "flex",
-    gap: "10px",
-    zIndex: 10,
-  }}
->
-  {[
-    { label: "GSTR-9", color: "#f59e0b" },
-    { label: "GSTR-9C", color: "#f97316" },
-    { label: "IMS", color: "#3b82f6" },
-  ].map((item) => (
-    <div
-      key={item.label}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "6px",
-        background: "#ffffff",
-        border: `1px solid ${item.color}`,
-        color: item.color,
-        padding: "6px 12px",
-        borderRadius: "999px",
-        fontSize: "0.78rem",
-        fontWeight: "600",
-        boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
-      }}
-    >
-      <span>{item.label}</span>
-      <span
-        style={{
-          background: item.color,
-          color: "white",
-          padding: "2px 8px",
-          borderRadius: "999px",
-          fontSize: "0.7rem",
-        }}
-      >
-        DUE
-      </span>
-    </div>
-  ))}
-</div>
-     <div
-  style={{
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: "12px",
-    marginBottom: "12px",
-  }}
->
-  {/* PDF */}
-  <button
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      padding: "10px 20px",
-      borderRadius: "14px",
-      border: "none",
-      background: "#fff5f5",
-      color: "#dc2626",
-      fontSize: "15px",
-      fontWeight: "600",
-      cursor: "pointer",
-      boxShadow: "0 8px 20px rgba(220,38,38,0.18)",
-    }}
-  >
-    <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span>
-    PDF
-  </button>
-
-  {/* EXCEL */}
-  <button
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      padding: "10px 20px",
-      borderRadius: "14px",
-      border: "none",
-      background: "#ecfdf5",
-      color: "#15803d",
-      fontSize: "15px",
-      fontWeight: "600",
-      cursor: "pointer",
-      boxShadow: "0 8px 20px rgba(22,163,74,0.22)",
-    }}
-  >
-    <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span>
-    Excel
-  </button>
-</div>
-
-
-          {/* LEDGER SUMMARY SECTION */}
-          <div style={{ marginTop: "48px" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "24px",
-              }}
-            >
-              <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "700", color: "#1f2937" }}>
-                Ledger Summary
-              </h2>
-             <button
-  style={{
-    background:
-      "linear-gradient(180deg, #34d399 0%, #22c55e 45%, #16a34a 100%)",
-    color: "#ffffff",
-    padding: "10px 26px",       // size same
-    borderRadius: "999px",
-    border: "none",
-    fontWeight: "700",
-    fontSize: "1rem",
-    cursor: "pointer",
-    boxShadow:
-      "0 14px 30px rgba(22,163,74,0.55), inset 0 2px 4px rgba(255,255,255,0.35)",
-    transition: "all 0.25s ease",
-  }}
-  onMouseEnter={e => {
-    e.currentTarget.style.transform = "translateY(-1px)";
-    e.currentTarget.style.boxShadow =
-      "0 18px 38px rgba(22,163,74,0.65), inset 0 2px 6px rgba(255,255,255,0.45)";
-  }}
-  onMouseLeave={e => {
-    e.currentTarget.style.transform = "translateY(0)";
-    e.currentTarget.style.boxShadow =
-      "0 14px 30px rgba(22,163,74,0.55), inset 0 2px 4px rgba(255,255,255,0.35)";
-  }}
->
-  Update
-</button>
-
-            </div>
-
-
-
-<div
-  style={{
-    display: "flex",
-    gap: "16px",
-    marginBottom: "36px",
-    flexWrap: "wrap",
-    alignItems: "center",
-  }}
->
-  {ledgerTabs.map((tab) => {
-    const isActive = activeLedgerTab === tab.id;
-
-    return (
-      <button
-        key={tab.id}
-        onClick={() => setActiveLedgerTab(tab.id)}
-        onMouseEnter={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = "#f1f5ff";
-            e.currentTarget.style.boxShadow =
-              "0 6px 18px rgba(37,99,235,0.18), inset 0 0 0 1px rgba(37,99,235,0.35)";
-            e.currentTarget.style.color = "#1e40af";
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isActive) {
-            e.currentTarget.style.background = "#ffffff";
-            e.currentTarget.style.boxShadow =
-              "0 4px 14px rgba(0,0,0,0.06)";
-            e.currentTarget.style.color = "#334155";
-          }
-        }}
-        style={{
-          padding: "14px 36px",
-          background: isActive
-            ? "linear-gradient(135deg, #1e40af, #2563eb)"
-            : "#ffffff",
-          color: isActive ? "#ffffff" : "#334155",
-          border: "1px solid",
-          borderColor: isActive ? "transparent" : "#e5e7eb",
-          borderRadius: "999px",
-          fontWeight: isActive ? "700" : "600",
-          fontSize: "1.05rem",
-          cursor: "pointer",
-          transition: "all 0.25s ease",
-          boxShadow: isActive
-            ? "0 14px 32px rgba(30,64,175,0.45)"
-            : "0 4px 14px rgba(0,0,0,0.06)",
-        }}
-      >
-        {tab.label}
-      </button>
-    );
-  })}
-</div>
-
-
-
-<div
-  style={{
-    background: "#ffffff",
-    borderRadius: "14px",
-    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-    overflow: "hidden",
-  }}
->
-  {activeLedgerTab === "summary" && (
-    <div
-      style={{
-        padding: "24px",
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "24px",
-      }}
-    >
-      {/* ───────── ELECTRONIC LEDGER CARD ───────── */}
-      <div
-        style={{
-          borderRadius: "12px",
-          background: "#ffffff",
-          boxShadow: "0 3px 14px rgba(0,0,0,0.07)",
-          padding: "20px",
-        }}
-      >
-        {/* HEADER – SMALL & PREMIUM */}
-        <div
-          style={{
-            display: "inline-block",
-            background: "linear-gradient(135deg, #1e3a8a, #2563eb)",
-            color: "#ffffff",
-            padding: "6px 14px",          // ⬅ smaller nav
-            borderRadius: "8px",
-            fontWeight: "600",
-            fontSize: "0.95rem",          // ⬅ reduced size
-            marginBottom: "18px",
-            boxShadow: "0 4px 10px rgba(37,99,235,0.35)",
-          }}
-        >
-          Electronic Ledger Balances
-        </div>
-
-        <div>
-          {/* CASH BALANCE */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "16px",
-              fontWeight: "600",
-              fontSize: "1.05rem",
-            }}
-          >
-            <span>Cash Balance</span>
-            <strong
-              style={{
-                color: "#2563eb",
-                cursor: "pointer",
-                textDecoration: "underline",
-              }}
-              onClick={() => setShowCreditLedger(!showCreditLedger)}
-            >
-              ₹58,756.00
-            </strong>
-          </div>
-
-          {/* CREDIT BALANCE */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "18px",
-              fontWeight: "600",
-              fontSize: "1.05rem",
-            }}
-          >
-            <span>Credit Balance</span>
-            <strong>₹36,845.00</strong>
-          </div>
-
-          {/* CREDIT LEDGER */}
-          {showCreditLedger && (
-            <div
-              style={{
-                marginTop: "18px",
-                paddingTop: "18px",
-                borderTop: "1px solid #e5e7eb",
-              }}
-            >
-              <div
-                style={{
-                  display: "inline-block",
-                  background:
-                    "linear-gradient(135deg, #16a34a, #22c55e)",
-                  color: "#fff",
-                  padding: "6px 14px",     // ⬅ compact
-                  borderRadius: "8px",
-                  fontWeight: "600",
-                  fontSize: "0.9rem",
-                  marginBottom: "10px",
-                  boxShadow: "0 3px 8px rgba(34,197,94,0.35)",
-                }}
-              >
-                Balance of Electronic Credit Ledger
-              </div>
-
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  background: "#ecfdf5",
-                  borderRadius: "10px",
-                  overflow: "hidden",
-                  fontSize: "0.9rem",
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th style={{ padding: "10px", textAlign: "center" }}>IGST</th>
-                    <th style={{ padding: "10px", textAlign: "center" }}>CGST</th>
-                    <th style={{ padding: "10px", textAlign: "center" }}>SGST</th>
-                    <th style={{ padding: "10px", textAlign: "center" }}>CESS</th>
-                    <th style={{ padding: "10px", textAlign: "center" }}>Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style={{ padding: "10px", textAlign: "center" }}>₹25,165</td>
-                    <td style={{ padding: "10px", textAlign: "center" }}>₹12,324</td>
-                    <td style={{ padding: "10px", textAlign: "center" }}>₹5,632</td>
-                    <td style={{ padding: "10px", textAlign: "center" }}>₹15,635</td>
-                    <td style={{ padding: "10px", textAlign: "center", fontWeight: "700" }}>
-                      ₹58,756
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ───────── TURNOVER CARD ───────── */}
-      <div
-        style={{
-          borderRadius: "12px",
-          background: "#ffffff",
-          boxShadow: "0 3px 14px rgba(0,0,0,0.07)",
-          padding: "20px",
-        }}
-      >
-        <div
-          style={{
-            display: "inline-block",
-            background: "linear-gradient(135deg, #1e3a8a, #2563eb)",
-            color: "#ffffff",
-            padding: "6px 14px",
-            borderRadius: "8px",
-            fontWeight: "600",
-            fontSize: "0.95rem",
-            marginBottom: "18px",
-            boxShadow: "0 4px 10px rgba(37,99,235,0.35)",
-          }}
-        >
-          Turnover Balances
-        </div>
-
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <tbody>
-            <tr>
-              <td style={{ padding: "14px", fontWeight: "600" }}>
-                Turnover Estimated
-              </td>
-              <td style={{ padding: "14px", textAlign: "right", fontWeight: "700" }}>
-                ₹1,25,65,635.00
-              </td>
-            </tr>
-            <tr style={{ background: "#f8fafc" }}>
-              <td style={{ padding: "14px", fontWeight: "600" }}>
-                Aggregate Turnover
-              </td>
-              <td style={{ padding: "14px", textAlign: "right", fontWeight: "700" }}>
-                ₹1,25,65,635.00
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )}
-
-            
-            
-            
-            
-            
-            
-            {activeLedgerTab === "elb" && (
-  <div style={{ padding: "28px" }}>
-    {/* ───── HEADER (SLIM PILL STYLE) ───── */}
-    <div
-      style={{
-        display: "inline-block",
-        background: "linear-gradient(135deg,#1e40af,#2563eb)",
-        color: "#ffffff",
-        padding: "6px 14px",        // 👈 height kam
-        borderRadius: "8px",
-        fontWeight: "600",
-        fontSize: "0.95rem",
-        marginBottom: "22px",
-      }}
-    >
-      Electronic Ledger Balances – Detailed View
-    </div>
-
-    <div
-      style={{
-        background: "#ffffff",
-        borderRadius: "12px",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-        padding: "24px",
-      }}
-    >
-      {/* BALANCES */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "18px",
-          fontSize: "1.05rem",
-          fontWeight: "600",
-        }}
-      >
-        <span>Cash Balance</span>
-        <strong>₹58,756.00</strong>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "22px",
-          fontSize: "1.05rem",
-          fontWeight: "600",
-        }}
-      >
-        <span>Credit Balance</span>
-        <strong>₹36,845.00</strong>
-      </div>
-
-      {/* ───── CREDIT LEDGER HEADER (MATCHING NAV STYLE) ───── */}
-      <div
-        style={{
-          display: "inline-block",
-          background: "linear-gradient(135deg,#16a34a,#22c55e)",
-          color: "#ffffff",
-          padding: "6px 14px",     // 👈 slim
-          borderRadius: "8px",
-          fontWeight: "600",
-          fontSize: "0.9rem",
-          marginBottom: "14px",
-        }}
-      >
-        Balance of Electronic Credit Ledger
-      </div>
-
-      {/* TABLE */}
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          background: "#ecfdf5",
-          borderRadius: "10px",
-          overflow: "hidden",
-        }}
-      >
-        <thead>
-          <tr>
-            <th style={{ padding: "12px", textAlign: "center" }}>IGST</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>CGST</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>SGST</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>CESS</th>
-            <th style={{ padding: "12px", textAlign: "center" }}>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style={{ padding: "12px", textAlign: "center" }}>₹25,165</td>
-            <td style={{ padding: "12px", textAlign: "center" }}>₹12,324</td>
-            <td style={{ padding: "12px", textAlign: "center" }}>₹5,632</td>
-            <td style={{ padding: "12px", textAlign: "center" }}>₹15,635</td>
-            <td
-              style={{
-                padding: "12px",
-                textAlign: "center",
-                fontWeight: "700",
-              }}
-            >
-              ₹58,756
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
-{/* ── TURNOVER TAB ── */}
-{activeLedgerTab === "turnover" && (
-  <div style={{ padding: "20px" }}>
-    {/* ── TOP BAR : LEFT EMPTY | RIGHT YEAR SELECT ── */}
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "flex-end",
-        marginBottom: "14px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-        }}
-      >
-        <span
-          style={{
-            fontWeight: "600",
-            fontSize: "0.85rem",
-            color: "#475569",
-          }}
-        >
-          Financial Year
-        </span>
-
-        <select
-          style={{
-            padding: "5px 10px",
-            border: "1px solid #d1d5db",
-            borderRadius: "8px",
-            fontSize: "0.8rem",
-            minWidth: "110px",
-            background: "#ffffff",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-            cursor: "pointer",
-          }}
-        >
-          <option>2017-18</option>
-          <option>2018-19</option>
-          <option>2019-20</option>
-          <option>2020-21</option>
-          <option>2021-22</option>
-          <option>2022-23</option>
-          <option>2023-24</option>
-          <option>2024-25</option>
-          <option selected>2025-26</option>
-        </select>
-      </div>
-    </div>
-
-    {/* ── Ledger Navigation Tabs ── */}
-    <div
-      style={{
-        display: "flex",
-        gap: "8px",
-        marginBottom: "18px",
-      }}
-    >
-      {[
-        { id: "overview", label: "Overview", color: "#2563eb" },
-        { id: "cash", label: "Electronic Cash Ledger", color: "#10b981" },
-        { id: "credit", label: "Electronic Credit Ledger", color: "#3b82f6" },
-      ].map((tab) => {
-        const active = activeTurnoverView === tab.id;
-
-        return (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTurnoverView(tab.id)}
-            style={{
-              padding: "6px 14px",
-              background: active
-                ? `linear-gradient(135deg, ${tab.color}, ${tab.color}cc)`
-                : "#ffffff",
-              color: active ? "#ffffff" : "#475569",
-              border: "1px solid #e5e7eb",
-              borderRadius: "999px",
-              fontWeight: "600",
-              fontSize: "0.8rem",
-              cursor: "pointer",
-              boxShadow: active
-                ? "0 4px 14px rgba(0,0,0,0.25)"
-                : "0 2px 5px rgba(0,0,0,0.08)",
-            }}
-          >
-            {tab.label}
-          </button>
-        );
-      })}
-    </div>
-
-    {/* ── OVERVIEW ── */}
-    {activeTurnoverView === "overview" && (
-      <div>
-        <div
-          style={{
-            fontWeight: "600",
-            marginBottom: "12px",
-            color: "#334155",
-          }}
-        >
-          Turnover Balances
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "14px",
-          }}
-        >
-          {[
-            { label: "Turnover Estimated", value: "₹1,25,65,635.00" },
-            { label: "Aggregate Turnover", value: "₹1,25,65,635.00" },
-          ].map((item) => (
-            <div
-              key={item.label}
-              style={{
-                padding: "14px",
-                background: "#f8fafc",
-                borderRadius: "12px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: "600",
-                  fontSize: "0.85rem",
-                  color: "#475569",
-                }}
-              >
-                {item.label}
-              </div>
-              <div
-                style={{
-                  fontSize: "1.1rem",
-                  fontWeight: "700",
-                  color: "#0f172a",
-                }}
-              >
-                {item.value}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-
-    {/* ── CASH / CREDIT LEDGER ── */}
-    {(activeTurnoverView === "cash" ||
-      activeTurnoverView === "credit") && (
-      <div>
-        {/* Date Range + GO */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            marginBottom: "16px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div>
-            <strong>From:</strong>
-            <input
-              type="date"
-              defaultValue="2025-04-01"
-              style={{
-                marginLeft: "6px",
-                padding: "6px 8px",
-                border: "1px solid #d1d5db",
-                borderRadius: "6px",
-                fontSize: "0.8rem",
-              }}
-            />
-          </div>
-
-          <div>
-            <strong>To:</strong>
-            <input
-              type="date"
-              defaultValue="2025-06-30"
-              style={{
-                marginLeft: "6px",
-                padding: "6px 8px",
-                border: "1px solid #d1d5db",
-                borderRadius: "6px",
-                fontSize: "0.8rem",
-              }}
-            />
-          </div>
-
-          <button
-            style={{
-              background: "linear-gradient(135deg,#2563eb,#3b82f6)",
-              color: "#fff",
-              padding: "6px 18px",
-              border: "none",
-              borderRadius: "8px",
-              fontWeight: "600",
-              fontSize: "0.85rem",
-              cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(37,99,235,0.35)",
-            }}
-          >
-            GO
-          </button>
-        </div>
-
-        {/* Table */}
-        <div style={{ overflowX: "auto" }}>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              fontSize: "0.85rem",
-            }}
-          >
-            <thead>
-              <tr style={{ background: "#f1f5f9" }}>
-                {[
-                  "Sr.No",
-                  "Date",
-                  "Reference No.",
-                  "Description",
-                  "Integrated Tax",
-                  "Central Tax",
-                  "State Tax",
-                  "Cess",
-                  "Total",
-                ].map((h) => (
-                  <th key={h} style={{ padding: "10px" }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td align="center">1</td>
-                <td>-</td>
-                <td>-</td>
-                <td>Opening Balance</td>
-                <td align="right">0.00</td>
-                <td align="right">0.00</td>
-                <td align="right">0.00</td>
-                <td align="right">0.00</td>
-                <td align="right" style={{ fontWeight: "700" }}>
-                  0.00
-                </td>
-              </tr>
-
-              <tr>
-                <td align="center">2</td>
-                <td>03/04/2025</td>
-                <td>AC09253604536</td>
-                <td>ITC accrued through - Inputs</td>
-                <td align="right">0.00</td>
-                <td align="right">16,390.00</td>
-                <td align="right">16,390.00</td>
-                <td align="right">0.00</td>
-                <td align="right">32,780.00</td>
-              </tr>
-
-              <tr
-                style={{
-                  background: "#ecfdf5",
-                  fontWeight: "700",
-                }}
-              >
-                <td colSpan="4">Closing Balance</td>
-                <td align="right">52,671.00</td>
-                <td align="right">2,68,221.00</td>
-                <td align="right">19,809.00</td>
-                <td align="right">0.00</td>
-                <td align="right" style={{ color: "#16a34a" }}>
-                  3,40,701.00
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        {/* PDF / EXCEL */}
-        <div
-          style={{
-            marginTop: "18px",
-            display: "flex",
-            gap: "12px",
-            justifyContent: "flex-end",
-          }}
-        >
-          <button
-            style={{
-              background: "#ffffff",
-              padding: "8px 18px",
-              borderRadius: "8px",
-              border: "1px solid #d1d5db",
-              fontWeight: "600",
-              fontSize: "0.85rem",
-              cursor: "pointer",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.18)",
-            }}
-          >
-            SAVE AS PDF ↓
-          </button>
-
-          <button
-            style={{
-              background: "#ffffff",
-              padding: "8px 18px",
-              borderRadius: "8px",
-              border: "1px solid #a7f3d0",
-              fontWeight: "600",
-              fontSize: "0.85rem",
-              cursor: "pointer",
-              boxShadow: "0 4px 14px rgba(16,185,129,0.3)",
-            }}
-          >
-            SAVE AS EXCEL ↓
-          </button>
-        </div>
-      </div>
-    )}
-  </div>
-)}
-
-
-
-
-{/* ── LIABILITY DETAILED TAB ── */}
-{activeLedgerTab === "liability" && (
-  <div style={{ padding: "20px" }}>
-    {/* ── HEADER ── */}
-    <div
-      style={{
-        display: "inline-block",
-        background: "linear-gradient(135deg,#1e40af,#2563eb)",
-        color: "#ffffff",
-        padding: "6px 14px",
-        borderRadius: "8px",
-        fontWeight: "600",
-        fontSize: "0.95rem",
-        marginBottom: "16px",
-        boxShadow: "0 4px 12px rgba(37,99,235,0.35)",
-      }}
-    >
-      Liability Ledger – Detailed View
-    </div>
-
-    {/* ── CONTENT CARD ── */}
-    <div
-      style={{
-        background: "#ffffff",
-        borderRadius: "14px",
-        boxShadow: "0 8px 26px rgba(0,0,0,0.12)",
-        padding: "18px",
-      }}
-    >
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          fontSize: "0.95rem",
-        }}
-      >
-        <tbody>
-          {/* Liability Section */}
-          <tr>
-            <td style={{ padding: "12px", fontWeight: "600" }}>
-              Liability (GSTR-1)
-            </td>
-            <td
-              style={{
-                padding: "12px",
-                textAlign: "right",
-                fontWeight: "700",
-              }}
-            >
-              ₹10,25,365.25
-            </td>
-          </tr>
-
-          <tr style={{ background: "#f8fafc" }}>
-            <td style={{ padding: "12px", fontWeight: "600" }}>
-              Liability (GSTR-3B)
-            </td>
-            <td
-              style={{
-                padding: "12px",
-                textAlign: "right",
-                fontWeight: "700",
-              }}
-            >
-              ₹10,20,365.25
-            </td>
-          </tr>
-
-          <tr
-            style={{
-              background: "#fee2e2",
-              color: "#b91c1c",
-              fontWeight: "700",
-            }}
-          >
-            <td style={{ padding: "12px" }}>Difference</td>
-            <td style={{ padding: "12px", textAlign: "right" }}>
-              ₹5,000.00
-            </td>
-          </tr>
-
-          {/* ITC Section */}
-          <tr>
-            <td style={{ padding: "12px", fontWeight: "600" }}>
-              ITC (GSTR-2B)
-            </td>
-            <td
-              style={{
-                padding: "12px",
-                textAlign: "right",
-                fontWeight: "700",
-              }}
-            >
-              ₹11,11,265.50
-            </td>
-          </tr>
-
-          <tr style={{ background: "#f8fafc" }}>
-            <td style={{ padding: "12px", fontWeight: "600" }}>
-              ITC (GSTR-3B)
-            </td>
-            <td
-              style={{
-                padding: "12px",
-                textAlign: "right",
-                fontWeight: "700",
-              }}
-            >
-              ₹11,10,265.50
-            </td>
-          </tr>
-
-          <tr
-            style={{
-              background: "#fef3c7",
-              color: "#b45309",
-              fontWeight: "700",
-            }}
-          >
-            <td style={{ padding: "12px" }}>Difference</td>
-            <td style={{ padding: "12px", textAlign: "right" }}>
-              -₹1,000.00
-            </td>
-          </tr>
-
-          {/* Final ITC Match */}
-          <tr>
-            <td style={{ padding: "12px", fontWeight: "600" }}>
-              ITC (GSTR-2A)
-            </td>
-            <td
-              style={{
-                padding: "12px",
-                textAlign: "right",
-                fontWeight: "700",
-              }}
-            >
-              ₹11,11,265.50
-            </td>
-          </tr>
-
-          <tr style={{ background: "#f8fafc" }}>
-            <td style={{ padding: "12px", fontWeight: "600" }}>
-              ITC (GSTR-3B)
-            </td>
-            <td
-              style={{
-                padding: "12px",
-                textAlign: "right",
-                fontWeight: "700",
-              }}
-            >
-              ₹11,10,265.50
-            </td>
-          </tr>
-
-          <tr
-            style={{
-              background: "#ecfdf5",
-              color: "#166534",
-              fontWeight: "700",
-            }}
-          >
-            <td style={{ padding: "12px" }}>Difference</td>
-            <td style={{ padding: "12px", textAlign: "right" }}>
-              ₹0.00
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
-
-
-
-{/* ───────── PAYMENT TAB ───────── */}
-{activeLedgerTab === "payment" && (
-  <div style={{ padding: "20px" }}>
-    {/* ── TAXPAYER INFO BAR ── */}
-    <div
-      style={{
-        background: "#ffffff",
-        padding: "16px 20px",
-        display: "grid",
-        gridTemplateColumns: "1fr 2fr 2fr",
-        gap: "16px",
-        fontWeight: "600",
-        borderRadius: "14px",
-        boxShadow: "0 6px 20px rgba(37,99,235,0.15)",
-        marginBottom: "20px",
-      }}
-    >
-      <div>
-        <div style={{ fontSize: "0.85rem", color: "#475569" }}>
-          GSTIN / TEMP ID
-        </div>
-        <div style={{ fontSize: "0.95rem", fontFamily: "monospace" }}>
-          09ACNPU2195H1ZY
-        </div>
-      </div>
-
-      <div>
-        <div style={{ fontSize: "0.85rem", color: "#475569" }}>
-          Legal Name
-        </div>
-        <div style={{ fontSize: "0.95rem" }}>Mohd Umair</div>
-      </div>
-
-      <div>
-        <div style={{ fontSize: "0.85rem", color: "#475569" }}>
-          Trade Name
-        </div>
-        <div style={{ fontSize: "0.95rem" }}>
-          U.A.F ENTERPRISE'S
-        </div>
-      </div>
-    </div>
-
-    {/* ── OUTSTANDING DEMAND CARD ── */}
-    <div
-      style={{
-        background: "#ffffff",
-        borderRadius: "16px",
-        boxShadow: "0 10px 28px rgba(0,0,0,0.12)",
-        overflow: "hidden",
-      }}
-    >
-      {/* HEADER */}
-     <div
-  style={{
-    padding: "18px 20px",
-    borderBottom: "1px solid #e5e7eb",
-    background: "#ffffff",
-  }}
->
-<span
-  style={{
-    display: "inline-block",
-    padding: "4px 12px",                 // ⬅ height kam
-    background: "linear-gradient(135deg,#2563eb,#1e40af)",
-    color: "#ffffff",
-    fontSize: "0.95rem",                 // ⬅ thoda chhota
-    fontWeight: "700",
-    borderRadius: "8px",                 // ⬅ curve kam (pill nahi)
-    boxShadow: "0 4px 10px rgba(37,99,235,0.30)", // ⬅ subtle premium shadow
-    letterSpacing: "0.2px",
-  }}
->
-  Outstanding Demand
-</span>
-</div>
-
-
-      {/* TABLE */}
-      <div style={{ overflowX: "auto" }}>
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            fontSize: "0.9rem",
-          }}
-        >
-          <thead>
-            <tr style={{ background: "#f1f5f9", color: "#334155" }}>
-              <th style={{ padding: "10px", textAlign: "center" }}>Sr.No</th>
-              <th style={{ padding: "10px" }}>Demand Date</th>
-              <th style={{ padding: "10px" }}>Demand ID</th>
-              <th style={{ padding: "10px", textAlign: "right" }}>Integrated Tax</th>
-              <th style={{ padding: "10px", textAlign: "right" }}>Central Tax</th>
-              <th style={{ padding: "10px", textAlign: "right" }}>State / UT Tax</th>
-              <th style={{ padding: "10px", textAlign: "right" }}>Cess</th>
-              <th style={{ padding: "10px", textAlign: "center" }}>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {outstandingDemands.map((item) => (
-              <tr
-                key={item.sr}
-                style={{
-                  borderBottom: "1px solid #e5e7eb",
-                  background: "#ffffff",
-                }}
-              >
-                <td style={{ padding: "10px", textAlign: "center" }}>
-                  {item.sr}
-                </td>
-                <td style={{ padding: "10px" }}>{item.date}</td>
-                <td style={{ padding: "10px", fontFamily: "monospace" }}>
-                  {item.demandId}
-                </td>
-                <td style={{ padding: "10px", textAlign: "right" }}>
-                  {item.integrated.toLocaleString()}
-                </td>
-                <td style={{ padding: "10px", textAlign: "right" }}>
-                  {item.central.toLocaleString()}
-                </td>
-                <td style={{ padding: "10px", textAlign: "right" }}>
-                  {item.state.toLocaleString()}
-                </td>
-                <td style={{ padding: "10px", textAlign: "right" }}>
-                  {item.cess.toLocaleString()}
-                </td>
-                <td style={{ padding: "10px", textAlign: "center" }}>
-                  <button
-                    onClick={() => setSelectedDemand(item)}
-                    style={{
-                      background: "linear-gradient(135deg,#2563eb,#3b82f6)",
-                      color: "#ffffff",
-                      border: "none",
-                      padding: "6px 18px",
-                      borderRadius: "8px",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                      boxShadow: "0 4px 14px rgba(37,99,235,0.35)",
-                    }}
-                  >
-                    SELECT
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    {/* ── PAYMENT MODAL ── */}
-    {selectedDemand && (
-      <div
-        onClick={() => setSelectedDemand(null)}
-        style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,0,0,0.45)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 2000,
-        }}
-      >
-        <div
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            width: "420px",
-            background: "#ffffff",
-            borderRadius: "18px",
-            boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
-            overflow: "hidden",
-          }}
-        >
-          {/* MODAL HEADER */}
-          <div
-            style={{
-              background: "linear-gradient(135deg,#2563eb,#3b82f6)",
-              color: "#ffffff",
-              padding: "14px",
-              textAlign: "center",
-              fontSize: "1rem",
-              fontWeight: "600",
-            }}
-          >
-            Payment towards Demand
-          </div>
-
-          {/* BODY */}
-          <div style={{ padding: "20px" }}>
-            <div style={{ marginBottom: "12px" }}>
-              <strong>GSTIN</strong>
-              <div style={{ fontFamily: "monospace" }}>
-                09ACNPU2195H1ZY
-              </div>
-            </div>
-
-            <div style={{ marginBottom: "12px" }}>
-              <strong>Trade Name</strong>
-              <div>U.A.F ENTERPRISE'S</div>
-            </div>
-
-            <div style={{ marginBottom: "18px" }}>
-              <strong>Demand ID</strong>
-              <div style={{ color: "#2563eb" }}>
-                {selectedDemand.demandId}
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "14px",
-                marginBottom: "22px",
-              }}
-            >
-              <div>
-                <div style={{ fontSize: "0.85rem", color: "#64748b" }}>
-                  Central Tax
-                </div>
-                <div style={{ fontSize: "1.15rem", fontWeight: 700 }}>
-                  ₹{selectedDemand.central.toLocaleString()}
-                </div>
-              </div>
-
-              <div>
-                <div style={{ fontSize: "0.85rem", color: "#64748b" }}>
-                  State / UT Tax
-                </div>
-                <div style={{ fontSize: "1.15rem", fontWeight: 700 }}>
-                  ₹{selectedDemand.state.toLocaleString()}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ textAlign: "center" }}>
-              <button
-                onClick={() => {
-                  alert("Payment initiation simulation...");
-                  setSelectedDemand(null);
-                }}
-                style={{
-                  background: "linear-gradient(135deg,#2563eb,#3b82f6)",
-                  color: "#ffffff",
-                  border: "none",
-                  padding: "12px 44px",
-                  fontSize: "0.95rem",
-                  fontWeight: "600",
-                  borderRadius: "12px",
-                  cursor: "pointer",
-                  boxShadow: "0 6px 20px rgba(37,99,235,0.4)",
-                }}
-              >
-                Proceed to Pay
-              </button>
-            </div>
-          </div>
-
-          {/* FOOTER */}
-          <div
-            style={{
-              borderTop: "1px solid #e5e7eb",
-              padding: "12px",
-              textAlign: "center",
-            }}
-          >
+                  {tab.label}
+                </button>
+              );
+            })}
             <button
-              onClick={() => setSelectedDemand(null)}
               style={{
-                background: "none",
+                background: "linear-gradient(180deg, #34d399 0%, #22c55e 45%, #16a34a 100%)",
+                color: "#ffffff",
+                padding: "10px 26px",
                 border: "none",
-                color: "#2563eb",
-                fontWeight: "600",
+                borderRadius: "999px",
+                fontWeight: "700",
+                fontSize: "1rem",
                 cursor: "pointer",
+                boxShadow: "0 14px 30px rgba(22,163,74,0.55), inset 0 2px 4px rgba(255,255,255,0.35)",
               }}
             >
-              Cancel
+              Update
             </button>
           </div>
         </div>
-      </div>
-    )}
-  </div>
-)}
-            </div>
-          </div>
-        </div>
-      );
-    }
 
-    // ── CLIENT DETAIL ── (unchanged)
-    if (activeMenu === "Client Detail") {
-      return (
-        <div style={{ padding: "24px", background: "#f8fafc" }}>
-          <div style={{ marginBottom: "40px" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "20px",
-                padding: "16px",
-                background: "#f0f9ff",
-                borderRadius: "12px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-              }}
-            >
-              <h3 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700", color: "#1f2937" }}>
-                Client Details
-              </h3>
-              <button
-                style={{
-                  background: "#10b981",
-                  color: "white",
-                  padding: "10px 20px",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "0.95rem",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                }}
-              >
-                Get Data From GSTN
-              </button>
+        {/* Months header */}
+        <div style={{ display: "grid", gridTemplateColumns: "120px repeat(12, 1fr)", gap: "8px", marginBottom: "16px", fontWeight: "700", fontSize: "0.9rem", minWidth: "1000px", overflowX: "auto" }}>
+          <div style={{ paddingLeft: "8px" }}>Return</div>
+          {months.map((m) => (
+            <div key={m} style={{ textAlign: "center", padding: "8px 0", background: "#e0e7ff", borderRadius: "8px", color: "#4338ca" }}>{m}</div>
+          ))}
+        </div>
+
+        {/* Return rows */}
+        {[
+          { name: "GSTR-1", filed: 9 },
+          { name: "GSTR-1A", filed: 0 },
+          { name: "GSTR-3B", filed: 8 },
+          { name: "TDS/TCS", filed: 8 },
+        ].map((ret) => (
+          <div key={ret.name} style={{ display: "grid", gridTemplateColumns: "120px repeat(12, 1fr)", gap: "8px", marginBottom: "12px", minWidth: "1000px", overflowX: "auto" }}>
+            <div style={{ fontWeight: "700", color: "#0d9488", fontSize: "1rem", paddingLeft: "8px" }}>
+              {ret.name}
+              <br />
+              <a href="#" style={{ fontSize: "0.8rem", color: "#2563eb", textDecoration: "underline" }}>All Download →</a>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
-              <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-                <h4 style={{ margin: "0 0 20px 0", color: "#0d9488", fontWeight: "700", fontSize: "1.1rem" }}>
-                  Personal Details
-                </h4>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>
-                    Name <span style={{ color: "red" }}>(required)</span>
-                  </label>
-                  <input
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
+            {Array.from({ length: 12 }, (_, i) => {
+              const filed = i < ret.filed;
+              const isCurrentPeriod = i >= 9;
+              const arn = filed ? `AA09${String(i + 4).padStart(2, "0")}24R${String(i + 1).padStart(3, "0")}` : isCurrentPeriod ? "" : "Pending";
+              return (
+                <div key={i} style={{ background: "#ffffff", borderRadius: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.06)", padding: "10px 6px", textAlign: "center", fontSize: "0.85rem", minHeight: "80px" }}>
+                  {filed ? (
+                    <>
+                      <span style={{ color: "#059669", fontWeight: "700", fontSize: "0.9rem" }}>Filed</span>
+                      <br />
+                      <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN:</span>
+                      <span style={{ color: "#333", fontWeight: "600", fontSize: "0.8rem" }}>{arn}</span>
+                      <br />
+                      <a href="#" style={{ color: "#2563eb", fontSize: "0.75rem", textDecoration: "underline" }}>Download</a>
+                    </>
+                  ) : isCurrentPeriod ? (
+                    <>
+                      <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Due</span>
+                      <br />
+                      <span style={{ color: "#999", fontSize: "0.75rem" }}>Not Filed</span>
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Not Filed</span>
+                      <br />
+                      <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN: {arn}</span>
+                    </>
+                  )}
                 </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Address</label>
-                  <input
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
+              );
+            })}
+          </div>
+        ))}
+
+        {/* DUE badges */}
+        <div style={{ position: "absolute", right: "28px", bottom: "220px", display: "flex", gap: "10px", zIndex: 10 }}>
+          {[
+            { label: "GSTR-9", color: "#f59e0b" },
+            { label: "GSTR-9C", color: "#f97316" },
+            { label: "IMS", color: "#3b82f6" },
+          ].map((item) => (
+            <div key={item.label} style={{ display: "flex", alignItems: "center", gap: "6px", background: "#ffffff", border: `1px solid ${item.color}`, color: item.color, padding: "6px 12px", borderRadius: "999px", fontSize: "0.78rem", fontWeight: "600", boxShadow: "0 6px 18px rgba(0,0,0,0.08)" }}>
+              <span>{item.label}</span>
+              <span style={{ background: item.color, color: "white", padding: "2px 8px", borderRadius: "999px", fontSize: "0.7rem" }}>DUE</span>
+            </div>
+          ))}
+        </div>
+
+        {/* PDF / Excel buttons */}
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginBottom: "24px" }}>
+          <button style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "14px", border: "none", background: "#fff5f5", color: "#dc2626", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "0 8px 20px rgba(220,38,38,0.18)" }}>
+            <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span> PDF
+          </button>
+          <button style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "14px", border: "none", background: "#ecfdf5", color: "#15803d", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "0 8px 20px rgba(22,163,74,0.22)" }}>
+            <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span> Excel
+          </button>
+        </div>
+
+        {/* ───────── LEDGER CONTENT (changes on tab click) ───────── */}
+        <div style={{ marginTop: "32px" }}>
+          {activeLedgerTab === "summary" && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+              {/* Electronic Ledger Card */}
+              <div style={{ borderRadius: "12px", background: "#ffffff", boxShadow: "0 3px 14px rgba(0,0,0,0.07)", padding: "20px" }}>
+                <div style={{ display: "inline-block", background: "linear-gradient(135deg, #1e3a8a, #2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "18px", boxShadow: "0 4px 10px rgba(37,99,235,0.35)" }}>
+                  Electronic Ledger Balances
                 </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Place</label>
-                  <input
-                    name="place"
-                    value={formData.place}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontWeight: "600", fontSize: "1.05rem" }}>
+                  <span>Cash Balance</span>
+                  <strong style={{ color: "#2563eb", cursor: "pointer", textDecoration: "underline" }} onClick={() => setShowCreditLedger(!showCreditLedger)}>
+                    ₹58,756.00
+                  </strong>
                 </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>PIN</label>
-                  <input
-                    name="pin"
-                    value={formData.pin}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "18px", fontWeight: "600", fontSize: "1.05rem" }}>
+                  <span>Credit Balance</span>
+                  <strong>₹36,845.00</strong>
                 </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>
-                    State <span style={{ color: "red" }}>(required)</span>
-                  </label>
-                  <select
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  >
-                    <option>Uttar Pradesh</option>
-                  </select>
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Mobile Number</label>
-                  <input
-                    name="mobile"
-                    value={formData.mobile}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Email Id</label>
-                  <input
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Phone Number</label>
-                  <input
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="Phone Number"
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
+                {showCreditLedger && (
+                  <div style={{ marginTop: "18px", paddingTop: "18px", borderTop: "1px solid #e5e7eb" }}>
+                    <div style={{ display: "inline-block", background: "linear-gradient(135deg, #16a34a, #22c55e)", color: "#fff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.9rem", marginBottom: "10px", boxShadow: "0 3px 8px rgba(34,197,94,0.35)" }}>
+                      Balance of Electronic Credit Ledger
+                    </div>
+                    <table style={{ width: "100%", borderCollapse: "collapse", background: "#ecfdf5", borderRadius: "10px", overflow: "hidden", fontSize: "0.9rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ padding: "10px", textAlign: "center" }}>IGST</th>
+                          <th style={{ padding: "10px", textAlign: "center" }}>CGST</th>
+                          <th style={{ padding: "10px", textAlign: "center" }}>SGST</th>
+                          <th style={{ padding: "10px", textAlign: "center" }}>CESS</th>
+                          <th style={{ padding: "10px", textAlign: "center" }}>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: "10px", textAlign: "center" }}>₹25,165</td>
+                          <td style={{ padding: "10px", textAlign: "center" }}>₹12,324</td>
+                          <td style={{ padding: "10px", textAlign: "center" }}>₹5,632</td>
+                          <td style={{ padding: "10px", textAlign: "center" }}>₹15,635</td>
+                          <td style={{ padding: "10px", textAlign: "center", fontWeight: "700" }}>₹58,756</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
-              <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-                <h4 style={{ margin: "0 0 20px 0", color: "#0d9488", fontWeight: "700", fontSize: "1.1rem" }}>
-                  Business Details
-                </h4>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Trade Name</label>
-                  <input
-                    name="tradeName"
-                    value={formData.tradeName}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
+
+              {/* Turnover Card */}
+              <div style={{ borderRadius: "12px", background: "#ffffff", boxShadow: "0 3px 14px rgba(0,0,0,0.07)", padding: "20px" }}>
+                <div style={{ display: "inline-block", background: "linear-gradient(135deg, #1e3a8a, #2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "18px", boxShadow: "0 4px 10px rgba(37,99,235,0.35)" }}>
+                  Turnover Balances
                 </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Business Type</label>
-                  <select
-                    name="businessType"
-                    value={formData.businessType}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  >
-                    <option>Proprietorship</option>
-                    <option>Partnership</option>
-                    <option>Private Limited</option>
-                  </select>
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Status</label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  >
-                    <option>Select</option>
-                    <option>Active</option>
-                    <option>Inactive</option>
-                  </select>
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>
-                    GSTIN <span style={{ color: "red" }}>(required)</span>
-                  </label>
-                  <input
-                    name="gstin"
-                    value={formData.gstin}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>
-                    Registration Date <span style={{ color: "red" }}>(required)</span>
-                  </label>
-                  <input
-                    name="regDate"
-                    value={formData.regDate}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>TAN</label>
-                  <input
-                    name="tan"
-                    value={formData.tan}
-                    onChange={handleInputChange}
-                    placeholder="TAN"
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>PAN</label>
-                  <input
-                    name="pan"
-                    value={formData.pan}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>CIN Number</label>
-                  <input
-                    name="cin"
-                    value={formData.cin}
-                    onChange={handleInputChange}
-                    placeholder="CIN Number"
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-              </div>
-              <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
-                <h4 style={{ margin: "0 0 20px 0", color: "#0d9488", fontWeight: "700", fontSize: "1.1rem" }}>
-                  Other Details
-                </h4>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>File No</label>
-                  <input
-                    name="fileNo"
-                    value={formData.fileNo}
-                    onChange={handleInputChange}
-                    placeholder="File No"
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Responsible Person</label>
-                  <input
-                    name="responsiblePerson"
-                    value={formData.responsiblePerson}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Designation</label>
-                  <input
-                    name="designation"
-                    value={formData.designation}
-                    onChange={handleInputChange}
-                    placeholder="Designation"
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Alternate Mobile</label>
-                  <input
-                    name="alternateMobile"
-                    value={formData.alternateMobile}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>
-                    GST User ID <span style={{ color: "red" }}>(required)</span>
-                  </label>
-                  <input
-                    name="gstUserId"
-                    value={formData.gstUserId}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>
-                    Tax Payer Type <span style={{ color: "red" }}>(required)</span>
-                  </label>
-                  <select
-                    name="taxPayerType"
-                    value={formData.taxPayerType}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  >
-                    <option>Normal</option>
-                    <option>Composition</option>
-                  </select>
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>
-                    Upload Type <span style={{ color: "red" }}>(required)</span>
-                  </label>
-                  <select
-                    name="uploadType"
-                    value={formData.uploadType}
-                    onChange={handleInputChange}
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  >
-                    <option>GST</option>
-                  </select>
-                </div>
-                <div style={{ marginBottom: "16px" }}>
-                  <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>LUT Number</label>
-                  <input
-                    name="lutNumber"
-                    value={formData.lutNumber}
-                    onChange={handleInputChange}
-                    placeholder="LUT Number"
-                    style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}
-                  />
-                </div>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: "14px", fontWeight: "600" }}>Turnover Estimated</td>
+                      <td style={{ padding: "14px", textAlign: "right", fontWeight: "700" }}>₹1,25,65,635.00</td>
+                    </tr>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <td style={{ padding: "14px", fontWeight: "600" }}>Aggregate Turnover</td>
+                      <td style={{ padding: "14px", textAlign: "right", fontWeight: "700" }}>₹1,25,65,635.00</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-            <div style={{ textAlign: "right", marginTop: "30px" }}>
-              <button
-                onClick={handleUpdate}
-                style={{
-                  background: "#16a34a",
-                  color: "white",
-                  padding: "12px 36px",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                }}
-              >
-                Update
-              </button>
+          )}
+
+          {activeLedgerTab === "elb" && (
+            <div style={{ padding: "28px" }}>
+              <div style={{ display: "inline-block", background: "linear-gradient(135deg,#1e40af,#2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "22px" }}>
+                Electronic Ledger Balances – Detailed View
+              </div>
+              <div style={{ background: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", padding: "24px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "18px", fontSize: "1.05rem", fontWeight: "600" }}>
+                  <span>Cash Balance</span>
+                  <strong>₹58,756.00</strong>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "22px", fontSize: "1.05rem", fontWeight: "600" }}>
+                  <span>Credit Balance</span>
+                  <strong>₹36,845.00</strong>
+                </div>
+                <div style={{ display: "inline-block", background: "linear-gradient(135deg,#16a34a,#22c55e)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.9rem", marginBottom: "14px" }}>
+                  Balance of Electronic Credit Ledger
+                </div>
+                <table style={{ width: "100%", borderCollapse: "collapse", background: "#ecfdf5", borderRadius: "10px", overflow: "hidden" }}>
+                  <thead>
+                    <tr>
+                      <th style={{ padding: "12px", textAlign: "center" }}>IGST</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>CGST</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>SGST</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>CESS</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: "12px", textAlign: "center" }}>₹25,165</td>
+                      <td style={{ padding: "12px", textAlign: "center" }}>₹12,324</td>
+                      <td style={{ padding: "12px", textAlign: "center" }}>₹5,632</td>
+                      <td style={{ padding: "12px", textAlign: "center" }}>₹15,635</td>
+                      <td style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>₹58,756</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        </div>
-      );
-    }
+          )}
 
-    const regularGstrTabs = ["gstr-1", "gstr-1A", "gstr 3b", "IMS"];
-    if (regularGstrTabs.includes(activeMenu)) {
-      const displayTitle = activeMenu
-        .toUpperCase()
-        .replace("GSTR ", "GSTR-")
-        .replace(" 3B", " 3B");
-      return <GSTRLayout title={displayTitle} />;
-    }
+          {activeLedgerTab === "turnover" && (
+            <div style={{ padding: "28px" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "14px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontWeight: "600", fontSize: "0.85rem", color: "#475569" }}>Financial Year</span>
+                  <select style={{ padding: "5px 10px", border: "1px solid #d1d5db", borderRadius: "8px", fontSize: "0.8rem", minWidth: "110px" }}>
+                    <option>2017-18</option>
+                    <option>2018-19</option>
+                    <option>2019-20</option>
+                    <option>2020-21</option>
+                    <option>2021-22</option>
+                    <option>2022-23</option>
+                    <option>2023-24</option>
+                    <option>2024-25</option>
+                    <option selected>2025-26</option>
+                  </select>
+                </div>
+              </div>
 
-    if (activeMenu === "Annual Return") {
-      return (
-        <div style={{ padding: "20px", background: "#f8fafc" }}>
-          <div style={{ background: "#ffffff", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
-            <div style={{ display: "flex", gap: "12px", marginBottom: "32px", borderBottom: "2px solid #e2e8f0" }}>
-              {["GSTR-9", "GSTR-9C"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveAnnualSubTab(tab)}
-                  style={{
-                    padding: "12px 28px",
-                    background: activeAnnualSubTab === tab ? "#7c3aed" : "transparent",
-                    color: activeAnnualSubTab === tab ? "white" : "#475569",
-                    border: "none",
-                    borderRadius: "10px 10px 0 0",
-                    fontSize: "1.1rem",
-                    fontWeight: activeAnnualSubTab === tab ? "600" : "500",
-                    cursor: "pointer",
-                  }}
-                >
-                  {tab}
-                </button>
-              ))}
+              <div style={{ display: "flex", gap: "8px", marginBottom: "18px" }}>
+                {[
+                  { id: "overview", label: "Overview", color: "#2563eb" },
+                  { id: "cash", label: "Electronic Cash Ledger", color: "#10b981" },
+                  { id: "credit", label: "Electronic Credit Ledger", color: "#3b82f6" },
+                ].map((tab) => {
+                  const active = activeTurnoverView === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTurnoverView(tab.id)}
+                      style={{
+                        padding: "6px 14px",
+                        background: active ? `linear-gradient(135deg, ${tab.color}, ${tab.color}cc)` : "#ffffff",
+                        color: active ? "#ffffff" : "#475569",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "999px",
+                        fontWeight: "600",
+                        fontSize: "0.8rem",
+                        cursor: "pointer",
+                        boxShadow: active ? "0 4px 14px rgba(0,0,0,0.25)" : "0 2px 5px rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {activeTurnoverView === "overview" && (
+                <div>
+                  <div style={{ fontWeight: "600", marginBottom: "12px", color: "#334155" }}>Turnover Balances</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                    {[
+                      { label: "Turnover Estimated", value: "₹1,25,65,635.00" },
+                      { label: "Aggregate Turnover", value: "₹1,25,65,635.00" },
+                    ].map((item) => (
+                      <div key={item.label} style={{ padding: "14px", background: "#f8fafc", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}>
+                        <div style={{ fontWeight: "600", fontSize: "0.85rem", color: "#475569" }}>{item.label}</div>
+                        <div style={{ fontSize: "1.1rem", fontWeight: "700", color: "#0f172a" }}>{item.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(activeTurnoverView === "cash" || activeTurnoverView === "credit") && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
+                    <div>
+                      <strong>From:</strong>
+                      <input type="date" defaultValue="2025-04-01" style={{ marginLeft: "6px", padding: "6px 8px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "0.8rem" }} />
+                    </div>
+                    <div>
+                      <strong>To:</strong>
+                      <input type="date" defaultValue="2025-06-30" style={{ marginLeft: "6px", padding: "6px 8px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "0.8rem" }} />
+                    </div>
+                    <button style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", padding: "6px 18px", border: "none", borderRadius: "8px", fontWeight: "600", fontSize: "0.85rem", boxShadow: "0 4px 12px rgba(37,99,235,0.35)" }}>GO</button>
+                  </div>
+
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
+                      <thead>
+                        <tr style={{ background: "#f1f5f9" }}>
+                          {["Sr.No", "Date", "Reference No.", "Description", "Integrated Tax", "Central Tax", "State Tax", "Cess", "Total"].map((h) => (
+                            <th key={h} style={{ padding: "10px" }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td align="center">1</td>
+                          <td>-</td>
+                          <td>-</td>
+                          <td>Opening Balance</td>
+                          <td align="right">0.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right" style={{ fontWeight: "700" }}>0.00</td>
+                        </tr>
+                        <tr>
+                          <td align="center">2</td>
+                          <td>03/04/2025</td>
+                          <td>AC09253604536</td>
+                          <td>ITC accrued through - Inputs</td>
+                          <td align="right">0.00</td>
+                          <td align="right">16,390.00</td>
+                          <td align="right">16,390.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right">32,780.00</td>
+                        </tr>
+                        <tr style={{ background: "#ecfdf5", fontWeight: "700" }}>
+                          <td colSpan="4">Closing Balance</td>
+                          <td align="right">52,671.00</td>
+                          <td align="right">2,68,221.00</td>
+                          <td align="right">19,809.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right" style={{ color: "#16a34a" }}>3,40,701.00</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div style={{ marginTop: "18px", display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+                    <button style={{ background: "#ffffff", padding: "8px 18px", borderRadius: "8px", border: "1px solid #d1d5db", fontWeight: "600", fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(0,0,0,0.18)" }}>SAVE AS PDF ↓</button>
+                    <button style={{ background: "#ffffff", padding: "8px 18px", borderRadius: "8px", border: "1px solid #a7f3d0", fontWeight: "600", fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }}>SAVE AS EXCEL ↓</button>
+                  </div>
+                </div>
+              )}
             </div>
-            <GSTRLayout title={activeAnnualSubTab} />
-          </div>
-        </div>
-      );
-    }
+          )}
 
-    return (
-      <div style={{ padding: "80px 40px", textAlign: "center", color: "#64748b" }}>
-        <h2 style={{ fontSize: "2rem", color: "#7c3aed", marginBottom: "20px" }}>
-          {activeMenu.toUpperCase().replace(/-/g, " ")}
-        </h2>
-        <p style={{ fontSize: "1.3rem" }}>This section is under development.</p>
+          {activeLedgerTab === "liability" && (
+            <div style={{ padding: "28px" }}>
+              <div style={{ display: "inline-block", background: "linear-gradient(135deg,#1e40af,#2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "16px", boxShadow: "0 4px 12px rgba(37,99,235,0.35)" }}>
+                Liability Ledger – Detailed View
+              </div>
+              <div style={{ background: "#ffffff", borderRadius: "14px", boxShadow: "0 8px 26px rgba(0,0,0,0.12)", padding: "18px" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.95rem" }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>Liability (GSTR-1)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹10,25,365.25</td>
+                    </tr>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>Liability (GSTR-3B)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹10,20,365.25</td>
+                    </tr>
+                    <tr style={{ background: "#fee2e2", color: "#b91c1c", fontWeight: "700" }}>
+                      <td style={{ padding: "12px" }}>Difference</td>
+                      <td style={{ padding: "12px", textAlign: "right" }}>₹5,000.00</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>ITC (GSTR-2B)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹11,11,265.50</td>
+                    </tr>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>ITC (GSTR-3B)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹11,10,265.50</td>
+                    </tr>
+                    <tr style={{ background: "#fef3c7", color: "#b45309", fontWeight: "700" }}>
+                      <td style={{ padding: "12px" }}>Difference</td>
+                      <td style={{ padding: "12px", textAlign: "right" }}>-₹1,000.00</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>ITC (GSTR-2A)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹11,11,265.50</td>
+                    </tr>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>ITC (GSTR-3B)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹11,10,265.50</td>
+                    </tr>
+                    <tr style={{ background: "#ecfdf5", color: "#166534", fontWeight: "700" }}>
+                      <td style={{ padding: "12px" }}>Difference</td>
+                      <td style={{ padding: "12px", textAlign: "right" }}>₹0.00</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeLedgerTab === "payment" && (
+            <div style={{ padding: "28px" }}>
+              <div style={{ background: "#ffffff", padding: "16px 20px", display: "grid", gridTemplateColumns: "1fr 2fr 2fr", gap: "16px", fontWeight: "600", borderRadius: "14px", boxShadow: "0 6px 20px rgba(37,99,235,0.15)", marginBottom: "20px" }}>
+                <div>
+                  <div style={{ fontSize: "0.85rem", color: "#475569" }}>GSTIN / TEMP ID</div>
+                  <div style={{ fontSize: "0.95rem", fontFamily: "monospace" }}>09ACNPU2195H1ZY</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.85rem", color: "#475569" }}>Legal Name</div>
+                  <div style={{ fontSize: "0.95rem" }}>Mohd Umair</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.85rem", color: "#475569" }}>Trade Name</div>
+                  <div style={{ fontSize: "0.95rem" }}>U.A.F ENTERPRISE'S</div>
+                </div>
+              </div>
+
+              <div style={{ background: "#ffffff", borderRadius: "16px", boxShadow: "0 10px 28px rgba(0,0,0,0.12)", overflow: "hidden" }}>
+                <div style={{ padding: "18px 20px", borderBottom: "1px solid #e5e7eb", background: "#ffffff" }}>
+                  <span style={{ display: "inline-block", padding: "4px 12px", background: "linear-gradient(135deg,#2563eb,#1e40af)", color: "#ffffff", fontSize: "0.95rem", fontWeight: "700", borderRadius: "8px", boxShadow: "0 4px 10px rgba(37,99,235,0.30)" }}>
+                    Outstanding Demand
+                  </span>
+                </div>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+                    <thead>
+                      <tr style={{ background: "#f1f5f9", color: "#334155" }}>
+                        <th style={{ padding: "10px", textAlign: "center" }}>Sr.No</th>
+                        <th style={{ padding: "10px" }}>Demand Date</th>
+                        <th style={{ padding: "10px" }}>Demand ID</th>
+                        <th style={{ padding: "10px", textAlign: "right" }}>Integrated Tax</th>
+                        <th style={{ padding: "10px", textAlign: "right" }}>Central Tax</th>
+                        <th style={{ padding: "10px", textAlign: "right" }}>State / UT Tax</th>
+                        <th style={{ padding: "10px", textAlign: "right" }}>Cess</th>
+                        <th style={{ padding: "10px", textAlign: "center" }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {outstandingDemands.map((item) => (
+                        <tr key={item.sr} style={{ borderBottom: "1px solid #e5e7eb", background: "#ffffff" }}>
+                          <td style={{ padding: "10px", textAlign: "center" }}>{item.sr}</td>
+                          <td style={{ padding: "10px" }}>{item.date}</td>
+                          <td style={{ padding: "10px", fontFamily: "monospace" }}>{item.demandId}</td>
+                          <td style={{ padding: "10px", textAlign: "right" }}>{item.integrated.toLocaleString()}</td>
+                          <td style={{ padding: "10px", textAlign: "right" }}>{item.central.toLocaleString()}</td>
+                          <td style={{ padding: "10px", textAlign: "right" }}>{item.state.toLocaleString()}</td>
+                          <td style={{ padding: "10px", textAlign: "right" }}>{item.cess.toLocaleString()}</td>
+                          <td style={{ padding: "10px", textAlign: "center" }}>
+                            <button
+                              onClick={() => setSelectedDemand(item)}
+                              style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#ffffff", border: "none", padding: "6px 18px", borderRadius: "8px", fontWeight: "600", cursor: "pointer", boxShadow: "0 4px 14px rgba(37,99,235,0.35)" }}
+                            >
+                              SELECT
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {selectedDemand && (
+                <div onClick={() => setSelectedDemand(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 2000 }}>
+                  <div onClick={(e) => e.stopPropagation()} style={{ width: "420px", background: "#ffffff", borderRadius: "18px", boxShadow: "0 20px 50px rgba(0,0,0,0.2)", overflow: "hidden" }}>
+                    <div style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#ffffff", padding: "14px", textAlign: "center", fontSize: "1rem", fontWeight: "600" }}>
+                      Payment towards Demand
+                    </div>
+                    <div style={{ padding: "20px" }}>
+                      <div style={{ marginBottom: "12px" }}>
+                        <strong>GSTIN</strong>
+                        <div style={{ fontFamily: "monospace" }}>09ACNPU2195H1ZY</div>
+                      </div>
+                      <div style={{ marginBottom: "12px" }}>
+                        <strong>Trade Name</strong>
+                        <div>U.A.F ENTERPRISE'S</div>
+                      </div>
+                      <div style={{ marginBottom: "18px" }}>
+                        <strong>Demand ID</strong>
+                        <div style={{ color: "#2563eb" }}>{selectedDemand.demandId}</div>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "22px" }}>
+                        <div>
+                          <div style={{ fontSize: "0.85rem", color: "#64748b" }}>Central Tax</div>
+                          <div style={{ fontSize: "1.15rem", fontWeight: 700 }}>₹{selectedDemand.central.toLocaleString()}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: "0.85rem", color: "#64748b" }}>State / UT Tax</div>
+                          <div style={{ fontSize: "1.15rem", fontWeight: 700 }}>₹{selectedDemand.state.toLocaleString()}</div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "center" }}>
+                        <button
+                          onClick={() => {
+                            alert("Payment initiation simulation...");
+                            setSelectedDemand(null);
+                          }}
+                          style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#ffffff", border: "none", padding: "12px 44px", fontSize: "0.95rem", fontWeight: "600", borderRadius: "12px", cursor: "pointer", boxShadow: "0 6px 20px rgba(37,99,235,0.4)" }}
+                        >
+                          Proceed to Pay
+                        </button>
+                      </div>
+                    </div>
+                    <div style={{ borderTop: "1px solid #e5e7eb", padding: "12px", textAlign: "center" }}>
+                      <button onClick={() => setSelectedDemand(null)} style={{ background: "none", border: "none", color: "#2563eb", fontWeight: "600", cursor: "pointer" }}>Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -4537,21 +3282,20 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Premium Header with All Clients Button */}
+        {/* Header */}
         <div
-  style={{
-    background: "linear-gradient(135deg, #4f46e5, #4338ca)",
-    color: "white",
-    padding: "12px 22px",          // ⬅ reduced
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    fontSize: "0.92rem",           // ⬅ smaller text
-    fontWeight: "600",
-    boxShadow: "0 4px 12px rgba(79,70,229,0.35)",
-  }}
->
-
+          style={{
+            background: "linear-gradient(135deg, #4f46e5, #4338ca)",
+            color: "white",
+            padding: "12px 22px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "0.92rem",
+            fontWeight: "600",
+            boxShadow: "0 4px 12px rgba(79,70,229,0.35)",
+          }}
+        >
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <button
               onClick={onClose}
@@ -4567,88 +3311,55 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
-                transition: "all 0.25s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.4)";
-                e.currentTarget.style.transform = "translateX(-3px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.25)";
-                e.currentTarget.style.transform = "translateX(0)";
               }}
             >
               ← All Clients
             </button>
             <div>
-              GSTIN: <strong>{dynamicClient.gstin}</strong> |
-              Reg Date: <strong>{dynamicClient.registrationDate}</strong> |
-              Name: <strong>{dynamicClient.company}</strong> |
-              Status: <strong style={{ color: "#a7f3d0" }}>{dynamicClient.status}</strong>
+              GSTIN: <strong>{dynamicClient.gstin}</strong> | Reg Date: <strong>{dynamicClient.registrationDate}</strong> | Name: <strong>{dynamicClient.company}</strong> | Status: <strong style={{ color: "#a7f3d0" }}>{dynamicClient.status}</strong>
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
-           
-            <a
-              href="https://services.gst.gov.in/services/login"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "white", textDecoration: "underline", fontWeight: "500" }}
-            >
-              Go to GST Portal →
-            </a>
+          <a href="https://services.gst.gov.in/services/login" target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "underline", fontWeight: "500" }}>
+            Go to GST Portal →
+          </a>
+        </div>
+
+        {/* Menu Bar */}
+        <div style={{ background: "#eef2ff", padding: "0 20px", borderBottom: "1px solid #e5e7eb" }}>
+          <div style={{ display: "inline-flex", gap: "8px", padding: "14px 0" }}>
+            {menuItems.map((item) => {
+              const isActive = activeMenu === item;
+              return (
+                <button
+                  key={item}
+                  onClick={() => {
+                    setActiveMenu(item);
+                    setActiveSubTab("Manually");
+                    if (item === "Annual Return") setActiveAnnualSubTab("GSTR-9");
+                  }}
+                  onMouseEnter={() => setHoveredMenu(item)}
+                  onMouseLeave={() => setHoveredMenu(null)}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "9999px",
+                    fontSize: "0.92rem",
+                    fontWeight: isActive ? "700" : "600",
+                    background: isActive ? "#4f46e5" : "#ffffff",
+                    color: isActive ? "#ffffff" : "#1e293b",
+                    border: isActive ? "none" : "1px solid #d1d5db",
+                    boxShadow: isActive ? "0 4px 12px rgba(79, 70, 229, 0.3)" : "0 2px 6px rgba(0,0,0,0.08)",
+                    cursor: "pointer",
+                    minWidth: "115px",
+                  }}
+                >
+                  {item.toUpperCase().replace(/-/g, " ")}
+                </button>
+              );
+            })}
           </div>
         </div>
-        {/* Premium Menu Bar */}
-       <div
-  style={{
-    background: "#eef2ff",        // ⬅ light premium bg (like image)
-    padding: "0 20px",
-    borderBottom: "1px solid #e5e7eb",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
-  }}
->
 
-        <div style={{ display: "inline-flex", gap: "8px", padding: "14px 0" }}>
-  {menuItems.map((item) => {
-    const isActive = activeMenu === item;
-
-    return (
-      <button
-        key={item}
-        onClick={() => {
-          setActiveMenu(item);
-          setActiveSubTab("Manually");
-          if (item === "Annual Return") {
-            setActiveAnnualSubTab("GSTR-9");
-          }
-        }}
-        onMouseEnter={() => setHoveredMenu(item)}
-        onMouseLeave={() => setHoveredMenu(null)}
-        style={{
-          padding:          "10px 20px",               // pill ke liye balanced padding
-          borderRadius:     "9999px",                  // ← yeh line se full curve/pill shape banega
-          fontSize:         "0.92rem",
-          fontWeight:       isActive ? "700" : "600",
-          background:       isActive ? "#4f46e5" : "#ffffff",
-          color:            isActive ? "#ffffff" : "#1e293b",
-          border:           isActive ? "none" : "1px solid #d1d5db",
-          boxShadow:        isActive 
-                              ? "0 4px 12px rgba(79, 70, 229, 0.3)"
-                              : "0 2px 6px rgba(0,0,0,0.08)",
-          cursor:           "pointer",
-          transition:       "all 0.25s ease",
-          minWidth:         "115px",
-          transform:        hoveredMenu === item ? "translateY(-2px)" : "translateY(0)",
-        }}
-      >
-        {item.toUpperCase().replace(/-/g, " ")}
-      </button>
-    );
-  })}
-</div>
-</div>
-        {/* Main Content Area */}
+        {/* Main Content */}
         <div style={{ flex: 1, overflowY: "auto", background: "#f9fafb" }}>
           {renderContent()}
         </div>
@@ -4656,7 +3367,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     </div>
   );
 };
-
 
 
   const PendingVouchersModal = () => (
@@ -5526,38 +4236,71 @@ const ClientsPage = ({
   
 const DashboardHome = ({ allClients, addClient, navigate }) => {
   const today = new Date();
-  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const currentYear = today.getFullYear(); // 2026 ab dynamic rahega
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState(today.getMonth());
-  const year = today.getFullYear();
-  const daysInMonth = new Date(year, selectedMonth + 1, 0).getDate();
-  const firstDay = new Date(year, selectedMonth, 1).getDay();
-  const calendarCells = [...Array(firstDay).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
+  const [calendarCells, setCalendarCells] = useState([]);
 
-  const growthData = {
-      labels: ["Jan","Feb","Mar","Apr","May","Jun"],
-      datasets: [{
-        data: [520, 540, 580, 620, 660, 710],
-        borderColor: "#1fa971",
-        backgroundColor: "rgba(31,169,113,0.15)",
-        tension: 0.4,
-        fill: true // ab error nahi aayega
-      }],
-    };
-  const pieData = {
-    labels: ["Regular","Composition","Deductor","ECO","ISD"],
-    datasets: [{ data: [428,165,34,2,11], backgroundColor: ["#1f2a70","#1fa971","#f4b400","#e55353","#8e44ad"] }]
-  };
-  const trendData = {
-    labels: ["2020","2021","2022","2023","2024"],
-    datasets: [{ data: [200,320,450,610,750], backgroundColor: "#1f2a70" }]
+  // Years dropdown ke liye (2017 se current year tak)
+  const years = Array.from({ length: currentYear - 2016 }, (_, i) => 2017 + i);
+
+  // Calendar cells generate karna
+  useEffect(() => {
+    const firstDay = new Date(selectedYear, selectedMonth, 1).getDay(); // 0 = Sunday
+    const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+
+    let cells = [];
+
+    // Blanks before 1st date
+    for (let i = 0; i < firstDay; i++) {
+      cells.push(null);
+    }
+
+    // Actual dates
+    for (let d = 1; d <= daysInMonth; d++) {
+      cells.push(d);
+    }
+
+    // Pad to make full 6 rows (42 cells) → layout consistent rahega
+    while (cells.length < 42) {
+      cells.push(null);
+    }
+
+    setCalendarCells(cells);
+  }, [selectedYear, selectedMonth]);
+
+  // Card styles
+  const card = {
+    background: "#fff",
+    borderRadius: "12px",
+    padding: "20px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.08)"
   };
 
-  const card = { background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 4px 15px rgba(0,0,0,0.08)" };
-  const chartCard = { ...card, height: "300px", overflow: "hidden", display: "flex", flexDirection: "column" };
+  const chartCard = {
+    ...card,
+    height: "320px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between"
+  };
+
   const chartWrap = { flex: 1, position: "relative" };
-  const headerCell = { background: "linear-gradient(90deg,#1f2a70,#3b4cc0)", color: "#fff", padding: "14px", fontWeight: "700", textAlign: "center" };
 
-  // Add Client Modal State
+  const headerCell = {
+    background: "linear-gradient(90deg, #1f2a70, #3b4cc0)",
+    color: "#fff",
+    padding: "14px",
+    fontWeight: "700",
+    textAlign: "center"
+  };
+
+  // Add Client Modal
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [newClient, setNewClient] = useState({
     name: "",
@@ -5568,78 +4311,90 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
     mobile: "",
     address: "",
     pincode: "",
-    registrationDate: today.toISOString().split("T")[0], // default today
+    registrationDate: today.toISOString().split("T")[0]
   });
-const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  setNewClient(prev => ({
-    ...prev,
-    [name]: value,
-  }));
-};
 
-const handleSubmitClient = () => {
-  // Validation (same rahegi)
-  if (!newClient.name?.trim() || !newClient.company?.trim() || !newClient.gstin?.trim() || !newClient.mobile?.trim()) {
-    toast.error("Name, Company, GSTIN aur Mobile required hain!");
-    return;
-  }
-  if (newClient.gstin.length !== 15) {
-    toast.error("GSTIN 15 characters ka hona chahiye!");
-    return;
-  }
-  if (newClient.mobile.length !== 10 || !/^\d{10}$/.test(newClient.mobile)) {
-    toast.error("Mobile 10 digits ka hona chahiye!");
-    return;
-  }
-
-  const clientData = {
-    name: newClient.name.trim(),
-    company: newClient.company.trim(),
-    gstin: newClient.gstin.trim().toUpperCase(),
-    pan: newClient.pan?.trim().toUpperCase() || "",
-    mobile: newClient.mobile.trim(),
-    aadhaar: newClient.aadhaar?.trim() || "",
-    address: newClient.address?.trim() || "",
-    pincode: newClient.pincode?.trim() || "",
-    registrationDate: newClient.registrationDate || new Date().toISOString().split("T")[0],
+  const handleClientChange = (e) => {
+    const { name, value } = e.target;
+    setNewClient((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Add client
-  addClient(clientData);
+  const handleSubmitClient = () => {
+    if (!newClient.name.trim() || !newClient.company.trim() || !newClient.gstin.trim() || !newClient.mobile.trim()) {
+      toast.error("Name, Company, GSTIN aur Mobile required hain!");
+      return;
+    }
 
-  // Success message
-  toast.success("Client successfully added!");
+    if (newClient.gstin.length !== 15) {
+      toast.error("GSTIN 15 characters ka hona chahiye!");
+      return;
+    }
 
-  // Close modal and reset form
-  setShowAddClientModal(true);
-  setNewClient({
-    name: "",
-    company: "",
-    gstin: "",
-    pan: "",
-    aadhaar: "",
-    mobile: "",
-    address: "",
-    pincode: "",
-    registrationDate: today.toISOString().split("T")[0],
-  });
+    if (newClient.mobile.length !== 10 || !/^\d{10}$/.test(newClient.mobile)) {
+      toast.error("Mobile 10 digits ka hona chahiye!");
+      return;
+    }
 
-  // Ek hi baar redirect karo (safe delay ke saath)
-  setTimeout(() => {
-    navigate("/user/clients");
-  }, 500);
-};
+    const clientData = {
+      name: newClient.name.trim(),
+      company: newClient.company.trim(),
+      gstin: newClient.gstin.trim().toUpperCase(),
+      pan: newClient.pan?.trim().toUpperCase() || "",
+      mobile: newClient.mobile.trim(),
+      aadhaar: newClient.aadhaar?.trim() || "",
+      address: newClient.address?.trim() || "",
+      pincode: newClient.pincode?.trim() || "",
+      registrationDate: newClient.registrationDate || today.toISOString().split("T")[0],
+      registrationType: "Regular" // default, baad mein change kar sakte ho
+    };
+
+    addClient(clientData);
+    toast.success("Client successfully added!");
+
+    // Reset form & close modal
+    setNewClient({
+      name: "",
+      company: "",
+      gstin: "",
+      pan: "",
+      aadhaar: "",
+      mobile: "",
+      address: "",
+      pincode: "",
+      registrationDate: today.toISOString().split("T")[0]
+    });
+
+    setShowAddClientModal(false);
+
+    // Optional: clients page pe le jao
+    setTimeout(() => {
+      navigate("/user/clients");
+    }, 800);
+  };
+
+  // Sample chart data (tumhare pass jo tha usko rakha)
+  const pieData = {
+    labels: ["Regular", "Composition", "Deductor", "ECO", "ISD"],
+    datasets: [{
+      data: [428, 165, 34, 2, 11],
+      backgroundColor: ["#1f2a70", "#1fa971", "#f4b400", "#e55353", "#8e44ad"]
+    }]
+  };
 
   return (
     <div style={{ padding: "20px", maxWidth: "100%", overflowX: "hidden" }}>
-      {/* Calendar & Status - unchanged */}
+      {/* Calendar + Filing Status */}
       <div style={{ display: "grid", gridTemplateColumns: "40% 60%", gap: "20px" }}>
+        {/* Calendar */}
         <div style={card}>
-          <h3>Due Dates of GST Returns – {months[selectedMonth]} {year}</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: "6px", marginTop: "10px" }}>
-            {["SUN","MON","TUE","WED","THU","FRI","SAT"].map(d => (
-              <div key={d} style={{ textAlign: "center", fontWeight: 600 }}>{d}</div>
+          <h3>
+            Due Dates of GST Returns – {months[selectedMonth]} {selectedYear}
+          </h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: "6px", marginTop: "16px" }}>
+            {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((d) => (
+              <div key={d} style={{ textAlign: "center", fontWeight: 600, padding: "8px 0" }}>
+                {d}
+              </div>
             ))}
             {calendarCells.map((day, i) => (
               <div
@@ -5648,8 +4403,21 @@ const handleSubmitClient = () => {
                   padding: "10px",
                   textAlign: "center",
                   borderRadius: "8px",
-                  background: day === today.getDate() && selectedMonth === today.getMonth() ? "#1f2a70" : "#f3f5fa",
-                  color: day === today.getDate() && selectedMonth === today.getMonth() ? "#fff" : "#000",
+                  background:
+                    day &&
+                    day === today.getDate() &&
+                    selectedMonth === today.getMonth() &&
+                    selectedYear === today.getFullYear()
+                      ? "#1f2a70"
+                      : "#f8f9ff",
+                  color:
+                    day &&
+                    day === today.getDate() &&
+                    selectedMonth === today.getMonth() &&
+                    selectedYear === today.getFullYear()
+                      ? "#fff"
+                      : "#333",
+                  fontWeight: day ? "500" : "normal"
                 }}
               >
                 {day || ""}
@@ -5658,194 +4426,337 @@ const handleSubmitClient = () => {
           </div>
         </div>
 
+        {/* Filing Status */}
         <div style={card}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
             <h3>GST Return Filing Status</h3>
-            <select value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value))} style={{ padding: "8px 12px", borderRadius: "8px" }}>
-              {months.map((m, i) => <option key={i} value={i}>{m}</option>)}
-            </select>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #ccc" }}
+              >
+                {months.map((m, i) => (
+                  <option key={i} value={i}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #ccc" }}
+              >
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
+
           {[
-            ["GSTR-1",365,210], ["GSTR-1A",365,210], ["GSTR-3B",300,275],
-            ["GSTR-7",300,275], ["GSTR-8",300,275], ["CMP-08",300,275],
+            ["GSTR-1", 365, 210],
+            ["GSTR-1A", 365, 210],
+            ["GSTR-3B", 300, 275],
+            ["GSTR-7", 300, 275],
+            ["GSTR-8", 300, 275],
+            ["CMP-08", 300, 275]
           ].map(([type, filed, pending]) => (
-            <div key={type} style={{ display: "grid", gridTemplateColumns: "120px 1fr 1fr", gap: "10px", marginBottom: "8px" }}>
-              <strong>{type}</strong>
-              <div style={{ background: "#e8f7f0", padding: "6px", borderRadius: "6px" }}>Filed - {filed}</div>
-              <div style={{ background: "#fdeaea", padding: "6px", borderRadius: "6px" }}>Pending - {pending}</div>
+            <div
+              key={type}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "120px 1fr 1fr",
+                gap: "12px",
+                marginBottom: "10px",
+                alignItems: "center"
+              }}
+            >
+              <strong style={{ fontSize: "1.05rem" }}>{type}</strong>
+              <div style={{ background: "#e8f7f0", padding: "8px", borderRadius: "6px", textAlign: "center" }}>
+                Filed - {filed}
+              </div>
+              <div style={{ background: "#fdeaea", padding: "8px", borderRadius: "6px", textAlign: "center" }}>
+                Pending - {pending}
+              </div>
             </div>
           ))}
         </div>
       </div>
-      {/* Types of Clients Table */}
-      <div style={{ ...card, marginTop: "30px" }}>
-        <h2 style={{ marginBottom: "16px", color: "#1f2a70" }}>Types of Clients</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr 2fr 2fr" }}>
-          <div style={headerCell}>Type</div>
+
+     {/* Types of Clients - Compact rows, reduced padding, premium styles */}
+      <div style={{ ...card, marginTop: "24px" }}> {/* Reduced marginTop */}
+        <h2 style={{ marginBottom: "12px", color: "#1f2a70", fontSize: "1.4rem" }}>Types of Clients</h2> {/* Smaller h2 */}
+        <div style={{ display: "grid", gridTemplateColumns: "3fr 1.5fr 1.5fr 1.5fr", gap: "8px" }}> {/* Adjusted columns for balance */}
+          <div style={{ ...headerCell, borderTopLeftRadius: "8px" }}>Type</div>
           <div style={headerCell}>No. of Clients</div>
           <div style={headerCell}>Open List</div>
-          <div style={headerCell}>Add Client</div>
+          <div style={{ ...headerCell, borderTopRightRadius: "8px" }}>Add Client</div>
         </div>
 
         {[
-          { label: "Tax Payer (Regular)", count: allClients.filter(c => c.registrationType === "Regular").length },
-          { label: "Tax Payer (Composition)", count: allClients.filter(c => c.registrationType === "Composition").length },
+          { label: "Tax Payer (Regular)", count: allClients.filter((c) => c.registrationType === "Regular").length },
+          { label: "Tax Payer (Composition)", count: allClients.filter((c) => c.registrationType === "Composition").length || 0 },
           { label: "Tax Deductor", count: 34 },
           { label: "Tax Collector (ECO)", count: 2 },
-          { label: "Input Service Distributor (ISD)", count: 11 },
+          { label: "Input Service Distributor (ISD)", count: 11 }
         ].map((row, i) => (
           <div
             key={i}
             style={{
               display: "grid",
-              gridTemplateColumns: "3fr 2fr 2fr 2fr",
+              gridTemplateColumns: "3fr 1.5fr 1.5fr 1.5fr",
               alignItems: "center",
-              borderBottom: "1px solid #e5e7eb",
-              padding: "14px 0",
+              borderBottom: i < 4 ? "1px solid #e5e7eb" : "none", // No border on last row
+              padding: "8px 0", // Reduced padding for compact rows
+              background: i % 2 === 0 ? "#f9fafb" : "#fff", // Alternating row colors for premium look
+              transition: "background 0.2s ease" // Hover effect (add :hover in CSS if needed, but inline limited)
             }}
           >
-            <div>{row.label}</div>
-            <div style={{ textAlign: "center", fontWeight: 600 }}>{row.count}</div>
-           <div style={{ textAlign: "center" }}>
-  <button
-    onClick={() => navigate("/user/clients")}
-    style={{
-      background: "#1f2a70",
-      color: "#fff",
-      padding: "8px 16px",
-      borderRadius: "8px",
-      border: "none",
-      cursor: "pointer",
-      fontSize: "0.95rem",
-      fontWeight: "500",
-    }}
-  >
-    Open List
-  </button>
-</div>
-
-
+            <div style={{ fontWeight: "500", fontSize: "0.95rem", paddingLeft: "12px" }}>{row.label}</div> {/* Smaller font */}
+            <div style={{ textAlign: "center", fontWeight: "600", fontSize: "0.95rem" }}>{row.count}</div>
+            <div style={{ textAlign: "center" }}>
+              <button
+                onClick={() => navigate("/user/clients")}
+                style={{
+                  background: "#1f2a70",
+                  color: "#fff",
+                  padding: "6px 16px", // Smaller buttons
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "0.9rem",
+                  fontWeight: "500",
+                  transition: "background 0.2s" // Premium hover feel
+                }}
+              >
+                Open List
+              </button>
+            </div>
             <div style={{ textAlign: "center" }}>
               <button
                 onClick={() => setShowAddClientModal(true)}
-                style={{ background: "#22c55e", color: "#fff", padding: "8px 14px", borderRadius: "8px", border: "none", fontWeight: "600" }}
+                style={{
+                  background: "#22c55e",
+                  color: "#fff",
+                  padding: "6px 14px", // Smaller buttons
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  margin: "0 auto",
+                  fontSize: "0.9rem",
+                  fontWeight: "500",
+                  transition: "background 0.2s"
+                }}
               >
-                <HiPlus style={{ marginRight: "6px", display: "inline" }} /> Add Client
+                <HiPlus style={{ fontSize: "1rem" }} /> Add Client
               </button>
             </div>
           </div>
         ))}
       </div>
-        {showAddClientModal && (
-          <div style={{
+
+      {/* Add Client Modal */}
+      {showAddClientModal && (
+        <div
+          style={{
             position: "fixed",
-            top: 0, left: 0, width: "100vw", height: "100vh",
-            background: "rgba(0,0,0,0.7)",
+            inset: 0,
+            background: "rgba(0,0,0,0.65)",
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
-            zIndex: 9999
-          }} onClick={() => setShowAddClientModal(true)}>
-            <div style={{
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+          onClick={() => setShowAddClientModal(false)}
+        >
+          <div
+            style={{
               background: "white",
-              borderRadius: "24px",
-              width: "900px",
-              maxHeight: "90vh",
+              borderRadius: "16px",
+              width: "90%",
+              maxWidth: "900px",
+              maxHeight: "92vh",
               overflowY: "auto",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.4)"
-            }} onClick={e => e.stopPropagation()}>
-              <div style={{
+              boxShadow: "0 20px 60px rgba(0,0,0,0.35)"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
                 background: "linear-gradient(135deg, #7c3aed, #4c1d95)",
                 padding: "30px",
-                borderRadius: "24px 24px 0 0",
                 color: "white",
-                textAlign: "center"
-              }}>
-                <h2 style={{ margin: 0, fontSize: "2rem" }}>Add New Client</h2>
-                <p>Client will be added with Active status</p>
+                textAlign: "center",
+                borderRadius: "16px 16px 0 0"
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: "1.9rem" }}>Add New Client</h2>
+              <p style={{ margin: "8px 0 0", opacity: 0.9 }}>Client will be added with Active status</p>
+            </div>
+
+            <div style={{ padding: "32px 40px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+                <div>
+                  <label style={{ fontWeight: "600", display: "block", marginBottom: "8px" }}>
+                    Name <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <input
+                    name="name"
+                    value={newClient.name}
+                    onChange={handleClientChange}
+                    style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontWeight: "600", display: "block", marginBottom: "8px" }}>
+                    Company Name <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <input
+                    name="company"
+                    value={newClient.company}
+                    onChange={handleClientChange}
+                    style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontWeight: "600", display: "block", marginBottom: "8px" }}>
+                    GSTIN <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <input
+                    name="gstin"
+                    value={newClient.gstin}
+                    onChange={handleClientChange}
+                    maxLength={15}
+                    style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontWeight: "600", display: "block", marginBottom: "8px" }}>
+                    Mobile <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <input
+                    name="mobile"
+                    value={newClient.mobile}
+                    onChange={handleClientChange}
+                    maxLength={10}
+                    style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontWeight: "600", display: "block", marginBottom: "8px" }}>PAN</label>
+                  <input
+                    name="pan"
+                    value={newClient.pan}
+                    onChange={handleClientChange}
+                    style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontWeight: "600", display: "block", marginBottom: "8px" }}>Registration Date</label>
+                  <input
+                    type="date"
+                    name="registrationDate"
+                    value={newClient.registrationDate}
+                    onChange={handleClientChange}
+                    style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontWeight: "600", display: "block", marginBottom: "8px" }}>Aadhaar</label>
+                  <input
+                    name="aadhaar"
+                    value={newClient.aadhaar}
+                    onChange={handleClientChange}
+                    style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontWeight: "600", display: "block", marginBottom: "8px" }}>Pincode</label>
+                  <input
+                    name="pincode"
+                    value={newClient.pincode}
+                    onChange={handleClientChange}
+                    style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label style={{ fontWeight: "600", display: "block", marginBottom: "8px" }}>Address</label>
+                  <textarea
+                    name="address"
+                    value={newClient.address}
+                    onChange={handleClientChange}
+                    rows={3}
+                    style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                  />
+                </div>
               </div>
-              <div style={{ padding: "40px" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "25px" }}>
-                  <div>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>
-                      Name <span style={{ color: "red" }}>*</span>
-                    </label>
-                    <input name="name" value={newClientForm.name} onChange={handleClientChange}
-                      style={{ width: "100%", padding: "15px", borderRadius: "10px", border: "1px solid #ccc" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>
-                      Company Name <span style={{ color: "red" }}>*</span>
-                    </label>
-                    <input name="company" value={newClientForm.company} onChange={handleClientChange}
-                      style={{ width: "100%", padding: "15px", borderRadius: "10px", border: "1px solid #ccc" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>
-                      GSTIN <span style={{ color: "red" }}>*</span>
-                    </label>
-                    <input name="gstin" value={newClientForm.gstin} onChange={handleClientChange} maxLength="15"
-                      style={{ width: "100%", padding: "15px", borderRadius: "10px", border: "1px solid #ccc" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>
-                      Mobile <span style={{ color: "red" }}>*</span>
-                    </label>
-                    <input name="mobile" value={newClientForm.mobile} onChange={handleClientChange} maxLength="10"
-                      style={{ width: "100%", padding: "15px", borderRadius: "10px", border: "1px solid #ccc" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>PAN</label>
-                    <input name="pan" value={newClientForm.pan} onChange={handleClientChange}
-                      style={{ width: "100%", padding: "15px", borderRadius: "10px", border: "1px solid #ccc" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>Registration Date</label>
-                    <input type="date" name="registrationDate" value={newClientForm.registrationDate} onChange={handleClientChange}
-                      style={{ width: "100%", padding: "15px", borderRadius: "10px", border: "1px solid #ccc" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>Aadhaar</label>
-                    <input name="aadhaar" value={newClientForm.aadhaar} onChange={handleClientChange}
-                      style={{ width: "100%", padding: "15px", borderRadius: "10px", border: "1px solid #ccc" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>Pincode</label>
-                    <input name="pincode" value={newClientForm.pincode} onChange={handleClientChange}
-                      style={{ width: "100%", padding: "15px", borderRadius: "10px", border: "1px solid #ccc" }} />
-                  </div>
-                  <div style={{ gridColumn: "span 2" }}>
-                    <label style={{ fontWeight: "bold", display: "block", marginBottom: "8px" }}>Address</label>
-                    <textarea name="address" value={newClientForm.address} onChange={handleClientChange} rows="3"
-                      style={{ width: "100%", padding: "15px", borderRadius: "10px", border: "1px solid #ccc" }}></textarea>
-                  </div>
-                </div>
-                <div style={{ textAlign: "right", marginTop: "30px" }}>
-                  <button onClick={() => setShowAddClientModal(true)}
-                    style={{ padding: "12px 30px", marginRight: "15px", background: "#ddd", border: "none", borderRadius: "10px" }}>
-                    Cancel
-                  </button>
-                  <button onClick={submitNewClient}
-                    style={{ padding: "12px 40px", background: "#7c3aed", color: "white", border: "none", borderRadius: "10px", fontWeight: "bold" }}>
-                    Submit Client
-                  </button>
-                </div>
+
+              <div style={{ marginTop: "32px", textAlign: "right", display: "flex", gap: "16px", justifyContent: "flex-end" }}>
+                <button
+                  onClick={() => setShowAddClientModal(false)}
+                  style={{
+                    padding: "12px 32px",
+                    background: "#e5e7eb",
+                    border: "none",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    fontWeight: "600"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitClient}
+                  style={{
+                    padding: "12px 40px",
+                    background: "#7c3aed",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontWeight: "bold",
+                    cursor: "pointer"
+                  }}
+                >
+                  Submit Client
+                </button>
               </div>
             </div>
           </div>
-        )}
-        
-      {/* Charts */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "20px", marginTop: "20px" }}>
-        <div style={chartCard}><h4>Business Growth</h4><div style={chartWrap}><Line data={growthData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} /></div></div>
-        <div style={chartCard}><h4 style={{ textAlign: "center" }}>Client Types</h4><div style={chartWrap}><Pie data={pieData} options={{ maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }} /></div></div>
-        <div style={chartCard}><h4 style={{ textAlign: "center" }}>Growth Trend</h4><div style={chartWrap}><Bar data={trendData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} /></div></div>
+        </div>
+      )}
+      {/* Charts Section */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "20px", marginTop: "30px" }}>
+        <div style={chartCard}>
+          <h4 style={{ textAlign: "center", margin: "12px 0" }}>Client Types Distribution</h4>
+          <div style={chartWrap}>
+            <Pie
+              data={pieData}
+              options={{
+                maintainAspectRatio: false,
+                plugins: { legend: { position: "bottom" } }
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Agar aur charts chahiye to yahan daal sakte ho */}
       </div>
-
-
     </div>
-
-    
   );
 };
 

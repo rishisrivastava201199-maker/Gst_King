@@ -1,24 +1,30 @@
 // server/index.js
-import 'dotenv/config';          // ← MUST be at the very top
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import nodemailer from 'nodemailer';
 
 const app = express();
 
-// Middleware
+/* =======================
+   MIDDLEWARE
+======================= */
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'], // Vite default + any others you use
+  origin: true,          // allow all origins (Vercel safe)
   credentials: true,
 }));
 app.use(express.json());
 
-// Test route (optional - helps debug)
+/* =======================
+   TEST ROUTE
+======================= */
 app.get('/', (req, res) => {
-  res.json({ message: 'Backend is alive 🚀' });
+  res.json({ success: true, message: 'Backend is alive 🚀' });
 });
 
-// OTP sending route
+/* =======================
+   SEND OTP ROUTE
+======================= */
 app.post('/send-otp', async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -30,47 +36,53 @@ app.post('/send-otp', async (req, res) => {
       });
     }
 
+    // Debug env (remove later)
+    console.log("EMAIL_USER:", process.env.EMAIL_USER);
+    console.log("EMAIL_PASS loaded:", !!process.env.EMAIL_PASS);
+
     // Create transporter
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
-      secure: false, // true for 465, false for other ports
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
     });
 
-    // Test SMTP connection (optional but very useful during debugging)
+    // Verify SMTP
     await transporter.verify();
 
-    // Send email
-    const info = await transporter.sendMail({
+    // Send OTP mail
+    await transporter.sendMail({
       from: `"SmartGST" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: 'Your SmartGST Verification OTP',
-      text: `Your OTP is: ${otp}\n\nThis code will expire in 10 minutes.`,
+      subject: 'SmartGST Email Verification OTP',
+      text: `Your OTP is ${otp}. This OTP is valid for 10 minutes.`,
       html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto;">
-          <h2 style="color: #4c1d95;">SmartGST Verification</h2>
-          <p>Use the following OTP to verify your email:</p>
-          <h1 style="letter-spacing: 8px; color: #7c3aed; font-size: 36px; margin: 20px 0;">${otp}</h1>
-          <p>This OTP is valid for <strong>10 minutes</strong>.</p>
-          <p style="color: #64748b; font-size: 0.9rem;">
-            If you did not request this OTP, please ignore this email.
+        <div style="font-family: Arial; padding:20px">
+          <h2 style="color:#4c1d95">SmartGST Verification</h2>
+          <p>Your One-Time Password (OTP):</p>
+          <h1 style="letter-spacing:6px; color:#7c3aed">${otp}</h1>
+          <p>This OTP is valid for <b>10 minutes</b>.</p>
+          <p style="color:#64748b;font-size:12px">
+            If you didn’t request this, please ignore this email.
           </p>
         </div>
       `,
     });
 
-    console.log('OTP email sent → Message ID:', info.messageId);
+    console.log(`✅ OTP sent to ${email}`);
 
     res.status(200).json({
       success: true,
       message: 'OTP sent successfully',
     });
+
   } catch (err) {
-    console.error('EMAIL ERROR:', err);
+    console.error('❌ OTP ERROR:', err);
+
     res.status(500).json({
       success: false,
       message: 'Failed to send OTP',
@@ -79,10 +91,11 @@ app.post('/send-otp', async (req, res) => {
   }
 });
 
-// Start server
+/* =======================
+   START SERVER
+======================= */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`✅ Server is running on http://localhost:${PORT}`);
-  console.log('Email user:', process.env.EMAIL_USER || '(not loaded)');
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
