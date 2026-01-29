@@ -2166,27 +2166,23 @@ const handleClientSelect = () => {
   );
 
 
-  
-const ClientGSTDashboardModal = ({ client, onClose }) => {
+  const ClientGSTDashboardModal = ({ client, onClose }) => {
   const [activeMenu, setActiveMenu] = useState("Dashboard");
   const [hoveredMenu, setHoveredMenu] = useState(null);
   const [activeSubTab, setActiveSubTab] = useState("Manually");
   const [activeAnnualSubTab, setActiveAnnualSubTab] = useState("GSTR-9");
   const [importStep, setImportStep] = useState("list"); // "list" | "upload"
   const [selectedImportType, setSelectedImportType] = useState(null);
-
-  const [activeLedgerTab, setActiveLedgerTab] = useState("summary");
+  const [activeDashboardTab, setActiveDashboardTab] = useState("returns-status"); // New state for dashboard tabs
   const [showCreditLedger, setShowCreditLedger] = useState(false);
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
   const [selectedDemand, setSelectedDemand] = useState(null);
-
   const [dynamicClient, setDynamicClient] = useState({
     gstin: client?.gstin || "09ABMCS5888A1ZU",
     company: client?.company || "SALVIA GRAFIX PRIVATE LIMITED",
     registrationDate: "10-Feb-2020",
     status: "Active",
   });
-
   const [formData, setFormData] = useState({
     name: "SALVIA GRAFIX PRIVATE LIMITED",
     address: "Shop No. 13, First Floor, Royal Plaza, Haj...",
@@ -2213,12 +2209,10 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     uploadType: "GST",
     lutNumber: "",
   });
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleUpdate = () => {
     setDynamicClient({
       gstin: formData.gstin,
@@ -2228,9 +2222,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     });
     toast.success("Client details updated successfully! Changes are now visible in the header card.");
   };
-
   const months = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
-
   const menuItems = [
     "Dashboard",
     "Client Detail",
@@ -2241,15 +2233,14 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     "Annual Return",
     "Reports",
   ];
-
-  const ledgerTabs = [
+  const dashboardTabs = [
+    { id: "returns-status", label: "Returns Status" },
     { id: "summary", label: "Ledger Summary" },
     { id: "elb", label: "ELB" },
     { id: "turnover", label: "Turnover" },
     { id: "liability", label: "Liability Ledger" },
     { id: "payment", label: "Demand" },
   ];
-
   const outstandingDemands = [
     {
       sr: 1,
@@ -2297,7 +2288,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       cess: 0,
     },
   ];
-
   const downloadClientTemplate = () => {
     const notes = [
       ["Note"],
@@ -2365,7 +2355,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     XLSX.writeFile(wb, "Client_Master_Template.xlsx");
     toast.success("Client Master Template Downloaded!");
   };
-
   const ImportOptionsList = () => {
     const options = [
       { title: "Bulk New File Creation for GST", hasTemplate: true },
@@ -2376,7 +2365,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       { title: "Transfer Income Tax Data From Previous Year", hasTemplate: false, singleButton: true },
     ];
     return (
-      <div style={{ padding: "20px", background: "#f8fafc" }}>
+      <div style={{ padding: "padding: 20px", background: "#f8fafc" }}>
         <div style={{ background: "#ffffff", borderRadius: "12px", padding: "32px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
           {options.map((opt, idx) => (
             <div
@@ -2426,7 +2415,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     );
   };
-
   const FileUploadScreen = () => {
     return (
       <div style={{ padding: "20px", background: "#f8fafc" }}>
@@ -2445,7 +2433,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     );
   };
-
   const GSTRLayout = ({ title }) => (
     <div style={{ padding: "20px", background: "#f8fafc" }}>
       <div style={{ background: "#ffffff", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
@@ -2528,9 +2515,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     </div>
   );
-
   const [activeTurnoverView, setActiveTurnoverView] = useState('overview');
-
   const renderContent = () => {
     if (activeMenu !== "Dashboard") {
       if (activeMenu === "Client Detail") {
@@ -2670,13 +2655,11 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
           </div>
         );
       }
-
       const regularGstrTabs = ["gstr-1", "gstr-1A", "gstr 3b", "IMS"];
       if (regularGstrTabs.includes(activeMenu)) {
         const displayTitle = activeMenu.toUpperCase().replace("GSTR ", "GSTR-").replace(" 3B", " 3B");
         return <GSTRLayout title={displayTitle} />;
       }
-
       if (activeMenu === "Annual Return") {
         return (
           <div style={{ padding: "20px", background: "#f8fafc" }}>
@@ -2706,7 +2689,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
           </div>
         );
       }
-
       return (
         <div style={{ padding: "80px 40px", textAlign: "center", color: "#64748b" }}>
           <h2 style={{ fontSize: "2rem", color: "#7c3aed", marginBottom: "20px" }}>{activeMenu.toUpperCase().replace(/-/g, " ")}</h2>
@@ -2714,34 +2696,29 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
         </div>
       );
     }
-
     // ───────── DASHBOARD ─────────
     return (
       <div style={{ padding: "20px 28px", background: "#f8fafc" }}>
-
-        {/* ───────── Returns Status + Ledger Tabs in one row ───────── */}
+        {/* ───────── Unified Tabs on Left, Update on Right ───────── */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "16px" }}>
-          {/* Left: Returns Status Title */}
-          <h2 style={{ margin: 0, color: "#0f766e", fontSize: "1.6rem", fontWeight: "700" }}>Returns Status</h2>
-
-          {/* Right: Ledger Tabs + Update button */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-            {ledgerTabs.map((tab) => {
-              const isActive = activeLedgerTab === tab.id;
+          {/* Left: Dashboard Tabs */}
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {dashboardTabs.map((tab) => {
+              const isActive = activeDashboardTab === tab.id;
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveLedgerTab(tab.id)}
+                  onClick={() => setActiveDashboardTab(tab.id)}
                   style={{
-                    padding: "10px 24px",
+                    padding: "8px 16px",
                     background: isActive ? "linear-gradient(135deg, #1e40af, #2563eb)" : "#ffffff",
                     color: isActive ? "white" : "#334155",
                     border: isActive ? "none" : "1px solid #e5e7eb",
                     borderRadius: "999px",
                     fontWeight: isActive ? "700" : "600",
-                    fontSize: "1rem",
+                    fontSize: "0.9rem",
                     cursor: "pointer",
-                    boxShadow: isActive ? "0 8px 20px rgba(30,64,175,0.4)" : "0 3px 10px rgba(0,0,0,0.08)",
+                    boxShadow: isActive ? "0 4px 12px rgba(30,64,175,0.3)" : "0 2px 6px rgba(0,0,0,0.08)",
                     transition: "all 0.25s ease",
                   }}
                 >
@@ -2749,106 +2726,106 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                 </button>
               );
             })}
-            <button
-              style={{
-                background: "linear-gradient(180deg, #34d399 0%, #22c55e 45%, #16a34a 100%)",
-                color: "#ffffff",
-                padding: "10px 26px",
-                border: "none",
-                borderRadius: "999px",
-                fontWeight: "700",
-                fontSize: "1rem",
-                cursor: "pointer",
-                boxShadow: "0 14px 30px rgba(22,163,74,0.55), inset 0 2px 4px rgba(255,255,255,0.35)",
-              }}
-            >
-              Update
-            </button>
           </div>
+          {/* Right: Update button */}
+          <button
+            style={{
+              background: "linear-gradient(180deg, #34d399 0%, #22c55e 45%, #16a34a 100%)",
+              color: "#ffffff",
+              padding: "8px 20px",
+              border: "none",
+              borderRadius: "999px",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              cursor: "pointer",
+              boxShadow: "0 8px 20px rgba(22,163,74,0.45), inset 0 2px 4px rgba(255,255,255,0.35)",
+            }}
+          >
+            Update
+          </button>
         </div>
-
-        {/* Months header */}
-        <div style={{ display: "grid", gridTemplateColumns: "120px repeat(12, 1fr)", gap: "8px", marginBottom: "16px", fontWeight: "700", fontSize: "0.9rem", minWidth: "1000px", overflowX: "auto" }}>
-          <div style={{ paddingLeft: "8px" }}>Return</div>
-          {months.map((m) => (
-            <div key={m} style={{ textAlign: "center", padding: "8px 0", background: "#e0e7ff", borderRadius: "8px", color: "#4338ca" }}>{m}</div>
-          ))}
-        </div>
-
-        {/* Return rows */}
-        {[
-          { name: "GSTR-1", filed: 9 },
-          { name: "GSTR-1A", filed: 0 },
-          { name: "GSTR-3B", filed: 8 },
-          { name: "TDS/TCS", filed: 8 },
-        ].map((ret) => (
-          <div key={ret.name} style={{ display: "grid", gridTemplateColumns: "120px repeat(12, 1fr)", gap: "8px", marginBottom: "12px", minWidth: "1000px", overflowX: "auto" }}>
-            <div style={{ fontWeight: "700", color: "#0d9488", fontSize: "1rem", paddingLeft: "8px" }}>
-              {ret.name}
-              <br />
-              <a href="#" style={{ fontSize: "0.8rem", color: "#2563eb", textDecoration: "underline" }}>All Download →</a>
-            </div>
-            {Array.from({ length: 12 }, (_, i) => {
-              const filed = i < ret.filed;
-              const isCurrentPeriod = i >= 9;
-              const arn = filed ? `AA09${String(i + 4).padStart(2, "0")}24R${String(i + 1).padStart(3, "0")}` : isCurrentPeriod ? "" : "Pending";
-              return (
-                <div key={i} style={{ background: "#ffffff", borderRadius: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.06)", padding: "10px 6px", textAlign: "center", fontSize: "0.85rem", minHeight: "80px" }}>
-                  {filed ? (
-                    <>
-                      <span style={{ color: "#059669", fontWeight: "700", fontSize: "0.9rem" }}>Filed</span>
-                      <br />
-                      <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN:</span>
-                      <span style={{ color: "#333", fontWeight: "600", fontSize: "0.8rem" }}>{arn}</span>
-                      <br />
-                      <a href="#" style={{ color: "#2563eb", fontSize: "0.75rem", textDecoration: "underline" }}>Download</a>
-                    </>
-                  ) : isCurrentPeriod ? (
-                    <>
-                      <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Due</span>
-                      <br />
-                      <span style={{ color: "#999", fontSize: "0.75rem" }}>Not Filed</span>
-                    </>
-                  ) : (
-                    <>
-                      <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Not Filed</span>
-                      <br />
-                      <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN: {arn}</span>
-                    </>
-                  )}
+        {/* ───────── Content based on active tab ───────── */}
+        <div style={{ background: "#ffffff", borderRadius: "16px", boxShadow: "0 8px 28px rgba(0,0,0,0.12)", padding: "20px", overflow: "hidden" }}>
+          {activeDashboardTab === "returns-status" && (
+            <>
+              {/* Months header */}
+              <div style={{ display: "grid", gridTemplateColumns: "120px repeat(12, 1fr)", gap: "8px", marginBottom: "16px", fontWeight: "700", fontSize: "0.9rem", minWidth: "1000px", overflowX: "auto" }}>
+                <div style={{ paddingLeft: "8px" }}>Return</div>
+                {months.map((m) => (
+                  <div key={m} style={{ textAlign: "center", padding: "8px 0", background: "#e0e7ff", borderRadius: "8px", color: "#4338ca" }}>{m}</div>
+                ))}
+              </div>
+              {/* Return rows */}
+              {[
+                { name: "GSTR-1", filed: 9 },
+                { name: "GSTR-1A", filed: 0 },
+                { name: "GSTR-3B", filed: 8 },
+                { name: "TDS/TCS", filed: 8 },
+              ].map((ret) => (
+                <div key={ret.name} style={{ display: "grid", gridTemplateColumns: "120px repeat(12, 1fr)", gap: "8px", marginBottom: "12px", minWidth: "1000px", overflowX: "auto" }}>
+                  <div style={{ fontWeight: "700", color: "#0d9488", fontSize: "1rem", paddingLeft: "8px" }}>
+                    {ret.name}
+                    <br />
+                    <a href="#" style={{ fontSize: "0.8rem", color: "#2563eb", textDecoration: "underline" }}>All Download →</a>
+                  </div>
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const filed = i < ret.filed;
+                    const isCurrentPeriod = i >= 9;
+                    const arn = filed ? `AA09${String(i + 4).padStart(2, "0")}24R${String(i + 1).padStart(3, "0")}` : isCurrentPeriod ? "" : "Pending";
+                    return (
+                      <div key={i} style={{ background: "#ffffff", borderRadius: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.06)", padding: "10px 6px", textAlign: "center", fontSize: "0.85rem", minHeight: "80px" }}>
+                        {filed ? (
+                          <>
+                            <span style={{ color: "#059669", fontWeight: "700", fontSize: "0.9rem" }}>Filed</span>
+                            <br />
+                            <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN:</span>
+                            <span style={{ color: "#333", fontWeight: "600", fontSize: "0.8rem" }}>{arn}</span>
+                            <br />
+                            <a href="#" style={{ color: "#2563eb", fontSize: "0.75rem", textDecoration: "underline" }}>Download</a>
+                          </>
+                        ) : isCurrentPeriod ? (
+                          <>
+                            <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Due</span>
+                            <br />
+                            <span style={{ color: "#999", fontSize: "0.75rem" }}>Not Filed</span>
+                          </>
+                        ) : (
+                          <>
+                            <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Not Filed</span>
+                            <br />
+                            <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN: {arn}</span>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
-        ))}
-
-        {/* DUE badges */}
-        <div style={{ position: "absolute", right: "28px", bottom: "220px", display: "flex", gap: "10px", zIndex: 10 }}>
-          {[
-            { label: "GSTR-9", color: "#f59e0b" },
-            { label: "GSTR-9C", color: "#f97316" },
-            { label: "IMS", color: "#3b82f6" },
-          ].map((item) => (
-            <div key={item.label} style={{ display: "flex", alignItems: "center", gap: "6px", background: "#ffffff", border: `1px solid ${item.color}`, color: item.color, padding: "6px 12px", borderRadius: "999px", fontSize: "0.78rem", fontWeight: "600", boxShadow: "0 6px 18px rgba(0,0,0,0.08)" }}>
-              <span>{item.label}</span>
-              <span style={{ background: item.color, color: "white", padding: "2px 8px", borderRadius: "999px", fontSize: "0.7rem" }}>DUE</span>
-            </div>
-          ))}
-        </div>
-
-        {/* PDF / Excel buttons */}
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginBottom: "24px" }}>
-          <button style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "14px", border: "none", background: "#fff5f5", color: "#dc2626", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "0 8px 20px rgba(220,38,38,0.18)" }}>
-            <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span> PDF
-          </button>
-          <button style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "14px", border: "none", background: "#ecfdf5", color: "#15803d", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "0 8px 20px rgba(22,163,74,0.22)" }}>
-            <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span> Excel
-          </button>
-        </div>
-
-        {/* ───────── LEDGER CONTENT (changes on tab click) ───────── */}
-        <div style={{ marginTop: "32px" }}>
-          {activeLedgerTab === "summary" && (
+              ))}
+              {/* DUE badges */}
+              <div style={{ position: "absolute", right: "28px", bottom: "14px", display: "flex", gap: "10px", zIndex: 10 }}>
+                {[
+                  { label: "GSTR-9", color: "#f59e0b" },
+                  { label: "GSTR-9C", color: "#f97316" },
+                  { label: "IMS", color: "#3b82f6" },
+                ].map((item) => (
+                  <div key={item.label} style={{ display: "flex", alignItems: "center", gap: "6px", background: "#ffffff", border: `1px solid ${item.color}`, color: item.color, padding: "6px 10px", borderRadius: "999px", fontSize: "0.78rem", fontWeight: "600", boxShadow: "0 6px 18px rgba(0,0,0,0.08)" }}>
+                    <span>{item.label}</span>
+                    <span style={{ background: item.color, color: "white", padding: "2px 8px", borderRadius: "999px", fontSize: "0.7rem" }}>DUE</span>
+                  </div>
+                ))}
+              </div>
+              {/* PDF / Excel buttons */}
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginBottom: "24px" }}>
+                <button style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "14px", border: "none", background: "#fff5f5", color: "#dc2626", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "0 8px 20px rgba(220,38,38,0.18)" }}>
+                  <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span> PDF
+                </button>
+                <button style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "14px", border: "none", background: "#ecfdf5", color: "#15803d", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "0 8px 20px rgba(22,163,74,0.22)" }}>
+                  <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span> Excel
+                </button>
+              </div>
+            </>
+          )}
+          {activeDashboardTab === "summary" && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
               {/* Electronic Ledger Card */}
               <div style={{ borderRadius: "12px", background: "#ffffff", boxShadow: "0 3px 14px rgba(0,0,0,0.07)", padding: "20px" }}>
@@ -2893,7 +2870,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                   </div>
                 )}
               </div>
-
               {/* Turnover Card */}
               <div style={{ borderRadius: "12px", background: "#ffffff", boxShadow: "0 3px 14px rgba(0,0,0,0.07)", padding: "20px" }}>
                 <div style={{ display: "inline-block", background: "linear-gradient(135deg, #1e3a8a, #2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "18px", boxShadow: "0 4px 10px rgba(37,99,235,0.35)" }}>
@@ -2914,8 +2890,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               </div>
             </div>
           )}
-
-          {activeLedgerTab === "elb" && (
+          {activeDashboardTab === "elb" && (
             <div style={{ padding: "28px" }}>
               <div style={{ display: "inline-block", background: "linear-gradient(135deg,#1e40af,#2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "22px" }}>
                 Electronic Ledger Balances – Detailed View
@@ -2955,8 +2930,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               </div>
             </div>
           )}
-
-          {activeLedgerTab === "turnover" && (
+          {activeDashboardTab === "turnover" && (
             <div style={{ padding: "28px" }}>
               <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "14px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -2974,7 +2948,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                   </select>
                 </div>
               </div>
-
               <div style={{ display: "flex", gap: "8px", marginBottom: "18px" }}>
                 {[
                   { id: "overview", label: "Overview", color: "#2563eb" },
@@ -3003,7 +2976,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                   );
                 })}
               </div>
-
               {activeTurnoverView === "overview" && (
                 <div>
                   <div style={{ fontWeight: "600", marginBottom: "12px", color: "#334155" }}>Turnover Balances</div>
@@ -3020,7 +2992,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                   </div>
                 </div>
               )}
-
               {(activeTurnoverView === "cash" || activeTurnoverView === "credit") && (
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
@@ -3034,7 +3005,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                     </div>
                     <button style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", padding: "6px 18px", border: "none", borderRadius: "8px", fontWeight: "600", fontSize: "0.85rem", boxShadow: "0 4px 12px rgba(37,99,235,0.35)" }}>GO</button>
                   </div>
-
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
                       <thead>
@@ -3078,7 +3048,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                       </tbody>
                     </table>
                   </div>
-
                   <div style={{ marginTop: "18px", display: "flex", gap: "12px", justifyContent: "flex-end" }}>
                     <button style={{ background: "#ffffff", padding: "8px 18px", borderRadius: "8px", border: "1px solid #d1d5db", fontWeight: "600", fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(0,0,0,0.18)" }}>SAVE AS PDF ↓</button>
                     <button style={{ background: "#ffffff", padding: "8px 18px", borderRadius: "8px", border: "1px solid #a7f3d0", fontWeight: "600", fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }}>SAVE AS EXCEL ↓</button>
@@ -3087,8 +3056,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               )}
             </div>
           )}
-
-          {activeLedgerTab === "liability" && (
+          {activeDashboardTab === "liability" && (
             <div style={{ padding: "28px" }}>
               <div style={{ display: "inline-block", background: "linear-gradient(135deg,#1e40af,#2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "16px", boxShadow: "0 4px 12px rgba(37,99,235,0.35)" }}>
                 Liability Ledger – Detailed View
@@ -3137,8 +3105,7 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
               </div>
             </div>
           )}
-
-          {activeLedgerTab === "payment" && (
+          {activeDashboardTab === "payment" && (
             <div style={{ padding: "28px" }}>
               <div style={{ background: "#ffffff", padding: "16px 20px", display: "grid", gridTemplateColumns: "1fr 2fr 2fr", gap: "16px", fontWeight: "600", borderRadius: "14px", boxShadow: "0 6px 20px rgba(37,99,235,0.15)", marginBottom: "20px" }}>
                 <div>
@@ -3154,7 +3121,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                   <div style={{ fontSize: "0.95rem" }}>U.A.F ENTERPRISE'S</div>
                 </div>
               </div>
-
               <div style={{ background: "#ffffff", borderRadius: "16px", boxShadow: "0 10px 28px rgba(0,0,0,0.12)", overflow: "hidden" }}>
                 <div style={{ padding: "18px 20px", borderBottom: "1px solid #e5e7eb", background: "#ffffff" }}>
                   <span style={{ display: "inline-block", padding: "4px 12px", background: "linear-gradient(135deg,#2563eb,#1e40af)", color: "#ffffff", fontSize: "0.95rem", fontWeight: "700", borderRadius: "8px", boxShadow: "0 4px 10px rgba(37,99,235,0.30)" }}>
@@ -3199,7 +3165,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                   </table>
                 </div>
               </div>
-
               {selectedDemand && (
                 <div onClick={() => setSelectedDemand(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 2000 }}>
                   <div onClick={(e) => e.stopPropagation()} style={{ width: "420px", background: "#ffffff", borderRadius: "18px", boxShadow: "0 20px 50px rgba(0,0,0,0.2)", overflow: "hidden" }}>
@@ -3253,7 +3218,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
       </div>
     );
   };
-
   return (
     <div
       style={{
@@ -3323,7 +3287,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
             Go to GST Portal →
           </a>
         </div>
-
         {/* Menu Bar */}
         <div style={{ background: "#eef2ff", padding: "0 20px", borderBottom: "1px solid #e5e7eb" }}>
           <div style={{ display: "inline-flex", gap: "8px", padding: "14px 0" }}>
@@ -3341,7 +3304,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
                   onMouseLeave={() => setHoveredMenu(null)}
                   style={{
                     padding: "10px 20px",
-                    borderRadius: "9999px",
                     fontSize: "0.92rem",
                     fontWeight: isActive ? "700" : "600",
                     background: isActive ? "#4f46e5" : "#ffffff",
@@ -3358,7 +3320,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
             })}
           </div>
         </div>
-
         {/* Main Content */}
         <div style={{ flex: 1, overflowY: "auto", background: "#f9fafb" }}>
           {renderContent()}
@@ -3367,7 +3328,6 @@ const ClientGSTDashboardModal = ({ client, onClose }) => {
     </div>
   );
 };
-
 
   const PendingVouchersModal = () => (
     <div style={modalOverlayStyle} onClick={() => setShowPendingVouchersModal(false)}>
