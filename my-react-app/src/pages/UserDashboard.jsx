@@ -575,6 +575,11 @@ const menuItems = [
   { text: "Notifications", link: "/user/notifications", icon: HiBell },
   { text: "Settings", link: "/user/settings", icon: HiCog }, // agar hai to
 ];
+
+
+// ==============================================
+// GST Return Period Selection Component
+// ==============================================
 const GSTReturnPeriodSelection = ({
   selectedFY, setSelectedFY,
   selectedQuarter, setSelectedQuarter,
@@ -621,7 +626,6 @@ const GSTReturnPeriodSelection = ({
         >
           File GST Returns
         </h1>
-
         <span
           style={{
             fontSize: "0.8rem",
@@ -784,13 +788,11 @@ const GSTReturnPeriodSelection = ({
             }}
             onMouseOver={e => {
               e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow =
-                "0 18px 40px rgba(37,99,235,0.6)";
+              e.currentTarget.style.boxShadow = "0 18px 40px rgba(37,99,235,0.6)";
             }}
             onMouseOut={e => {
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow =
-                "0 12px 30px rgba(37,99,235,0.45)";
+              e.currentTarget.style.boxShadow = "0 12px 30px rgba(37,99,235,0.45)";
             }}
           >
             SEARCH RETURNS
@@ -801,438 +803,155 @@ const GSTReturnPeriodSelection = ({
   </div>
 );
 
-// ──────────────────────────────────────────────
-const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => (
-  <div
-    style={{
-      padding: "20px 5% 32px",
-      background: "linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%)",
-      minHeight: "100vh",
-      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-    }}
-  >
-    <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "20px",
-          flexWrap: "wrap",
-          gap: "12px"
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <button
-            onClick={onBack}
+// ==============================================
+// Returns Summary Screen Component
+// ==============================================
+const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
+  const pastMonths = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const isPastPeriod = fy !== '2025-26' || pastMonths.includes(period);
+
+  return (
+    <div
+      style={{
+        padding: "20px 5% 32px",
+        background: "linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%)",
+        minHeight: "100vh",
+        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+      }}
+    >
+      <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "20px",
+            flexWrap: "wrap",
+            gap: "12px"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button
+              onClick={onBack}
+              style={{
+                background: "white",
+                border: "1px solid #cbd5e1",
+                width: "44px",
+                height: "44px",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: "1.1rem",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+              }}
+            >
+              ←
+            </button>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "1.75rem",
+                fontWeight: 700,
+                color: "#0f172a"
+              }}
+            >
+              Returns Dashboard
+            </h1>
+          </div>
+          <div
+            style={{
+              background: "#eff6ff",
+              padding: "8px 16px",
+              borderRadius: "9999px",
+              fontSize: "0.95rem",
+              fontWeight: 600,
+              color: "#1d4ed8",
+              border: "1px solid #bfdbfe",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
+            }}
+          >
+            FY {fy} · {quarter}
+          </div>
+        </div>
+
+        {/* Note */}
+        <div
+          style={{
+            background: "white",
+            borderLeft: "4px solid #3b82f6",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            marginBottom: "24px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+            fontSize: "0.95rem",
+            color: "#1e40af",
+            fontWeight: 500
+          }}
+        >
+          Monthly filing enabled. GSTR-1 & GSTR-3B required every month.
+        </div>
+
+        {/* Cards Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: "20px"
+          }}
+        >
+          {/* GSTR-1 */}
+          <div
             style={{
               background: "white",
-              border: "1px solid #cbd5e1",
-              width: "44px",
-              height: "44px",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              fontSize: "1.1rem",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
-            }}
-          >
-            ←
-          </button>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "1.75rem",
-              fontWeight: 700,
-              color: "#0f172a"
-            }}
-          >
-            Returns Dashboard
-          </h1>
-        </div>
-
-        <div
-          style={{
-            background: "#eff6ff",
-            padding: "8px 16px",
-            borderRadius: "9999px",
-            fontSize: "0.95rem",
-            fontWeight: 600,
-            color: "#1d4ed8",
-            border: "1px solid #bfdbfe",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
-          }}
-        >
-          FY {fy} · {quarter}
-        </div>
-      </div>
-
-      {/* Note */}
-      <div
-        style={{
-          background: "white",
-          borderLeft: "4px solid #3b82f6",
-          padding: "12px 16px",
-          borderRadius: "8px",
-          marginBottom: "24px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-          fontSize: "0.95rem",
-          color: "#1e40af",
-          fontWeight: 500
-        }}
-      >
-        Monthly filing enabled. GSTR-1 & GSTR-3B required every month.
-      </div>
-
-      {/* Cards Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: "20px"
-        }}
-      >
-        {/* GSTR-1 */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: "12px",
-            overflow: "hidden",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-            border: "1px solid #e2e8f0",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "260px"
-          }}
-        >
-          <div
-            style={{
-              padding: "14px 20px",
-              background: "linear-gradient(90deg, #eff6ff, #dbeafe)",
-              color: "#1d4ed8",
-              fontSize: "1.1rem",
-              fontWeight: 700,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px"
-            }}
-          >
-            <span>GSTR-1 · Outward Supplies</span>
-            <span
-              style={{
-                background: "#ecfdf5",
-                color: "#065f46",
-                padding: "5px 14px",
-                borderRadius: "9999px",
-                fontSize: "0.85rem",
-                fontWeight: 600
-              }}
-            >
-              Filed
-            </span>
-          </div>
-          <div
-            style={{
-              padding: "16px 20px",
-              flex: 1,
+              borderRadius: "12px",
+              overflow: "hidden",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+              border: "1px solid #e2e8f0",
               display: "flex",
               flexDirection: "column",
-              justifyContent: "space-between"
+              minHeight: "260px"
             }}
           >
-            <p
+            <div
               style={{
-                fontSize: "0.92rem",
-                color: "#475569",
-                lineHeight: "1.45",
-                margin: 0
+                padding: "14px 20px",
+                background: "linear-gradient(90deg, #eff6ff, #dbeafe)",
+                color: "#1d4ed8",
+                fontSize: "1.1rem",
+                fontWeight: 700,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "10px"
               }}
             >
-              Summary of outward taxable supplies reported for the selected period.
-            </p>
-
-            <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
-              <button
-                onClick={() => onViewForm("GSTR1")}
+              <span>GSTR-1 · Outward Supplies</span>
+              <span
                 style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "#f1f5f9",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
+                  background: "#ecfdf5",
+                  color: "#065f46",
+                  padding: "5px 14px",
+                  borderRadius: "9999px",
+                  fontSize: "0.85rem",
+                  fontWeight: 600
                 }}
               >
-                View
-              </button>
-              <button
-                style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
-                }}
-              >
-                Download
-              </button>
+                Filed
+              </span>
             </div>
-          </div>
-        </div>
-
-        {/* Amendments */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: "12px",
-            overflow: "hidden",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-            border: "1px solid #e2e8f0",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "260px"
-          }}
-        >
-          <div
-            style={{
-              padding: "14px 20px",
-              background: "linear-gradient(90deg, #fffbeb, #fef3c7)",
-              color: "#92400e",
-              fontSize: "1.1rem",
-              fontWeight: 700,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px"
-            }}
-          >
-            <span>Amendments</span>
-            <span
+            <div
               style={{
-                background: "#fefce8",
-                color: "#854d0e",
-                padding: "5px 14px",
-                borderRadius: "9999px",
-                fontSize: "0.85rem",
-                fontWeight: 600
+                padding: "16px 20px",
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
               }}
             >
-              Open
-            </span>
-          </div>
-          <div
-            style={{
-              padding: "16px 20px",
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }}
-          >
-            <p
-              style={{
-                fontSize: "0.92rem",
-                color: "#475569",
-                lineHeight: "1.45",
-                margin: 0
-              }}
-            >
-              Update invoices, debit notes, or credit notes for the current tax period.
-            </p>
-
-            <button
-              style={{
-                width: "100%",
-                padding: "10px 0",
-                marginTop: "20px",
-                background: "linear-gradient(90deg, #f59e0b, #d97706)",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: 600,
-                fontSize: "0.92rem",
-                cursor: "pointer"
-              }}
-            >
-              Prepare Online
-            </button>
-          </div>
-        </div>
-
-        {/* Auto-Drafted ITC */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: "12px",
-            overflow: "hidden",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-            border: "1px solid #e2e8f0",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "260px"
-          }}
-        >
-          <div
-            style={{
-              padding: "14px 20px",
-              background: "linear-gradient(90deg, #f0fdfa, #ccfbf1)",
-              color: "#0f766e",
-              fontSize: "1.1rem",
-              fontWeight: 700,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px"
-            }}
-          >
-            <span>Auto-Drafted ITC</span>
-            <span
-              style={{
-                background: "#f0fdfa",
-                color: "#0f766e",
-                padding: "5px 14px",
-                borderRadius: "9999px",
-                fontSize: "0.85rem",
-                fontWeight: 600
-              }}
-            >
-              Available
-            </span>
-          </div>
-          <div
-            style={{
-              padding: "16px 20px",
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }}
-          >
-            <p
-              style={{
-                fontSize: "0.92rem",
-                color: "#475569",
-                lineHeight: "1.45",
-                margin: 0
-              }}
-            >
-              ITC statement auto-generated based on supplier filings.
-            </p>
-
-            <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
-              <button
-                onClick={() => onViewForm("AutoDraftedITC")}
-                style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "#f1f5f9",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
-                }}
-              >
-                View
-              </button>
-              <button
-                style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
-                }}
-              >
-                Download
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* GSTR-3B */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: "12px",
-            overflow: "hidden",
-            boxShadow: "0 6px 24px rgba(153,27,27,0.18)",
-            border: "1px solid #fecaca",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "260px"
-          }}
-        >
-          <div
-            style={{
-              padding: "14px 20px",
-              background: "linear-gradient(90deg, #fef2f2, #fee2e2)",
-              color: "#991b1b",
-              fontSize: "1.1rem",
-              fontWeight: 700,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px"
-            }}
-          >
-            <span>GSTR-3B · Monthly Return</span>
-            <span
-              style={{
-                background: "#fef2f2",
-                color: "#991b1b",
-                padding: "5px 14px",
-                borderRadius: "9999px",
-                fontSize: "0.85rem",
-                fontWeight: 600
-              }}
-            >
-              Pending
-            </span>
-          </div>
-          <div
-            style={{
-              padding: "16px 20px",
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  background: "#fefce8",
-                  color: "#854d0e",
-                  padding: "8px 12px",
-                  borderRadius: "8px",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  textAlign: "center",
-                  marginBottom: "16px"
-                }}
-              >
-                Due date: 20 Jan 2026
-              </div>
-
               <p
                 style={{
                   fontSize: "0.92rem",
@@ -1241,74 +960,472 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => (
                   margin: 0
                 }}
               >
-                Summary of monthly return including liability, ITC and payment details.
+                Summary of outward taxable supplies reported for the selected period.
               </p>
+              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+                <button
+                  onClick={() => onViewForm("GSTR1")}
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    background: "#f1f5f9",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  View
+                </button>
+                <button
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  Download
+                </button>
+              </div>
             </div>
+          </div>
 
-            <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
-              <button
+          {/* Amendments */}
+          {!isPastPeriod && (
+            <div
+              style={{
+                background: "white",
+                borderRadius: "12px",
+                overflow: "hidden",
+                boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+                border: "1px solid #e2e8f0",
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "260px"
+              }}
+            >
+              <div
                 style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
+                  padding: "14px 20px",
+                  background: "linear-gradient(90deg, #fffbeb, #fef3c7)",
+                  color: "#92400e",
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "10px"
                 }}
               >
-                Prepare Online
-              </button>
-              <button
+                <span>Amendments</span>
+                <span
+                  style={{
+                    background: "#fefce8",
+                    color: "#854d0e",
+                    padding: "5px 14px",
+                    borderRadius: "9999px",
+                    fontSize: "0.85rem",
+                    fontWeight: 600
+                  }}
+                >
+                  Open
+                </span>
+              </div>
+              <div
                 style={{
+                  padding: "16px 20px",
                   flex: 1,
-                  padding: "10px 0",
-                  background: "#f1f5f9",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between"
                 }}
               >
-                Prepare Offline
-              </button>
+                <p
+                  style={{
+                    fontSize: "0.92rem",
+                    color: "#475569",
+                    lineHeight: "1.45",
+                    margin: 0
+                  }}
+                >
+                  Update invoices, debit notes, or credit notes for the current tax period.
+                </p>
+                <button
+                  style={{
+                    width: "100%",
+                    padding: "10px 0",
+                    marginTop: "20px",
+                    background: "linear-gradient(90deg, #f59e0b, #d97706)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "0.92rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  Prepare Online
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Auto-Drafted ITC */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: "12px",
+              overflow: "hidden",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+              border: "1px solid #e2e8f0",
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "260px"
+            }}
+          >
+            <div
+              style={{
+                padding: "14px 20px",
+                background: "linear-gradient(90deg, #f0fdfa, #ccfbf1)",
+                color: "#0f766e",
+                fontSize: "1.1rem",
+                fontWeight: 700,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "10px"
+              }}
+            >
+              <span>Auto-Drafted ITC</span>
+              <span
+                style={{
+                  background: "#f0fdfa",
+                  color: "#0f766e",
+                  padding: "5px 14px",
+                  borderRadius: "9999px",
+                  fontSize: "0.85rem",
+                  fontWeight: 600
+                }}
+              >
+                Available
+              </span>
+            </div>
+            <div
+              style={{
+                padding: "16px 20px",
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "0.92rem",
+                  color: "#475569",
+                  lineHeight: "1.45",
+                  margin: 0
+                }}
+              >
+                ITC statement auto-generated based on supplier filings.
+              </p>
+              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+                <button
+                  onClick={() => onViewForm("AutoDraftedITC")}
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    background: "#f1f5f9",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  View
+                </button>
+                <button
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* GSTR-3B */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: "12px",
+              overflow: "hidden",
+              boxShadow: "0 6px 24px rgba(153,27,27,0.18)",
+              border: "1px solid #fecaca",
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "260px"
+            }}
+          >
+            <div
+              style={{
+                padding: "14px 20px",
+                background: "linear-gradient(90deg, #fef2f2, #fee2e2)",
+                color: "#991b1b",
+                fontSize: "1.1rem",
+                fontWeight: 700,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "10px"
+              }}
+            >
+              <span>GSTR-3B · Monthly Return</span>
+              <span
+                style={{
+                  background: "#fef2f2",
+                  color: "#991b1b",
+                  padding: "5px 14px",
+                  borderRadius: "9999px",
+                  fontSize: "0.85rem",
+                  fontWeight: 600
+                }}
+              >
+                Pending
+              </span>
+            </div>
+            <div
+              style={{
+                padding: "16px 20px",
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    background: "#fefce8",
+                    color: "#854d0e",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    textAlign: "center",
+                    marginBottom: "16px"
+                  }}
+                >
+                  Due date: 20 {period} 2026
+                </div>
+                <p
+                  style={{
+                    fontSize: "0.92rem",
+                    color: "#475569",
+                    lineHeight: "1.45",
+                    margin: 0
+                  }}
+                >
+                  Summary of monthly return including liability, ITC and payment details.
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+                <button
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  Prepare Online
+                </button>
+                <button
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    background: "#f1f5f9",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  Prepare Offline
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
-
-
-// ──────────────────────────────────────────────
-// Detailed GST View (fixed modal)
+// ==============================================
+// Detailed GST View - Full Dynamic + Premium Form
+// ==============================================
 const DetailedGSTView = ({ formType, fy, period, onBack }) => {
   const [selectedSection, setSelectedSection] = useState(null);
-  const sections = [
-    { title: "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices", count: 1 },
-    { title: "5 - B2C (Large) Invoices", count: 0 },
-    { title: "6A - Exports Invoices", count: 0 },
-    { title: "7 - B2C (Others)", count: 0 },
-    { title: "8A, 8B, 8C, 8D - Nil Rated Supplies", count: 0 },
-    { title: "9B - Credit / Debit Notes (Registered)", count: 0 },
-    { title: "9B - Credit / Debit Notes (Unregistered)", count: 0 },
-    { title: "11A(1), 11A(2) - Tax Liability (Advances Received)", count: 0 },
-    { title: "11B - Adjustment of Advances", count: 0 },
-    { title: "12 - HSN-wise summary of outward supplies", count: 1 },
-    { title: "13 - Documents Issued", count: 1 },
-    { title: "14 - Supplies made through ECO", count: 0 },
-    { title: "15 - Supplies U/s 9(5)", count: 0 }
-  ];
-  const handleCardClick = (section) => {
-    if (section.count > 0) {
-      setSelectedSection(section);
+  const [records, setRecords] = useState({}); // { "section title": [record1, record2, ...] }
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  // Form data state
+  const [form, setForm] = useState({
+    deemedExports: false,
+    sezWithPayment: false,
+    sezWithoutPayment: false,
+    reverseCharge: false,
+    intraStateIGST: false,
+    differentialTax: false,
+    gstin: "",
+    recipientName: "",
+    nameInMaster: "",
+    invoiceNo: "",
+    invoiceDate: "",
+    totalValue: "",
+    pos: "09-Uttar Pradesh",
+    supplyType: "Intra-State",
+    source: "",
+    irn: "",
+    irnDate: ""
+  });
+
+  // Item details table state
+  const [items, setItems] = useState([
+    { rate: 0, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 0.1, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 0.25, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 1, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 1.5, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 3, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 5, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 6, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 7.5, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 12, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 18, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 28, taxableValue: "", central: 0, state: 0, cess: 0 },
+    { rate: 40, taxableValue: "", central: 0, state: 0, cess: 0 }
+  ]);
+
+  const updateItem = (index, field, value) => {
+    const newItems = [...items];
+    newItems[index][field] = value;
+
+    if (field === "taxableValue" && value !== "") {
+      const rate = newItems[index].rate / 100;
+      const half = (Number(value) * rate) / 2;
+      newItems[index].central = half.toFixed(2);
+      newItems[index].state = half.toFixed(2);
+      newItems[index].cess = 0; // can be changed later if needed
     }
+
+    setItems(newItems);
   };
+
+  const saveRecord = () => {
+    // Basic validation
+    if (!form.gstin || !form.recipientName || !form.invoiceNo || !form.invoiceDate || !form.totalValue) {
+      alert("Please fill all mandatory fields (*)");
+      return;
+    }
+
+    const filledItems = items.filter(item => item.taxableValue !== "");
+
+    const newRecord = {
+      ...form,
+      items: filledItems,
+      timestamp: new Date().toISOString()
+    };
+
+    const title = selectedSection.title;
+    setRecords(prev => ({
+      ...prev,
+      [title]: [...(prev[title] || []), newRecord]
+    }));
+
+    setShowAddForm(false);
+
+    // Reset form
+    setForm({
+      deemedExports: false,
+      sezWithPayment: false,
+      sezWithoutPayment: false,
+      reverseCharge: false,
+      intraStateIGST: false,
+      differentialTax: false,
+      gstin: "",
+      recipientName: "",
+      nameInMaster: "",
+      invoiceNo: "",
+      invoiceDate: "",
+      totalValue: "",
+      pos: "09-Uttar Pradesh",
+      supplyType: "Intra-State",
+      source: "",
+      irn: "",
+      irnDate: ""
+    });
+
+    setItems(items.map(i => ({ ...i, taxableValue: "", central: 0, state: 0, cess: 0 })));
+
+    alert("Record saved successfully!");
+  };
+
+  // Section generation logic
+  const baseSections = [
+    "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
+    "5 - B2C (Large) Invoices",
+    "6A - Exports Invoices",
+    "7 - B2C (Others)",
+    "8A, 8B, 8C, 8D - Nil Rated Supplies",
+    "9B - Credit / Debit Notes (Registered)",
+    "9B - Credit / Debit Notes (Unregistered)",
+    "11A(1), 11A(2) - Tax Liability (Advances Received)",
+    "11B - Adjustment of Advances",
+    "12 - HSN-wise summary of outward supplies",
+    "13 - Documents Issued",
+    "14 - Supplies made through ECO",
+    "15 - Supplies U/s 9(5)"
+  ];
+
+  const sections = baseSections.map(title => ({
+    title,
+    count: records[title]?.length || 
+           (fy === "2025-26" && ["January","February","March"].includes(period) ? 0 : 
+           (title.startsWith("4A") || title.startsWith("12") || title.startsWith("13") ? 1 : 0))
+  }));
+
+  const isZeroRecord = selectedSection && sections.find(s => s.title === selectedSection.title)?.count === 0;
+
+  const isFiled = fy === "2025-26" && ["January", "February", "March"].includes(period);
+
   return (
     <div style={{
       padding: "20px 5% 40px",
@@ -1317,6 +1434,7 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
       fontFamily: "system-ui, sans-serif"
     }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+
         {/* Back button */}
         <button
           onClick={onBack}
@@ -1347,6 +1465,7 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
         >
           <HiArrowLeft size={18} /> Back to Returns Dashboard
         </button>
+
         {/* Main info card */}
         <div style={{
           background: "#ffffff",
@@ -1369,37 +1488,36 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
             </h1>
             <div style={{ display: "flex", gap: "8px" }}>
               <button
-  style={{
-    background: "#eff6ff",
-    color: "#1d4ed8",
-    border: "1px solid #bfdbfe",
-    padding: "8px 14px",
-    borderRadius: "8px",
-    fontWeight: 600,
-    cursor: "pointer",
-    boxShadow: "0 2px 6px rgba(37,99,235,0.25)"
-  }}
->
-  E-INVOICE ADVISORY
-</button>
-
+                style={{
+                  background: "#eff6ff",
+                  color: "#1d4ed8",
+                  border: "1px solid #bfdbfe",
+                  padding: "8px 14px",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 6px rgba(37,99,235,0.25)"
+                }}
+              >
+                E-INVOICE ADVISORY
+              </button>
               <button
-  style={{
-    background: "#1076f2ff",
-    color: "#e8edf4ff",
-    border: "1px solid #d1d5db",
-    padding: "8px 14px",
-    borderRadius: "8px",
-    fontWeight: 600,
-    cursor: "pointer",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.12)"
-  }}
->
-  HELP
-</button>
-
+                style={{
+                  background: "#1076f2ff",
+                  color: "#e8edf4ff",
+                  border: "1px solid #d1d5db",
+                  padding: "8px 14px",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)"
+                }}
+              >
+                HELP
+              </button>
             </div>
           </div>
+
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
@@ -1412,25 +1530,25 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
             <div><strong>Financial Year:</strong> {fy}</div>
             <div><strong>Tax Period:</strong> {period}</div>
             <div>
-  <strong>Status:</strong>
-  <span
-    style={{
-      color: "#059669",
-      fontWeight: 400,
-      padding: "1px 4px",
-      borderRadius: "4px",
-      background: "#ecfdf5",
-      boxShadow: " 2px 4px rgba(5,150,105,0.35)"
-    }}
-  >
-    Filed
-  </span>
-</div>
-
-            <div><strong>Due Date:</strong> 11/02/2026</div>
+              <strong>Status:</strong>
+              <span
+                style={{
+                  color: isFiled ? "#059669" : "#991b1b",
+                  fontWeight: 400,
+                  padding: "1px 4px",
+                  borderRadius: "4px",
+                  background: isFiled ? "#ecfdf5" : "#fef2f2",
+                  boxShadow: isFiled ? "2px 4px rgba(5,150,105,0.35)" : "none"
+                }}
+              >
+                {isFiled ? "Filed" : "Not Filed"}
+              </span>
+            </div>
+            <div><strong>Due Date:</strong> 20 {period} 2026</div>
           </div>
         </div>
-        {/* Nil filing */}
+
+        {/* Nil filing checkbox */}
         <div style={{
           background: "#ffffff",
           borderRadius: "12px",
@@ -1447,7 +1565,8 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
             File Nil {formType}
           </span>
         </div>
-        {/* ADD RECORD DETAILS */}
+
+        {/* ADD RECORD DETAILS - Cards */}
         <div style={{
           background: "#ffffff",
           borderRadius: "12px",
@@ -1469,6 +1588,7 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
             <span>ADD RECORD DETAILS</span>
             <span style={{ fontSize: "1.3rem", cursor: "pointer" }}>▼</span>
           </div>
+
           <div style={{
             padding: "24px",
             display: "grid",
@@ -1478,13 +1598,16 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
             {sections.map((item, index) => (
               <div
                 key={index}
-                onClick={() => handleCardClick(item)}
+                onClick={() => {
+                  setSelectedSection(item);
+                  setShowAddForm(false);
+                }}
                 style={{
                   background: "#f8fafc",
                   border: item.count > 0 ? "1px solid #86efac" : "1px solid #e5e7eb",
                   borderRadius: "10px",
                   overflow: "hidden",
-                  cursor: item.count > 0 ? "pointer" : "default",
+                  cursor: "pointer",
                   transition: "transform 0.15s ease, box-shadow 0.15s ease"
                 }}
                 onMouseEnter={e => {
@@ -1498,340 +1621,748 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
-<div
-  style={{
-    background: "linear-gradient(135deg, #e0f2fe, #f8fafc)",
-    color: "#0f172a",
-    padding: "12px 14px",
-    fontWeight: 600,
-    fontSize: "0.85rem",
-    minHeight: "60px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
-    borderBottom: "1px solid #e5e7eb",
-    letterSpacing: "0.2px"
-  }}
->
-  {item.title}
-</div>
-
-
-               <div style={{ padding: "18px", textAlign: "center" }}>
-  <span
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "36px",
-      height: "36px",
-      borderRadius: "50%",
-      background: item.count > 0 ? "#ecfdf5" : "#f3f4f6",
-      color: item.count > 0 ? "#16a34a" : "#9ca3af",
-      fontSize: "0.9rem",           // chhota text
-      fontWeight: 600,
-     background:
-  item.count > 0
-    ? "linear-gradient(135deg, #dcfce7, #f0fdf4)"
-    : "linear-gradient(135deg, #e0f2fe, #f8fafc)",
-
-    }}
-  >
-    {item.count}
-  </span>
-</div>
-
+                <div
+                  style={{
+                    background: item.count > 0 
+                      ? "linear-gradient(135deg, #ecfdf5, #f0fdf4)" 
+                      : "linear-gradient(135deg, #e0f2fe, #f8fafc)",
+                    color: "#0f172a",
+                    padding: "12px 14px",
+                    fontWeight: 600,
+                    fontSize: "0.85rem",
+                    minHeight: "60px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    borderBottom: "1px solid #e5e7eb"
+                  }}
+                >
+                  {item.title}
+                </div>
+                <div style={{ padding: "18px", textAlign: "center" }}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "44px",
+                      height: "44px",
+                      borderRadius: "50%",
+                      background: item.count > 0 ? "#dcfce7" : "#f3f4f6",
+                      color: item.count > 0 ? "#15803d" : "#9ca3af",
+                      fontSize: "1.1rem",
+                      fontWeight: 700,
+                      boxShadow: item.count > 0 ? "0 2px 8px rgba(34,197,94,0.25)" : "none"
+                    }}
+                  >
+                    {item.count}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
-        {/* FIXED MODAL - Ab click pe khulega */}
-      {selectedSection && (
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.55)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1000,
-      padding: "16px"
-    }}
-    onClick={() => setSelectedSection(null)}
-  >
-    <div
-      style={{
-    background: "#ffffff",
-    width: "100vw",                // ← full screen width
-    height: "100vh",               // ← full screen height
-    overflowY: "auto",
-    boxShadow: "none",             // shadow nahi chahiye full screen mein
-    borderRadius: "0",             // corners bilkul nahi
-  }}
-      onClick={e => e.stopPropagation()}
-    >
-      {/* ───── Header ───── */}
-      <div
-        style={{
-          padding: "10px 18px",
-          borderBottom: "1px solid #e5e7eb",
-          background: "linear-gradient(135deg,#f8fafc,#eef2ff)",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}
-      >
-        <h2
-          style={{
-            margin: 0,
-            fontSize: "1rem",
-            fontWeight: 600,
-            color: "#0f172a"
-          }}
-        >
-          {selectedSection.title}
-        </h2>
 
-        <button
-          onClick={() => setSelectedSection(null)}
-          style={{
-            background: "#ffffff",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            width: "32px",
-            height: "32px",
-            fontSize: "1.2rem",
-            color: "#475569",
-            cursor: "pointer",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.12)"
-          }}
-        >
-          <HiX />
-        </button>
-      </div>
-
-      {/* ───── Compact Info Grid ───── */}
-      <div
-        style={{
-          padding: "10px 18px",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
-          gap: "6px 14px",
-          fontSize: "0.8rem",
-          color: "#334155",
-          background: "#f8fafc",
-          borderBottom: "1px solid #e5e7eb"
-        }}
-      >
-        <div><strong>GSTIN:</strong> 09ACNPU2195H1ZY</div>
-        <div><strong>Legal:</strong> Mohd Umair</div>
-        <div><strong>Trade:</strong> U.A.F ENTERPRISE'S</div>
-        <div><strong>FY:</strong> {fy}</div>
-        <div><strong>Period:</strong> {period}</div>
-        <div>
-          <strong>Status:</strong>{" "}
-          <span
-            style={{
-              background: "#ecfdf5",
-              color: "#16a34a",
-              padding: "2px 6px",
-              borderRadius: "6px",
-              fontWeight: 600
-            }}
-          >
-            Filed
-          </span>
-        </div>
-      </div>
-
-      {/* ───── Teal Strip ───── */}
-      <div
-        style={{
-          background: "#0f766e",
-          color: "white",
-          padding: "8px 18px",
-          fontSize: "0.9rem",
-          fontWeight: 600,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}
-      >
-        <span>Recipient wise count</span>
-        <div style={{ display: "flex", gap: "6px" }}>
-          <button
-            style={{
-              background: "rgba(255,255,255,0.25)",
-              border: "none",
-              color: "white",
-              padding: "3px 8px",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontSize: "0.75rem"
-            }}
-          >
-            HELP ?
-          </button>
-          <button
-            style={{
-              background: "rgba(255,255,255,0.25)",
-              border: "none",
-              color: "white",
-              padding: "3px 8px",
-              borderRadius: "6px",
-              cursor: "pointer"
-            }}
-          >
-            ↻
-          </button>
-        </div>
-      </div>
-
-      {/* ───── Action Buttons ───── */}
-      <div
-        style={{
-          padding: "10px 18px",
-          display: "flex",
-          justifyContent: "space-between",
-          borderBottom: "1px solid #e5e7eb",
-          background: "#ffffff"
-        }}
-      >
-        <button
-          style={{
-            background: "#f1f5f9",
-            border: "1px solid #e5e7eb",
-            padding: "7px 16px",
-            borderRadius: "8px",
-            fontWeight: 600,
-            cursor: "pointer",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.12)"
-          }}
-        >
-          ADD RECORD
-        </button>
-
-        <button
-          style={{
-            background: "linear-gradient(135deg,#3b82f6,#2563eb)",
-            color: "white",
-            border: "none",
-            padding: "7px 16px",
-            borderRadius: "8px",
-            fontWeight: 600,
-            cursor: "pointer",
-            boxShadow: "0 4px 14px rgba(37,99,235,0.45)"
-          }}
-        >
-          IMPORT EWB DATA
-        </button>
-      </div>
-
-      {/* ───── Table ───── */}
-      <div style={{ padding: "14px 18px" }}>
-        <h3 style={{ margin: "0 0 8px", fontSize: "0.9rem", fontWeight: 600 }}>
-          Record Details
-        </h3>
-
-        <div
-          style={{
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            overflow: "hidden"
-          }}
-        >
+        {/* ───── Modal ───── */}
+        {selectedSection && (
           <div
             style={{
-              background: "#f1f5f9",
-              padding: "6px 12px",
-              fontWeight: 600,
-              display: "grid",
-              gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.6fr",
-              gap: "8px",
-              fontSize: "0.75rem"
-            }}
-          >
-            <div>Recipient</div>
-            <div>Name</div>
-            <div>Type</div>
-            <div>Processed</div>
-            <div>Pending</div>
-            <div>Add</div>
-          </div>
-
-          <div
-            style={{
-              padding: "6px 12px",
-              display: "grid",
-              gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.6fr",
-              gap: "8px",
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.55)",
+              display: "flex",
               alignItems: "center",
-              fontSize: "0.8rem",
-              borderTop: "1px solid #e5e7eb"
+              justifyContent: "center",
+              zIndex: 1000,
+              padding: "16px"
+            }}
+            onClick={() => {
+              setSelectedSection(null);
+              setShowAddForm(false);
             }}
           >
-            <div>09AFYPA8613C2ZB</div>
-            <div>JK STEEL TRADERS</div>
-            <div>Regular</div>
-            <div style={{ fontWeight: 600 }}>1</div>
-            <div style={{ fontWeight: 600, color: "#dc2626" }}>0</div>
-            <button
+            <div
               style={{
-                background: "#10b981",
-                color: "white",
-                border: "none",
-                width: "26px",
-                height: "26px",
-                borderRadius: "6px",
-                cursor: "pointer"
+                background: "#ffffff",
+                width: "100%",
+                maxWidth: "1100px",
+                height: "95vh",
+                borderRadius: "14px",
+                overflowY: "auto",
+                boxShadow: "0 20px 70px rgba(0,0,0,0.25)"
               }}
+              onClick={e => e.stopPropagation()}
             >
-              +
-            </button>
-          </div>
-        </div>
-      </div>
+              {/* Header */}
+              <div
+                style={{
+                  padding: "12px 24px",
+                  background: "linear-gradient(135deg,#f8fafc,#eef2ff)",
+                  borderBottom: "1px solid #e5e7eb",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  position: "sticky",
+                  top: 0,
+                  zIndex: 10
+                }}
+              >
+                <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "#0f172a" }}>
+                  {selectedSection.title}
+                </h2>
+                <button
+                  onClick={() => {
+                    setSelectedSection(null);
+                    setShowAddForm(false);
+                  }}
+                  style={{
+                    background: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "10px",
+                    width: "38px",
+                    height: "38px",
+                    fontSize: "1.4rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  ×
+                </button>
+              </div>
 
-      {/* ───── Footer ───── */}
-      <div
-        style={{
-          padding: "10px 18px",
-          borderTop: "1px solid #e5e7eb",
-          textAlign: "right"
-        }}
-      >
-        <button
-          onClick={() => setSelectedSection(null)}
-          style={{
-            background: "#475569",
-            color: "white",
-            border: "none",
-            padding: "6px 18px",
-            borderRadius: "8px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          BACK
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+              {/* Info strip */}
+              <div
+                style={{
+                  padding: "10px 24px",
+                  background: "#f8fafc",
+                  borderBottom: "1px solid #e5e7eb",
+                  fontSize: "0.9rem",
+                  color: "#334155",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                  gap: "8px"
+                }}
+              >
+                <div><strong>GSTIN:</strong> 09ACNPU2195H1ZY</div>
+                <div><strong>Legal:</strong> Mohd Umair</div>
+                <div><strong>Trade:</strong> U.A.F ENTERPRISE'S</div>
+                <div><strong>FY:</strong> {fy}</div>
+                <div><strong>Period:</strong> {period}</div>
+                <div>
+                  <strong>Status:</strong> 
+                  <span style={{
+                    marginLeft: "8px",
+                    padding: "3px 10px",
+                    background: isFiled ? "#ecfdf5" : "#fef2f2",
+                    color: isFiled ? "#059669" : "#991b1b",
+                    borderRadius: "6px",
+                    fontWeight: 600
+                  }}>
+                    {isFiled ? "Filed" : "Not Filed"}
+                  </span>
+                </div>
+              </div>
+
+              {isZeroRecord && !showAddForm ? (
+                /* No Data View */
+                <div style={{
+                  padding: "80px 40px",
+                  textAlign: "center",
+                  minHeight: "60vh",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  <div style={{
+                    fontSize: "1.6rem",
+                    fontWeight: 700,
+                    color: "#1e293b",
+                    marginBottom: "16px"
+                  }}>
+                    No Data Available
+                  </div>
+                  <p style={{
+                    color: "#64748b",
+                    fontSize: "1.05rem",
+                    marginBottom: "48px",
+                    maxWidth: "540px"
+                  }}>
+                    There are no records to display for the selected period in this section.
+                  </p>
+
+                  <div style={{
+                    display: "flex",
+                    gap: "16px",
+                    flexWrap: "wrap",
+                    justifyContent: "center"
+                  }}>
+                    <button
+                      onClick={() => setSelectedSection(null)}
+                      style={{
+                        padding: "12px 36px",
+                        background: "#f1f5f9",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        fontSize: "1rem",
+                        cursor: "pointer",
+                        minWidth: "140px"
+                      }}
+                    >
+                      BACK
+                    </button>
+
+                    <button
+                      onClick={() => setShowAddForm(true)}
+                      style={{
+                        padding: "12px 36px",
+                        background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        fontSize: "1rem",
+                        cursor: "pointer",
+                        minWidth: "160px",
+                        boxShadow: "0 4px 14px rgba(59,130,246,0.3)"
+                      }}
+                    >
+                      ADD RECORD
+                    </button>
+
+                    <button
+                      style={{
+                        padding: "12px 36px",
+                        background: "#334155",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        fontSize: "1rem",
+                        cursor: "pointer",
+                        minWidth: "180px"
+                      }}
+                    >
+                      IMPORT EWB DATA
+                    </button>
+                  </div>
+                </div>
+              ) : isZeroRecord && showAddForm ? (
+                /* ───── PREMIUM ADD RECORD FORM ───── */
+                <div style={{ padding: "32px 36px 60px", background: "#fdfdfd" }}>
+                  {/* Checkboxes Row 1 */}
+                  <div style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "20px 32px",
+                    marginBottom: "32px"
+                  }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.deemedExports}
+                        onChange={e => setForm({ ...form, deemedExports: e.target.checked })}
+                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
+                      />
+                      Deemed Exports Invoice
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.sezWithPayment}
+                        onChange={e => setForm({ ...form, sezWithPayment: e.target.checked })}
+                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
+                      />
+                      SEZ Supplies with payment
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.sezWithoutPayment}
+                        onChange={e => setForm({ ...form, sezWithoutPayment: e.target.checked })}
+                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
+                      />
+                      SEZ Supplies without payment
+                    </label>
+                  </div>
+
+                  {/* Checkboxes Row 2 */}
+                  <div style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "20px 32px",
+                    marginBottom: "32px"
+                  }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.reverseCharge}
+                        onChange={e => setForm({ ...form, reverseCharge: e.target.checked })}
+                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
+                      />
+                      Supply attract reverse charge
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.intraStateIGST}
+                        onChange={e => setForm({ ...form, intraStateIGST: e.target.checked })}
+                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
+                      />
+                      Intra-State Supplies attracting IGST
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.differentialTax}
+                        onChange={e => setForm({ ...form, differentialTax: e.target.checked })}
+                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
+                      />
+                      Is the supply eligible to be taxed at a differential percentage (%)?
+                    </label>
+                  </div>
+
+                  {/* Main Input Fields */}
+                  <div style={{
+                    display: "grid",
+                    gap: "20px",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))"
+                  }}>
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
+                        Recipient GSTIN/UIN <span style={{ color: "#ef4444" }}>*</span>
+                      </label>
+                      <input
+                        value={form.gstin}
+                        onChange={e => setForm({ ...form, gstin: e.target.value })}
+                        style={{
+                          width: "100%",
+                          padding: "12px 14px",
+                          borderRadius: "10px",
+                          border: "1px solid #3b82f6",
+                          background: "#f0f9ff",
+                          fontSize: "0.95rem"
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
+                        Recipient Name <span style={{ color: "#ef4444" }}>*</span>
+                      </label>
+                      <input
+                        value={form.recipientName}
+                        onChange={e => setForm({ ...form, recipientName: e.target.value })}
+                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
+                        Name as in Master
+                      </label>
+                      <input
+                        value={form.nameInMaster}
+                        onChange={e => setForm({ ...form, nameInMaster: e.target.value })}
+                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
+                        Invoice no. <span style={{ color: "#ef4444" }}>*</span>
+                      </label>
+                      <input
+                        value={form.invoiceNo}
+                        onChange={e => setForm({ ...form, invoiceNo: e.target.value })}
+                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
+                        Invoice date <span style={{ color: "#ef4444" }}>*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={form.invoiceDate}
+                        onChange={e => setForm({ ...form, invoiceDate: e.target.value })}
+                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
+                        Total invoice value (₹) <span style={{ color: "#ef4444" }}>*</span>
+                      </label>
+                      <input
+                        type="number"
+                        value={form.totalValue}
+                        onChange={e => setForm({ ...form, totalValue: e.target.value })}
+                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* POS & Supply Type */}
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "20px",
+                    margin: "28px 0"
+                  }}>
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
+                        Place of Supply (POS) <span style={{ color: "#ef4444" }}>*</span>
+                      </label>
+                      <select
+                        value={form.pos}
+                        onChange={e => setForm({ ...form, pos: e.target.value })}
+                        style={{
+                          width: "100%",
+                          padding: "12px 14px",
+                          borderRadius: "10px",
+                          border: "1px solid #cbd5e1",
+                          fontSize: "0.95rem",
+                          background: "white"
+                        }}
+                      >
+                        <option>09-Uttar Pradesh</option>
+                        <option>07-Delhi</option>
+                        <option>27-Maharashtra</option>
+                        <option>29-Karnataka</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
+                        Supply Type
+                      </label>
+                      <select
+                        value={form.supplyType}
+                        onChange={e => setForm({ ...form, supplyType: e.target.value })}
+                        style={{
+                          width: "100%",
+                          padding: "12px 14px",
+                          borderRadius: "10px",
+                          border: "1px solid #cbd5e1",
+                          fontSize: "0.95rem",
+                          background: "white"
+                        }}
+                      >
+                        <option>Intra-State</option>
+                        <option>Inter-State</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* IRN Fields */}
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                    gap: "20px",
+                    marginBottom: "40px"
+                  }}>
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>Source</label>
+                      <input
+                        value={form.source}
+                        onChange={e => setForm({ ...form, source: e.target.value })}
+                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>IRN</label>
+                      <input
+                        value={form.irn}
+                        onChange={e => setForm({ ...form, irn: e.target.value })}
+                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>IRN Date</label>
+                      <input
+                        type="date"
+                        value={form.irnDate}
+                        onChange={e => setForm({ ...form, irnDate: e.target.value })}
+                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Item Details Table */}
+                  <div style={{ marginBottom: "40px" }}>
+                    <h3 style={{ margin: "0 0 16px", fontSize: "1.2rem", fontWeight: 700, color: "#1e293b" }}>
+                      Item Details
+                    </h3>
+
+                    <div style={{
+                      overflowX: "auto",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "12px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
+                    }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "900px" }}>
+                        <thead>
+                          <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e5e7eb" }}>
+                            <th style={{ padding: "12px 14px", textAlign: "left", fontWeight: 600 }}>Rate (%)</th>
+                            <th style={{ padding: "12px 14px", textAlign: "left", fontWeight: 600 }}>Taxable value (₹) *</th>
+                            <th style={{ padding: "12px 14px", textAlign: "center", fontWeight: 600 }}>Central tax (₹) *</th>
+                            <th style={{ padding: "12px 14px", textAlign: "center", fontWeight: 600 }}>State/UT tax (₹) *</th>
+                            <th style={{ padding: "12px 14px", textAlign: "center", fontWeight: 600 }}>Cess (₹)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {items.map((item, idx) => (
+                            <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "12px 14px", fontWeight: 500 }}>{item.rate}%</td>
+                              <td style={{ padding: "12px 14px" }}>
+                                <input
+                                  type="number"
+                                  value={item.taxableValue}
+                                  onChange={e => updateItem(idx, "taxableValue", e.target.value)}
+                                  style={{
+                                    width: "100%",
+                                    padding: "10px 12px",
+                                    borderRadius: "8px",
+                                    border: "1px solid #cbd5e1",
+                                    fontSize: "0.95rem"
+                                  }}
+                                />
+                              </td>
+                              <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 500 }}>
+                                {item.central || "-"}
+                              </td>
+                              <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 500 }}>
+                                {item.state || "-"}
+                              </td>
+                              <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 500 }}>
+                                {item.cess || "-"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: "20px",
+                    paddingTop: "24px",
+                    borderTop: "1px solid #e5e7eb"
+                  }}>
+                    <button
+                      onClick={() => setShowAddForm(false)}
+                      style={{
+                        padding: "12px 40px",
+                        background: "#f1f5f9",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        fontSize: "1rem",
+                        cursor: "pointer",
+                        minWidth: "140px"
+                      }}
+                    >
+                      BACK
+                    </button>
+
+                    <button
+                      onClick={saveRecord}
+                      style={{
+                        padding: "12px 48px",
+                        background: "linear-gradient(90deg, #10b981, #059669)",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        fontSize: "1rem",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 14px rgba(16,185,129,0.3)",
+                        minWidth: "160px"
+                      }}
+                    >
+                      SAVE RECORD
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Has Data View - Dynamic + Original fallback */
+                <div style={{ padding: "32px 36px" }}>
+                  <h3 style={{ margin: "0 0 20px", fontSize: "1.25rem", fontWeight: 700, color: "#1e293b" }}>
+                    Record Details
+                  </h3>
+
+                  <div style={{
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
+                  }}>
+                    <div style={{
+                      background: "#f8fafc",
+                      padding: "12px 20px",
+                      fontWeight: 600,
+                      display: "grid",
+                      gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.8fr",
+                      gap: "12px",
+                      fontSize: "0.85rem"
+                    }}>
+                      <div>Recipient GSTIN</div>
+                      <div>Name</div>
+                      <div>Type</div>
+                      <div>Items</div>
+                      <div>Pending</div>
+                      <div>Action</div>
+                    </div>
+
+                    {records[selectedSection?.title]?.length > 0 ? (
+                      records[selectedSection.title].map((rec, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            padding: "12px 20px",
+                            display: "grid",
+                            gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.8fr",
+                            gap: "12px",
+                            alignItems: "center",
+                            fontSize: "0.9rem",
+                            borderTop: "1px solid #f1f5f9"
+                          }}
+                        >
+                          <div>{rec.gstin}</div>
+                          <div>{rec.recipientName}</div>
+                          <div>Regular</div>
+                          <div style={{ fontWeight: 600, color: "#15803d" }}>{rec.items.length}</div>
+                          <div style={{ fontWeight: 600, color: "#dc2626" }}>0</div>
+                          <button style={{
+                            background: "#10b981",
+                            color: "white",
+                            border: "none",
+                            width: "34px",
+                            height: "34px",
+                            borderRadius: "8px",
+                            fontSize: "1.1rem",
+                            cursor: "pointer"
+                          }}>
+                            +
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div
+                        style={{
+                          padding: "12px 20px",
+                          display: "grid",
+                          gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.8fr",
+                          gap: "12px",
+                          alignItems: "center",
+                          fontSize: "0.9rem",
+                          borderTop: "1px solid #f1f5f9"
+                        }}
+                      >
+                        <div>09AFYPA8613C2ZB</div>
+                        <div>JK STEEL TRADERS</div>
+                        <div>Regular</div>
+                        <div style={{ fontWeight: 600, color: "#15803d" }}>1</div>
+                        <div style={{ fontWeight: 600, color: "#dc2626" }}>0</div>
+                        <button style={{
+                          background: "#10b981",
+                          color: "white",
+                          border: "none",
+                          width: "34px",
+                          height: "34px",
+                          borderRadius: "8px",
+                          fontSize: "1.1rem",
+                          cursor: "pointer"
+                        }}>
+                          +
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom Actions */}
+                  <div style={{
+                    marginTop: "32px",
+                    display: "flex",
+                    gap: "16px",
+                    justifyContent: "flex-end"
+                  }}>
+                    <button
+                      onClick={() => setSelectedSection(null)}
+                      style={{
+                        padding: "11px 32px",
+                        background: "#f1f5f9",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        cursor: "pointer"
+                      }}
+                    >
+                      BACK
+                    </button>
+
+                    <button
+                      onClick={() => setShowAddForm(true)}
+                      style={{
+                        padding: "11px 32px",
+                        background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        boxShadow: "0 3px 12px rgba(59,130,246,0.25)"
+                      }}
+                    >
+                      ADD RECORD
+                    </button>
+
+                    <button
+                      style={{
+                        padding: "11px 32px",
+                        background: "#334155",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "10px",
+                        fontWeight: 600,
+                        cursor: "pointer"
+                      }}
+                    >
+                      IMPORT EWB DATA
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-// ──────────────────────────────────────────────
+// ==============================================
+// Main Wrapper Component
+// ==============================================
 const YourReturnsComponent = () => {
   const [step, setStep] = useState('selection');
   const [selectedForm, setSelectedForm] = useState(null);
   const [selectedFY, setSelectedFY] = useState("2025-26");
   const [selectedQuarter, setSelectedQuarter] = useState("Quarter 4 (Jan - Mar)");
   const [selectedPeriod, setSelectedPeriod] = useState("January");
+
   if (step === 'detail') {
     return (
       <DetailedGSTView
@@ -1842,6 +2373,7 @@ const YourReturnsComponent = () => {
       />
     );
   }
+
   if (step === 'summary') {
     return (
       <ReturnsSummaryScreen
@@ -1856,6 +2388,7 @@ const YourReturnsComponent = () => {
       />
     );
   }
+
   return (
     <GSTReturnPeriodSelection
       selectedFY={selectedFY}
@@ -1868,6 +2401,8 @@ const YourReturnsComponent = () => {
     />
   );
 };
+
+
   // Dummy data for GST Returns - sample clients with filing status
   const gstFilingData = [
     { sl: 1, name: "MODERN MASTER PUBLICATION", mobile: "8439393333", filingType: "Monthly", gstin: "09QACPS3544H1Z4", dateOfFiling: "2025-11-20"  },
