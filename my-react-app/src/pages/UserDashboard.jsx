@@ -580,6 +580,9 @@ const menuItems = [
 // ==============================================
 // GST Return Period Selection Component
 // ==============================================
+// ==============================================
+// GST Return Period Selection Component (unchanged)
+// ==============================================
 const GSTReturnPeriodSelection = ({
   selectedFY, setSelectedFY,
   selectedQuarter, setSelectedQuarter,
@@ -650,7 +653,6 @@ const GSTReturnPeriodSelection = ({
             marginBottom: "26px"
           }}
         >
-          {/* Financial Year */}
           <div>
             <label
               style={{
@@ -683,7 +685,6 @@ const GSTReturnPeriodSelection = ({
             </select>
           </div>
 
-          {/* Quarter */}
           <div>
             <label
               style={{
@@ -716,7 +717,6 @@ const GSTReturnPeriodSelection = ({
             </select>
           </div>
 
-          {/* Period */}
           <div>
             <label
               style={{
@@ -752,7 +752,6 @@ const GSTReturnPeriodSelection = ({
           </div>
         </div>
 
-        {/* ───── Note ───── */}
         <div
           style={{
             background: "#eff6ff",
@@ -770,7 +769,6 @@ const GSTReturnPeriodSelection = ({
           GSTR-1 and GSTR-3B are required for each month of the quarter.
         </div>
 
-        {/* ───── Search Button ───── */}
         <div style={{ textAlign: "center" }}>
           <button
             onClick={onSearch}
@@ -804,7 +802,7 @@ const GSTReturnPeriodSelection = ({
 );
 
 // ==============================================
-// Returns Summary Screen Component
+// Returns Summary Screen (unchanged)
 // ==============================================
 const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
   const pastMonths = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -820,7 +818,6 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
       }}
     >
       <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-        {/* Header */}
         <div
           style={{
             display: "flex",
@@ -877,7 +874,6 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
           </div>
         </div>
 
-        {/* Note */}
         <div
           style={{
             background: "white",
@@ -894,15 +890,13 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
           Monthly filing enabled. GSTR-1 & GSTR-3B required every month.
         </div>
 
-        {/* Cards Grid */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
             gap: "20px"
           }}
         >
-          {/* GSTR-1 */}
           <div
             style={{
               background: "white",
@@ -912,7 +906,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
               border: "1px solid #e2e8f0",
               display: "flex",
               flexDirection: "column",
-              minHeight: "260px"
+              minHeight: "240px"
             }}
           >
             <div
@@ -920,7 +914,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                 padding: "14px 20px",
                 background: "linear-gradient(90deg, #eff6ff, #dbeafe)",
                 color: "#1d4ed8",
-                fontSize: "1.1rem",
+                fontSize: "1.05rem",
                 fontWeight: 700,
                 display: "flex",
                 justifyContent: "space-between",
@@ -934,9 +928,9 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                 style={{
                   background: "#ecfdf5",
                   color: "#065f46",
-                  padding: "5px 14px",
+                  padding: "5px 12px",
                   borderRadius: "9999px",
-                  fontSize: "0.85rem",
+                  fontSize: "0.8rem",
                   fontWeight: 600
                 }}
               >
@@ -954,7 +948,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
             >
               <p
                 style={{
-                  fontSize: "0.92rem",
+                  fontSize: "0.9rem",
                   color: "#475569",
                   lineHeight: "1.45",
                   margin: 0
@@ -997,7 +991,6 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
             </div>
           </div>
 
-          {/* Amendments */}
           {!isPastPeriod && (
             <div
               style={{
@@ -1008,7 +1001,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                 border: "1px solid #e2e8f0",
                 display: "flex",
                 flexDirection: "column",
-                minHeight: "260px"
+                minHeight: "240px"
               }}
             >
               <div
@@ -1016,7 +1009,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                   padding: "14px 20px",
                   background: "linear-gradient(90deg, #fffbeb, #fef3c7)",
                   color: "#92400e",
-                  fontSize: "1.1rem",
+                  fontSize: "1.05rem",
                   fontWeight: 700,
                   display: "flex",
                   justifyContent: "space-between",
@@ -1030,9 +1023,9 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                   style={{
                     background: "#fefce8",
                     color: "#854d0e",
-                    padding: "5px 14px",
+                    padding: "5px 12px",
                     borderRadius: "9999px",
-                    fontSize: "0.85rem",
+                    fontSize: "0.8rem",
                     fontWeight: 600
                   }}
                 >
@@ -1050,7 +1043,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
               >
                 <p
                   style={{
-                    fontSize: "0.92rem",
+                    fontSize: "0.9rem",
                     color: "#475569",
                     lineHeight: "1.45",
                     margin: 0
@@ -1078,7 +1071,6 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
             </div>
           )}
 
-          {/* Auto-Drafted ITC */}
           <div
             style={{
               background: "white",
@@ -1088,7 +1080,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
               border: "1px solid #e2e8f0",
               display: "flex",
               flexDirection: "column",
-              minHeight: "260px"
+              minHeight: "240px"
             }}
           >
             <div
@@ -1096,7 +1088,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                 padding: "14px 20px",
                 background: "linear-gradient(90deg, #f0fdfa, #ccfbf1)",
                 color: "#0f766e",
-                fontSize: "1.1rem",
+                fontSize: "1.05rem",
                 fontWeight: 700,
                 display: "flex",
                 justifyContent: "space-between",
@@ -1110,9 +1102,9 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                 style={{
                   background: "#f0fdfa",
                   color: "#0f766e",
-                  padding: "5px 14px",
+                  padding: "5px 12px",
                   borderRadius: "9999px",
-                  fontSize: "0.85rem",
+                  fontSize: "0.8rem",
                   fontWeight: 600
                 }}
               >
@@ -1130,7 +1122,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
             >
               <p
                 style={{
-                  fontSize: "0.92rem",
+                  fontSize: "0.9rem",
                   color: "#475569",
                   lineHeight: "1.45",
                   margin: 0
@@ -1173,7 +1165,6 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
             </div>
           </div>
 
-          {/* GSTR-3B */}
           <div
             style={{
               background: "white",
@@ -1183,7 +1174,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
               border: "1px solid #fecaca",
               display: "flex",
               flexDirection: "column",
-              minHeight: "260px"
+              minHeight: "240px"
             }}
           >
             <div
@@ -1191,7 +1182,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                 padding: "14px 20px",
                 background: "linear-gradient(90deg, #fef2f2, #fee2e2)",
                 color: "#991b1b",
-                fontSize: "1.1rem",
+                fontSize: "1.05rem",
                 fontWeight: 700,
                 display: "flex",
                 justifyContent: "space-between",
@@ -1205,9 +1196,9 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                 style={{
                   background: "#fef2f2",
                   color: "#991b1b",
-                  padding: "5px 14px",
+                  padding: "5px 12px",
                   borderRadius: "9999px",
-                  fontSize: "0.85rem",
+                  fontSize: "0.8rem",
                   fontWeight: 600
                 }}
               >
@@ -1240,7 +1231,7 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
                 </div>
                 <p
                   style={{
-                    fontSize: "0.92rem",
+                    fontSize: "0.9rem",
                     color: "#475569",
                     lineHeight: "1.45",
                     margin: 0
@@ -1289,14 +1280,13 @@ const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
 };
 
 // ==============================================
-// Detailed GST View - Full Dynamic + Premium Form
+// Detailed GST View - Premium Compact UI + Dynamic Form
 // ==============================================
 const DetailedGSTView = ({ formType, fy, period, onBack }) => {
   const [selectedSection, setSelectedSection] = useState(null);
-  const [records, setRecords] = useState({}); // { "section title": [record1, record2, ...] }
+  const [records, setRecords] = useState({});
   const [showAddForm, setShowAddForm] = useState(false);
 
-  // Form data state
   const [form, setForm] = useState({
     deemedExports: false,
     sezWithPayment: false,
@@ -1317,7 +1307,6 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
     irnDate: ""
   });
 
-  // Item details table state
   const [items, setItems] = useState([
     { rate: 0, taxableValue: "", central: 0, state: 0, cess: 0 },
     { rate: 0.1, taxableValue: "", central: 0, state: 0, cess: 0 },
@@ -1337,32 +1326,25 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
   const updateItem = (index, field, value) => {
     const newItems = [...items];
     newItems[index][field] = value;
-
     if (field === "taxableValue" && value !== "") {
       const rate = newItems[index].rate / 100;
       const half = (Number(value) * rate) / 2;
       newItems[index].central = half.toFixed(2);
       newItems[index].state = half.toFixed(2);
-      newItems[index].cess = 0; // can be changed later if needed
+      newItems[index].cess = 0;
     }
-
     setItems(newItems);
   };
 
   const saveRecord = () => {
-    // Basic validation
     if (!form.gstin || !form.recipientName || !form.invoiceNo || !form.invoiceDate || !form.totalValue) {
-      alert("Please fill all mandatory fields (*)");
+      alert("Please fill all mandatory fields");
       return;
     }
 
-    const filledItems = items.filter(item => item.taxableValue !== "");
+    const filledItems = items.filter(i => i.taxableValue !== "");
 
-    const newRecord = {
-      ...form,
-      items: filledItems,
-      timestamp: new Date().toISOString()
-    };
+    const newRecord = { ...form, items: filledItems, timestamp: new Date().toISOString() };
 
     const title = selectedSection.title;
     setRecords(prev => ({
@@ -1371,8 +1353,6 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
     }));
 
     setShowAddForm(false);
-
-    // Reset form
     setForm({
       deemedExports: false,
       sezWithPayment: false,
@@ -1392,13 +1372,11 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
       irn: "",
       irnDate: ""
     });
-
     setItems(items.map(i => ({ ...i, taxableValue: "", central: 0, state: 0, cess: 0 })));
 
-    alert("Record saved successfully!");
+    alert("Record saved!");
   };
 
-  // Section generation logic
   const baseSections = [
     "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
     "5 - B2C (Large) Invoices",
@@ -1424,258 +1402,210 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
 
   const isZeroRecord = selectedSection && sections.find(s => s.title === selectedSection.title)?.count === 0;
 
-  const isFiled = fy === "2025-26" && ["January", "February", "March"].includes(period);
-
   return (
     <div style={{
       padding: "20px 5% 40px",
-      background: "#ffffff",
+      background: "#f9fafb",
       minHeight: "100vh",
       fontFamily: "system-ui, sans-serif"
     }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
 
-        {/* Back button */}
+        {/* Back button - smaller & premium */}
         <button
           onClick={onBack}
           style={{
             display: "inline-flex",
             alignItems: "center",
             gap: "8px",
-            background: "#ffffff",
+            padding: "10px 18px",
+            background: "white",
             border: "1px solid #d1d5db",
-            color: "#070707ff",
-            fontSize: "1rem",
+            borderRadius: "10px",
             fontWeight: 600,
-            padding: "8px 16px",
-            borderRadius: "8px",
+            fontSize: "0.95rem",
             cursor: "pointer",
-            marginBottom: "24px",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-            transition: "all 0.15s ease"
+            marginBottom: "20px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            transition: "all 0.18s ease"
           }}
           onMouseOver={e => {
-            e.currentTarget.style.boxShadow = "0 2px 8px rgba(37,99,235,0.15)";
+            e.currentTarget.style.boxShadow = "0 4px 16px rgba(59,130,246,0.15)";
             e.currentTarget.style.borderColor = "#3b82f6";
           }}
           onMouseOut={e => {
-            e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)";
+            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
             e.currentTarget.style.borderColor = "#d1d5db";
           }}
         >
-          <HiArrowLeft size={18} /> Back to Returns Dashboard
+          ← Back
         </button>
 
-        {/* Main info card */}
+        {/* Main Info Card - compact */}
         <div style={{
-          background: "#ffffff",
+          background: "white",
           borderRadius: "12px",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
           padding: "20px 24px",
           marginBottom: "24px",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.07)",
           border: "1px solid #e5e7eb"
         }}>
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "16px",
-            marginBottom: "16px"
-          }}>
-            <h1 style={{ margin: 0, fontSize: "1.6rem", fontWeight: 700, color: "#1d4ed8" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "16px" }}>
+            <h1 style={{ margin: 0, fontSize: "1.55rem", fontWeight: 700, color: "#1d4ed8" }}>
               {formType}
             </h1>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <button
-                style={{
-                  background: "#eff6ff",
-                  color: "#1d4ed8",
-                  border: "1px solid #bfdbfe",
-                  padding: "8px 14px",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  boxShadow: "0 2px 6px rgba(37,99,235,0.25)"
-                }}
-              >
-                E-INVOICE ADVISORY
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button style={{
+                padding: "8px 14px",
+                background: "#eff6ff",
+                color: "#1d4ed8",
+                border: "1px solid #bfdbfe",
+                borderRadius: "8px",
+                fontWeight: 600,
+                fontSize: "0.9rem",
+                cursor: "pointer"
+              }}>
+                Advisory
               </button>
-              <button
-                style={{
-                  background: "#1076f2ff",
-                  color: "#e8edf4ff",
-                  border: "1px solid #d1d5db",
-                  padding: "8px 14px",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)"
-                }}
-              >
-                HELP
+              <button style={{
+                padding: "8px 14px",
+                background: "#1d4ed8",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: 600,
+                fontSize: "0.9rem",
+                cursor: "pointer"
+              }}>
+                Help
               </button>
             </div>
           </div>
 
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "12px 18px",
-            fontSize: "0.95rem"
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "10px",
+            fontSize: "0.9rem"
           }}>
             <div><strong>GSTIN:</strong> 09ACNPU2195H1ZY</div>
-            <div><strong>Legal Name:</strong> Mohd Umair</div>
-            <div><strong>Trade Name:</strong> U.A.F ENTERPRISE'S</div>
-            <div><strong>Financial Year:</strong> {fy}</div>
-            <div><strong>Tax Period:</strong> {period}</div>
+            <div><strong>Legal:</strong> Mohd Umair</div>
+            <div><strong>Trade:</strong> U.A.F ENTERPRISE'S</div>
+            <div><strong>FY:</strong> {fy}</div>
+            <div><strong>Period:</strong> {period}</div>
             <div>
-              <strong>Status:</strong>
-              <span
-                style={{
-                  color: isFiled ? "#059669" : "#991b1b",
-                  fontWeight: 400,
-                  padding: "1px 4px",
-                  borderRadius: "4px",
-                  background: isFiled ? "#ecfdf5" : "#fef2f2",
-                  boxShadow: isFiled ? "2px 4px rgba(5,150,105,0.35)" : "none"
-                }}
-              >
-                {isFiled ? "Filed" : "Not Filed"}
+              <strong>Status:</strong> 
+              <span style={{
+                marginLeft: "8px",
+                padding: "4px 10px",
+                background: "#ecfdf5",
+                color: "#059669",
+                borderRadius: "6px",
+                fontWeight: 600,
+                fontSize: "0.85rem"
+              }}>
+                Filed
               </span>
             </div>
-            <div><strong>Due Date:</strong> 20 {period} 2026</div>
           </div>
         </div>
 
-        {/* Nil filing checkbox */}
+        {/* Nil filing - smaller */}
         <div style={{
-          background: "#ffffff",
-          borderRadius: "12px",
-          padding: "14px 20px",
-          marginBottom: "24px",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+          background: "white",
+          borderRadius: "10px",
+          padding: "12px 18px",
+          marginBottom: "20px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
           border: "1px solid #e5e7eb",
           display: "flex",
           alignItems: "center",
           gap: "10px"
         }}>
           <input type="checkbox" style={{ width: "16px", height: "16px", accentColor: "#3b82f6" }} />
-          <span style={{ fontSize: "1rem", fontWeight: 600, color: "#1e293b" }}>
+          <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#1e293b" }}>
             File Nil {formType}
           </span>
         </div>
 
-        {/* ADD RECORD DETAILS - Cards */}
+        {/* Compact Cards Grid */}
         <div style={{
-          background: "#ffffff",
-          borderRadius: "12px",
-          overflow: "hidden",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-          border: "1px solid #e5e7eb"
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gap: "16px"
         }}>
-          <div style={{
-            background: "#ffffff",
-            color: "#1e40af",
-            padding: "14px 24px",
-            fontSize: "1.2rem",
-            fontWeight: 700,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderBottom: "1px solid #e5e7eb"
-          }}>
-            <span>ADD RECORD DETAILS</span>
-            <span style={{ fontSize: "1.3rem", cursor: "pointer" }}>▼</span>
-          </div>
-
-          <div style={{
-            padding: "24px",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "16px"
-          }}>
-            {sections.map((item, index) => (
-              <div
-                key={index}
-                onClick={() => {
-                  setSelectedSection(item);
-                  setShowAddForm(false);
-                }}
-                style={{
-                  background: "#f8fafc",
-                  border: item.count > 0 ? "1px solid #86efac" : "1px solid #e5e7eb",
-                  borderRadius: "10px",
-                  overflow: "hidden",
-                  cursor: "pointer",
-                  transition: "transform 0.15s ease, box-shadow 0.15s ease"
-                }}
-                onMouseEnter={e => {
-                  if (item.count > 0) {
-                    e.currentTarget.style.transform = "translateY(-3px)";
-                    e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.1)";
-                  }
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                <div
-                  style={{
-                    background: item.count > 0 
-                      ? "linear-gradient(135deg, #ecfdf5, #f0fdf4)" 
-                      : "linear-gradient(135deg, #e0f2fe, #f8fafc)",
-                    color: "#0f172a",
-                    padding: "12px 14px",
-                    fontWeight: 600,
-                    fontSize: "0.85rem",
-                    minHeight: "60px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    textAlign: "center",
-                    borderBottom: "1px solid #e5e7eb"
-                  }}
-                >
-                  {item.title}
-                </div>
-                <div style={{ padding: "18px", textAlign: "center" }}>
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "44px",
-                      height: "44px",
-                      borderRadius: "50%",
-                      background: item.count > 0 ? "#dcfce7" : "#f3f4f6",
-                      color: item.count > 0 ? "#15803d" : "#9ca3af",
-                      fontSize: "1.1rem",
-                      fontWeight: 700,
-                      boxShadow: item.count > 0 ? "0 2px 8px rgba(34,197,94,0.25)" : "none"
-                    }}
-                  >
-                    {item.count}
-                  </span>
+          {sections.map((item, index) => (
+            <div
+              key={index}
+              onClick={() => {
+                setSelectedSection(item);
+                setShowAddForm(false);
+              }}
+              style={{
+                background: "white",
+                borderRadius: "12px",
+                border: item.count > 0 ? "1px solid #86efac" : "1px solid #e5e7eb",
+                overflow: "hidden",
+                cursor: "pointer",
+                boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
+                transition: "all 0.2s ease"
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow = "0 12px 30px rgba(0,0,0,0.12)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,0,0,0.06)";
+              }}
+            >
+              <div style={{
+                background: item.count > 0 
+                  ? "linear-gradient(135deg, #ecfdf5, #f0fdf4)" 
+                  : "linear-gradient(135deg, #f8fafc, #f1f5f9)",
+                padding: "12px 14px",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                textAlign: "center",
+                minHeight: "54px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}>
+                {item.title}
+              </div>
+              <div style={{ padding: "16px", textAlign: "center" }}>
+                <div style={{
+                  width: "48px",
+                  height: "48px",
+                  lineHeight: "48px",
+                  borderRadius: "50%",
+                  margin: "0 auto",
+                  fontSize: "1.3rem",
+                  fontWeight: 700,
+                  background: item.count > 0 ? "#dcfce7" : "#f1f5f9",
+                  color: item.count > 0 ? "#15803d" : "#64748b",
+                  boxShadow: item.count > 0 ? "0 2px 8px rgba(34,197,94,0.25)" : "none"
+                }}>
+                  {item.count}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
 
-        {/* ───── Modal ───── */}
+        {/* ───── Compact Modal ───── */}
         {selectedSection && (
           <div
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(0,0,0,0.55)",
+              background: "rgba(0,0,0,0.5)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               zIndex: 1000,
-              padding: "16px"
+              padding: "20px"
             }}
             onClick={() => {
               setSelectedSection(null);
@@ -1684,31 +1614,26 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
           >
             <div
               style={{
-                background: "#ffffff",
+                background: "white",
                 width: "100%",
-                maxWidth: "1100px",
-                height: "95vh",
+                maxWidth: "960px",
+                maxHeight: "90vh",
                 borderRadius: "14px",
-                overflowY: "auto",
+                overflow: "hidden",
                 boxShadow: "0 20px 70px rgba(0,0,0,0.25)"
               }}
               onClick={e => e.stopPropagation()}
             >
-              {/* Header */}
-              <div
-                style={{
-                  padding: "12px 24px",
-                  background: "linear-gradient(135deg,#f8fafc,#eef2ff)",
-                  borderBottom: "1px solid #e5e7eb",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 10
-                }}
-              >
-                <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "#0f172a" }}>
+              {/* Header - smaller */}
+              <div style={{
+                padding: "14px 24px",
+                background: "linear-gradient(135deg, #f8fafc, #eef2ff)",
+                borderBottom: "1px solid #e5e7eb",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}>
+                <h2 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700, color: "#0f172a" }}>
                   {selectedSection.title}
                 </h2>
                 <button
@@ -1717,12 +1642,12 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
                     setShowAddForm(false);
                   }}
                   style={{
-                    background: "white",
-                    border: "1px solid #e5e7eb",
+                    width: "36px",
+                    height: "36px",
                     borderRadius: "10px",
-                    width: "38px",
-                    height: "38px",
-                    fontSize: "1.4rem",
+                    border: "1px solid #e5e7eb",
+                    background: "white",
+                    fontSize: "1.3rem",
                     cursor: "pointer"
                   }}
                 >
@@ -1730,84 +1655,44 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
                 </button>
               </div>
 
-              {/* Info strip */}
-              <div
-                style={{
-                  padding: "10px 24px",
-                  background: "#f8fafc",
-                  borderBottom: "1px solid #e5e7eb",
-                  fontSize: "0.9rem",
-                  color: "#334155",
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                  gap: "8px"
-                }}
-              >
-                <div><strong>GSTIN:</strong> 09ACNPU2195H1ZY</div>
-                <div><strong>Legal:</strong> Mohd Umair</div>
-                <div><strong>Trade:</strong> U.A.F ENTERPRISE'S</div>
-                <div><strong>FY:</strong> {fy}</div>
-                <div><strong>Period:</strong> {period}</div>
-                <div>
-                  <strong>Status:</strong> 
-                  <span style={{
-                    marginLeft: "8px",
-                    padding: "3px 10px",
-                    background: isFiled ? "#ecfdf5" : "#fef2f2",
-                    color: isFiled ? "#059669" : "#991b1b",
-                    borderRadius: "6px",
-                    fontWeight: 600
-                  }}>
-                    {isFiled ? "Filed" : "Not Filed"}
-                  </span>
-                </div>
-              </div>
-
               {isZeroRecord && !showAddForm ? (
-                /* No Data View */
-                <div style={{
-                  padding: "80px 40px",
-                  textAlign: "center",
-                  minHeight: "60vh",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}>
+                /* No Data - compact premium */
+                <div style={{ padding: "60px 40px", textAlign: "center" }}>
                   <div style={{
-                    fontSize: "1.6rem",
+                    fontSize: "1.45rem",
                     fontWeight: 700,
                     color: "#1e293b",
-                    marginBottom: "16px"
+                    marginBottom: "12px"
                   }}>
                     No Data Available
                   </div>
                   <p style={{
                     color: "#64748b",
-                    fontSize: "1.05rem",
-                    marginBottom: "48px",
-                    maxWidth: "540px"
+                    fontSize: "1rem",
+                    marginBottom: "40px",
+                    maxWidth: "480px",
+                    margin: "0 auto"
                   }}>
-                    There are no records to display for the selected period in this section.
+                    There are no records for this section in the selected period.
                   </p>
 
                   <div style={{
                     display: "flex",
-                    gap: "16px",
-                    flexWrap: "wrap",
-                    justifyContent: "center"
+                    gap: "14px",
+                    justifyContent: "center",
+                    flexWrap: "wrap"
                   }}>
                     <button
                       onClick={() => setSelectedSection(null)}
                       style={{
-                        padding: "12px 36px",
+                        padding: "10px 28px",
                         background: "#f1f5f9",
                         border: "1px solid #cbd5e1",
                         borderRadius: "10px",
                         fontWeight: 600,
-                        fontSize: "1rem",
+                        fontSize: "0.95rem",
                         cursor: "pointer",
-                        minWidth: "140px"
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
                       }}
                     >
                       BACK
@@ -1816,15 +1701,14 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
                     <button
                       onClick={() => setShowAddForm(true)}
                       style={{
-                        padding: "12px 36px",
+                        padding: "10px 28px",
                         background: "linear-gradient(90deg, #3b82f6, #2563eb)",
                         color: "white",
                         border: "none",
                         borderRadius: "10px",
                         fontWeight: 600,
-                        fontSize: "1rem",
+                        fontSize: "0.95rem",
                         cursor: "pointer",
-                        minWidth: "160px",
                         boxShadow: "0 4px 14px rgba(59,130,246,0.3)"
                       }}
                     >
@@ -1833,319 +1717,148 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
 
                     <button
                       style={{
-                        padding: "12px 36px",
+                        padding: "10px 28px",
                         background: "#334155",
                         color: "white",
                         border: "none",
                         borderRadius: "10px",
                         fontWeight: 600,
-                        fontSize: "1rem",
+                        fontSize: "0.95rem",
                         cursor: "pointer",
-                        minWidth: "180px"
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
                       }}
                     >
-                      IMPORT EWB DATA
+                      IMPORT EWB
                     </button>
                   </div>
                 </div>
               ) : isZeroRecord && showAddForm ? (
-                /* ───── PREMIUM ADD RECORD FORM ───── */
-                <div style={{ padding: "32px 36px 60px", background: "#fdfdfd" }}>
-                  {/* Checkboxes Row 1 */}
+                /* Premium Form - compact */
+                <div style={{ padding: "28px 32px", maxHeight: "calc(90vh - 80px)", overflowY: "auto" }}>
+                  {/* Checkboxes */}
                   <div style={{
                     display: "flex",
                     flexWrap: "wrap",
-                    gap: "20px 32px",
-                    marginBottom: "32px"
+                    gap: "16px 28px",
+                    marginBottom: "28px"
                   }}>
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.deemedExports}
-                        onChange={e => setForm({ ...form, deemedExports: e.target.checked })}
-                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
-                      />
-                      Deemed Exports Invoice
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.93rem" }}>
+                      <input type="checkbox" checked={form.deemedExports} onChange={e => setForm({...form, deemedExports: e.target.checked})} style={{ width: "16px", height: "16px" }} />
+                      Deemed Exports
                     </label>
-
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.sezWithPayment}
-                        onChange={e => setForm({ ...form, sezWithPayment: e.target.checked })}
-                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
-                      />
-                      SEZ Supplies with payment
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.93rem" }}>
+                      <input type="checkbox" checked={form.sezWithPayment} onChange={e => setForm({...form, sezWithPayment: e.target.checked})} style={{ width: "16px", height: "16px" }} />
+                      SEZ with payment
                     </label>
-
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.sezWithoutPayment}
-                        onChange={e => setForm({ ...form, sezWithoutPayment: e.target.checked })}
-                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
-                      />
-                      SEZ Supplies without payment
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.93rem" }}>
+                      <input type="checkbox" checked={form.sezWithoutPayment} onChange={e => setForm({...form, sezWithoutPayment: e.target.checked})} style={{ width: "16px", height: "16px" }} />
+                      SEZ without payment
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.93rem" }}>
+                      <input type="checkbox" checked={form.reverseCharge} onChange={e => setForm({...form, reverseCharge: e.target.checked})} style={{ width: "16px", height: "16px" }} />
+                      Reverse Charge
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.93rem" }}>
+                      <input type="checkbox" checked={form.intraStateIGST} onChange={e => setForm({...form, intraStateIGST: e.target.checked})} style={{ width: "16px", height: "16px" }} />
+                      Intra-State IGST
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.93rem" }}>
+                      <input type="checkbox" checked={form.differentialTax} onChange={e => setForm({...form, differentialTax: e.target.checked})} style={{ width: "16px", height: "16px" }} />
+                      Differential %
                     </label>
                   </div>
 
-                  {/* Checkboxes Row 2 */}
-                  <div style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "20px 32px",
-                    marginBottom: "32px"
-                  }}>
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.reverseCharge}
-                        onChange={e => setForm({ ...form, reverseCharge: e.target.checked })}
-                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
-                      />
-                      Supply attract reverse charge
-                    </label>
-
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.intraStateIGST}
-                        onChange={e => setForm({ ...form, intraStateIGST: e.target.checked })}
-                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
-                      />
-                      Intra-State Supplies attracting IGST
-                    </label>
-
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.96rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.differentialTax}
-                        onChange={e => setForm({ ...form, differentialTax: e.target.checked })}
-                        style={{ width: "18px", height: "18px", accentColor: "#3b82f6" }}
-                      />
-                      Is the supply eligible to be taxed at a differential percentage (%)?
-                    </label>
-                  </div>
-
-                  {/* Main Input Fields */}
-                  <div style={{
-                    display: "grid",
-                    gap: "20px",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))"
-                  }}>
+                  {/* Fields */}
+                  <div style={{ display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
-                        Recipient GSTIN/UIN <span style={{ color: "#ef4444" }}>*</span>
-                      </label>
-                      <input
-                        value={form.gstin}
-                        onChange={e => setForm({ ...form, gstin: e.target.value })}
-                        style={{
-                          width: "100%",
-                          padding: "12px 14px",
-                          borderRadius: "10px",
-                          border: "1px solid #3b82f6",
-                          background: "#f0f9ff",
-                          fontSize: "0.95rem"
-                        }}
-                      />
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>GSTIN/UIN *</label>
+                      <input value={form.gstin} onChange={e => setForm({...form, gstin: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #3b82f6", background: "#f0f9ff" }} />
                     </div>
-
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
-                        Recipient Name <span style={{ color: "#ef4444" }}>*</span>
-                      </label>
-                      <input
-                        value={form.recipientName}
-                        onChange={e => setForm({ ...form, recipientName: e.target.value })}
-                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                      />
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>Recipient Name *</label>
+                      <input value={form.recipientName} onChange={e => setForm({...form, recipientName: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                     </div>
-
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
-                        Name as in Master
-                      </label>
-                      <input
-                        value={form.nameInMaster}
-                        onChange={e => setForm({ ...form, nameInMaster: e.target.value })}
-                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                      />
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>Name in Master</label>
+                      <input value={form.nameInMaster} onChange={e => setForm({...form, nameInMaster: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                     </div>
-
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
-                        Invoice no. <span style={{ color: "#ef4444" }}>*</span>
-                      </label>
-                      <input
-                        value={form.invoiceNo}
-                        onChange={e => setForm({ ...form, invoiceNo: e.target.value })}
-                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                      />
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>Invoice No. *</label>
+                      <input value={form.invoiceNo} onChange={e => setForm({...form, invoiceNo: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                     </div>
-
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
-                        Invoice date <span style={{ color: "#ef4444" }}>*</span>
-                      </label>
-                      <input
-                        type="date"
-                        value={form.invoiceDate}
-                        onChange={e => setForm({ ...form, invoiceDate: e.target.value })}
-                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                      />
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>Invoice Date *</label>
+                      <input type="date" value={form.invoiceDate} onChange={e => setForm({...form, invoiceDate: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                     </div>
-
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
-                        Total invoice value (₹) <span style={{ color: "#ef4444" }}>*</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={form.totalValue}
-                        onChange={e => setForm({ ...form, totalValue: e.target.value })}
-                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                      />
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>Total Value (₹) *</label>
+                      <input type="number" value={form.totalValue} onChange={e => setForm({...form, totalValue: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                     </div>
                   </div>
 
-                  {/* POS & Supply Type */}
-                  <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "20px",
-                    margin: "28px 0"
-                  }}>
+                  {/* POS + Supply Type */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", margin: "24px 0" }}>
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
-                        Place of Supply (POS) <span style={{ color: "#ef4444" }}>*</span>
-                      </label>
-                      <select
-                        value={form.pos}
-                        onChange={e => setForm({ ...form, pos: e.target.value })}
-                        style={{
-                          width: "100%",
-                          padding: "12px 14px",
-                          borderRadius: "10px",
-                          border: "1px solid #cbd5e1",
-                          fontSize: "0.95rem",
-                          background: "white"
-                        }}
-                      >
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>POS *</label>
+                      <select value={form.pos} onChange={e => setForm({...form, pos: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }}>
                         <option>09-Uttar Pradesh</option>
                         <option>07-Delhi</option>
-                        <option>27-Maharashtra</option>
-                        <option>29-Karnataka</option>
                       </select>
                     </div>
-
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>
-                        Supply Type
-                      </label>
-                      <select
-                        value={form.supplyType}
-                        onChange={e => setForm({ ...form, supplyType: e.target.value })}
-                        style={{
-                          width: "100%",
-                          padding: "12px 14px",
-                          borderRadius: "10px",
-                          border: "1px solid #cbd5e1",
-                          fontSize: "0.95rem",
-                          background: "white"
-                        }}
-                      >
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>Supply Type</label>
+                      <select value={form.supplyType} onChange={e => setForm({...form, supplyType: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }}>
                         <option>Intra-State</option>
                         <option>Inter-State</option>
                       </select>
                     </div>
                   </div>
 
-                  {/* IRN Fields */}
-                  <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                    gap: "20px",
-                    marginBottom: "40px"
-                  }}>
+                  {/* IRN */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "32px" }}>
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>Source</label>
-                      <input
-                        value={form.source}
-                        onChange={e => setForm({ ...form, source: e.target.value })}
-                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                      />
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>Source</label>
+                      <input value={form.source} onChange={e => setForm({...form, source: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                     </div>
-
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>IRN</label>
-                      <input
-                        value={form.irn}
-                        onChange={e => setForm({ ...form, irn: e.target.value })}
-                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                      />
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>IRN</label>
+                      <input value={form.irn} onChange={e => setForm({...form, irn: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                     </div>
-
                     <div>
-                      <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, fontSize: "0.95rem" }}>IRN Date</label>
-                      <input
-                        type="date"
-                        value={form.irnDate}
-                        onChange={e => setForm({ ...form, irnDate: e.target.value })}
-                        style={{ width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
-                      />
+                      <label style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "0.93rem" }}>IRN Date</label>
+                      <input type="date" value={form.irnDate} onChange={e => setForm({...form, irnDate: e.target.value})} style={{ width: "100%", padding: "11px 14px", borderRadius: "10px", border: "1px solid #cbd5e1" }} />
                     </div>
                   </div>
 
-                  {/* Item Details Table */}
-                  <div style={{ marginBottom: "40px" }}>
-                    <h3 style={{ margin: "0 0 16px", fontSize: "1.2rem", fontWeight: 700, color: "#1e293b" }}>
-                      Item Details
-                    </h3>
-
-                    <div style={{
-                      overflowX: "auto",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "12px",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
-                    }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "900px" }}>
+                  {/* Item Table */}
+                  <div style={{ marginBottom: "32px" }}>
+                    <h3 style={{ margin: "0 0 16px", fontSize: "1.15rem", fontWeight: 700 }}>Item Details</h3>
+                    <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: "10px" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "800px" }}>
                         <thead>
-                          <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e5e7eb" }}>
-                            <th style={{ padding: "12px 14px", textAlign: "left", fontWeight: 600 }}>Rate (%)</th>
-                            <th style={{ padding: "12px 14px", textAlign: "left", fontWeight: 600 }}>Taxable value (₹) *</th>
-                            <th style={{ padding: "12px 14px", textAlign: "center", fontWeight: 600 }}>Central tax (₹) *</th>
-                            <th style={{ padding: "12px 14px", textAlign: "center", fontWeight: 600 }}>State/UT tax (₹) *</th>
-                            <th style={{ padding: "12px 14px", textAlign: "center", fontWeight: 600 }}>Cess (₹)</th>
+                          <tr style={{ background: "#f8fafc" }}>
+                            <th style={{ padding: "12px", textAlign: "left" }}>Rate (%)</th>
+                            <th style={{ padding: "12px", textAlign: "left" }}>Taxable Value *</th>
+                            <th style={{ padding: "12px", textAlign: "center" }}>CGST *</th>
+                            <th style={{ padding: "12px", textAlign: "center" }}>SGST *</th>
+                            <th style={{ padding: "12px", textAlign: "center" }}>Cess</th>
                           </tr>
                         </thead>
                         <tbody>
                           {items.map((item, idx) => (
-                            <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                              <td style={{ padding: "12px 14px", fontWeight: 500 }}>{item.rate}%</td>
-                              <td style={{ padding: "12px 14px" }}>
+                            <tr key={idx}>
+                              <td style={{ padding: "10px" }}>{item.rate}%</td>
+                              <td style={{ padding: "10px" }}>
                                 <input
                                   type="number"
                                   value={item.taxableValue}
                                   onChange={e => updateItem(idx, "taxableValue", e.target.value)}
-                                  style={{
-                                    width: "100%",
-                                    padding: "10px 12px",
-                                    borderRadius: "8px",
-                                    border: "1px solid #cbd5e1",
-                                    fontSize: "0.95rem"
-                                  }}
+                                  style={{ width: "100%", padding: "8px 10px", borderRadius: "8px", border: "1px solid #cbd5e1" }}
                                 />
                               </td>
-                              <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 500 }}>
-                                {item.central || "-"}
-                              </td>
-                              <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 500 }}>
-                                {item.state || "-"}
-                              </td>
-                              <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 500 }}>
-                                {item.cess || "-"}
-                              </td>
+                              <td style={{ padding: "10px", textAlign: "center" }}>{item.central || '-'}</td>
+                              <td style={{ padding: "10px", textAlign: "center" }}>{item.state || '-'}</td>
+                              <td style={{ padding: "10px", textAlign: "center" }}>{item.cess || '-'}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -2153,156 +1866,95 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: "20px",
-                    paddingTop: "24px",
-                    borderTop: "1px solid #e5e7eb"
-                  }}>
+                  {/* Buttons */}
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                     <button
                       onClick={() => setShowAddForm(false)}
                       style={{
-                        padding: "12px 40px",
+                        padding: "10px 32px",
                         background: "#f1f5f9",
                         border: "1px solid #cbd5e1",
                         borderRadius: "10px",
                         fontWeight: 600,
-                        fontSize: "1rem",
-                        cursor: "pointer",
-                        minWidth: "140px"
+                        cursor: "pointer"
                       }}
                     >
                       BACK
                     </button>
-
                     <button
                       onClick={saveRecord}
                       style={{
-                        padding: "12px 48px",
+                        padding: "10px 40px",
                         background: "linear-gradient(90deg, #10b981, #059669)",
                         color: "white",
                         border: "none",
                         borderRadius: "10px",
                         fontWeight: 600,
-                        fontSize: "1rem",
-                        cursor: "pointer",
-                        boxShadow: "0 4px 14px rgba(16,185,129,0.3)",
-                        minWidth: "160px"
+                        boxShadow: "0 4px 12px rgba(16,185,129,0.3)",
+                        cursor: "pointer"
                       }}
                     >
-                      SAVE RECORD
+                      SAVE
                     </button>
                   </div>
                 </div>
               ) : (
-                /* Has Data View - Dynamic + Original fallback */
-                <div style={{ padding: "32px 36px" }}>
-                  <h3 style={{ margin: "0 0 20px", fontSize: "1.25rem", fontWeight: 700, color: "#1e293b" }}>
-                    Record Details
-                  </h3>
-
-                  <div style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
-                  }}>
+                /* Has Data - compact table */
+                <div style={{ padding: "24px" }}>
+                  <h3 style={{ margin: "0 0 16px", fontSize: "1.15rem", fontWeight: 700 }}>Record Details</h3>
+                  <div style={{ border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
                     <div style={{
                       background: "#f8fafc",
-                      padding: "12px 20px",
+                      padding: "10px 16px",
                       fontWeight: 600,
                       display: "grid",
-                      gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.8fr",
+                      gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.7fr",
                       gap: "12px",
                       fontSize: "0.85rem"
                     }}>
-                      <div>Recipient GSTIN</div>
+                      <div>Recipient</div>
                       <div>Name</div>
                       <div>Type</div>
                       <div>Items</div>
                       <div>Pending</div>
                       <div>Action</div>
                     </div>
-
-                    {records[selectedSection?.title]?.length > 0 ? (
-                      records[selectedSection.title].map((rec, idx) => (
-                        <div
-                          key={idx}
-                          style={{
-                            padding: "12px 20px",
-                            display: "grid",
-                            gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.8fr",
-                            gap: "12px",
-                            alignItems: "center",
-                            fontSize: "0.9rem",
-                            borderTop: "1px solid #f1f5f9"
-                          }}
-                        >
-                          <div>{rec.gstin}</div>
-                          <div>{rec.recipientName}</div>
-                          <div>Regular</div>
-                          <div style={{ fontWeight: 600, color: "#15803d" }}>{rec.items.length}</div>
-                          <div style={{ fontWeight: 600, color: "#dc2626" }}>0</div>
-                          <button style={{
-                            background: "#10b981",
-                            color: "white",
-                            border: "none",
-                            width: "34px",
-                            height: "34px",
-                            borderRadius: "8px",
-                            fontSize: "1.1rem",
-                            cursor: "pointer"
-                          }}>
-                            +
-                          </button>
-                        </div>
-                      ))
-                    ) : (
+                    {(records[selectedSection?.title] || []).map((rec, i) => (
                       <div
+                        key={i}
                         style={{
-                          padding: "12px 20px",
+                          padding: "10px 16px",
                           display: "grid",
-                          gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.8fr",
+                          gridTemplateColumns: "2fr 2fr 1fr 1fr 1fr 0.7fr",
                           gap: "12px",
                           alignItems: "center",
                           fontSize: "0.9rem",
                           borderTop: "1px solid #f1f5f9"
                         }}
                       >
-                        <div>09AFYPA8613C2ZB</div>
-                        <div>JK STEEL TRADERS</div>
+                        <div>{rec.gstin}</div>
+                        <div>{rec.recipientName}</div>
                         <div>Regular</div>
-                        <div style={{ fontWeight: 600, color: "#15803d" }}>1</div>
+                        <div style={{ fontWeight: 600, color: "#15803d" }}>{rec.items.length}</div>
                         <div style={{ fontWeight: 600, color: "#dc2626" }}>0</div>
                         <button style={{
                           background: "#10b981",
                           color: "white",
                           border: "none",
-                          width: "34px",
-                          height: "34px",
+                          width: "32px",
+                          height: "32px",
                           borderRadius: "8px",
-                          fontSize: "1.1rem",
                           cursor: "pointer"
-                        }}>
-                          +
-                        </button>
+                        }}>+</button>
                       </div>
-                    )}
+                    ))}
                   </div>
 
-                  {/* Bottom Actions */}
-                  <div style={{
-                    marginTop: "32px",
-                    display: "flex",
-                    gap: "16px",
-                    justifyContent: "flex-end"
-                  }}>
+                  <div style={{ marginTop: "24px", textAlign: "right" }}>
                     <button
                       onClick={() => setSelectedSection(null)}
                       style={{
-                        padding: "11px 32px",
+                        padding: "10px 28px",
                         background: "#f1f5f9",
                         border: "1px solid #cbd5e1",
                         borderRadius: "10px",
@@ -2312,35 +1964,20 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
                     >
                       BACK
                     </button>
-
                     <button
                       onClick={() => setShowAddForm(true)}
                       style={{
-                        padding: "11px 32px",
+                        padding: "10px 28px",
                         background: "linear-gradient(90deg, #3b82f6, #2563eb)",
                         color: "white",
                         border: "none",
                         borderRadius: "10px",
                         fontWeight: 600,
-                        cursor: "pointer",
-                        boxShadow: "0 3px 12px rgba(59,130,246,0.25)"
-                      }}
-                    >
-                      ADD RECORD
-                    </button>
-
-                    <button
-                      style={{
-                        padding: "11px 32px",
-                        background: "#334155",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "10px",
-                        fontWeight: 600,
+                        marginLeft: "12px",
                         cursor: "pointer"
                       }}
                     >
-                      IMPORT EWB DATA
+                      ADD RECORD
                     </button>
                   </div>
                 </div>
@@ -2354,7 +1991,7 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
 };
 
 // ==============================================
-// Main Wrapper Component
+// Main App Wrapper
 // ==============================================
 const YourReturnsComponent = () => {
   const [step, setStep] = useState('selection');
@@ -2381,7 +2018,7 @@ const YourReturnsComponent = () => {
         quarter={selectedQuarter}
         period={selectedPeriod}
         onBack={() => setStep('selection')}
-        onViewForm={(form) => {
+        onViewForm={form => {
           setSelectedForm(form);
           setStep('detail');
         }}
@@ -2401,6 +2038,8 @@ const YourReturnsComponent = () => {
     />
   );
 };
+
+
 
 
   // Dummy data for GST Returns - sample clients with filing status
@@ -2771,7 +2410,7 @@ const handleClientSelect = () => {
   const dashboardTabs = [
     { id: "returns-status", label: "Returns Status" },
     { id: "summary", label: "Ledger Summary" },
-    { id: "elb", label: "ELB" },
+    // { id: "elb", label: "ELB" },
     { id: "turnover", label: "Turnover" },
     { id: "liability", label: "Liability Ledger" },
     { id: "payment", label: "Demand" },
@@ -3425,7 +3064,7 @@ const handleClientSelect = () => {
               </div>
             </div>
           )}
-          {activeDashboardTab === "elb" && (
+          {/* {activeDashboardTab === "elb" && (
             <div style={{ padding: "28px" }}>
               <div style={{ display: "inline-block", background: "linear-gradient(135deg,#1e40af,#2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "22px" }}>
                 Electronic Ledger Balances – Detailed View
@@ -3462,9 +3101,9 @@ const handleClientSelect = () => {
                     </tr>
                   </tbody>
                 </table>
-              </div>
-            </div>
-          )}
+              </div> */}
+            {/* </div>
+          )} */}
           {activeDashboardTab === "turnover" && (
             <div style={{ padding: "28px" }}>
               <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "14px" }}>
