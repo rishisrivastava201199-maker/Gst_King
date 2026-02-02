@@ -5698,70 +5698,106 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
     setNotifications({ ...notifications, [key]: !notifications[key] });
     toast.success(`${key.replace(/([A-Z])/g, ' $1').trim()} notifications ${!notifications[key] ? "enabled" : "disabled"}`);
   };
-  const SettingsPage = () => (
-  <div className="full-width-page" style={{ padding: "20px" }}>
+ const SettingsPage = () => (
+  <div
+    className="full-width-page"
+    style={{
+      padding: "24px 20px",
+      minHeight: "100vh",
+      background: "#f8f9fc",
+      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    }}
+  >
     <div style={{
       maxWidth: "1100px",
       margin: "0 auto",
-      background: "#fff",
+      background: "#ffffff",
       borderRadius: "16px",
-      boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
-      overflow: "hidden"
+      boxShadow: "0 10px 30px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)",
+      overflow: "hidden",
+      border: "1px solid #e5e7eb",
     }}>
-      {/* Header */}
-      <div style={{ background: "#7c3aed", padding: "30px", textAlign: "center", color: "white" }}>
-        <h2 style={{ fontSize: "2rem", margin: 0, fontWeight: "700" }}>Settings</h2>
-        <p style={{ margin: "8px 0 0 0", opacity: 0.9 }}>Manage your profile, security, notifications, and plan</p>
+      {/* Header – ab bahut chhota (padding kam, text tight) */}
+      <div style={{
+        padding: "10px 32px",               // ← height ab minimal (top/bottom 10px)
+        textAlign: "center",
+        background: "#ffffff",
+        borderBottom: "1px solid #e5e7eb",
+      }}>
+        <h2 style={{
+          fontSize: "1.55rem",              // font bhi thoda chhota
+          margin: "0",
+          fontWeight: "700",
+          color: "#7c3aed",
+          letterSpacing: "-0.015em",
+        }}>
+          Settings
+        </h2>
+        <p style={{
+          margin: "2px 0 0 0",              // sub-text bahut tight
+          fontSize: "0.82rem",
+          color: "#6b7280",
+          fontWeight: "400",
+        }}>
+          Profile • Security • Notifications • Plan
+        </p>
       </div>
 
       <div style={{ display: "flex" }}>
-        {/* Compact Sidebar - Takes less space */}
-        <div style={{ 
-          width: "240px", 
-          background: "#f9fafb", 
-          padding: "20px 15px",
-          borderRight: "1px solid #eee"
+        {/* Sidebar – pehle wala slim version */}
+        <div style={{
+          width: "180px",
+          background: "#ffffff",
+          borderRight: "1px solid #e5e7eb",
+          padding: "12px 8px",
         }}>
           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {[
-              { key: "profile", icon: HiUser, label: "Edit Profile" },
-              { key: "password", icon: HiLockClosed, label: "Change Password" },
+              { key: "profile", icon: HiUser, label: "Profile" },
+              { key: "password", icon: HiLockClosed, label: "Password" },
               { key: "notifications", icon: HiBell, label: "Notifications" },
-              { key: "billing", icon: HiCreditCard, label: "Billing & Plan" },
+              { key: "billing", icon: HiCreditCard, label: "Billing" },
             ].map(item => (
-              <li key={item.key} style={{ marginBottom: "8px" }}>
+              <li key={item.key} style={{ marginBottom: "3px" }}>
                 <button
                   onClick={() => setSelectedSetting(item.key)}
                   style={{
                     width: "100%",
-                    padding: "14px 16px",
-                    background: selectedSetting === item.key ? "#7c3aed" : "transparent",
-                    color: selectedSetting === item.key ? "white" : "#444",
+                    padding: "9px 10px",
+                    background: selectedSetting === item.key ? "#f3e8ff" : "transparent",
+                    color: selectedSetting === item.key ? "#6d28d9" : "#374151",
                     border: "none",
-                    borderRadius: "10px",
-                    fontSize: "1rem",
+                    borderRadius: "8px",
+                    fontSize: "0.92rem",
                     fontWeight: selectedSetting === item.key ? "600" : "500",
                     display: "flex",
                     alignItems: "center",
-                    gap: "12px",
+                    gap: "10px",
                     cursor: "pointer",
-                    transition: "all 0.2s ease"
+                    transition: "all 0.16s ease",
                   }}
                   onMouseOver={(e) => {
-                    if (selectedSetting !== item.key) e.currentTarget.style.background = "#e0d4ff";
+                    if (selectedSetting !== item.key) {
+                      e.currentTarget.style.background = "#f8f5ff";
+                    }
                   }}
                   onMouseOut={(e) => {
-                    if (selectedSetting !== item.key) e.currentTarget.style.background = "transparent";
+                    if (selectedSetting !== item.key) {
+                      e.currentTarget.style.background = "transparent";
+                    }
                   }}
                 >
-                  <item.icon style={{ fontSize: "1.3rem" }} />
-                 
+                  <item.icon style={{
+                    fontSize: "1.18rem",
+                    color: selectedSetting === item.key ? "#6d28d9" : "#6b7280",
+                    minWidth: "20px"
+                  }} />
                   {item.label}
                 </button>
               </li>
             ))}
 
-            <li style={{ marginTop: "40px" }}>
+            <li style={{ marginTop: "24px" }}>
               <button
                 onClick={() => {
                   toast.success("Logged out successfully!");
@@ -5771,21 +5807,29 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
                 }}
                 style={{
                   width: "100%",
-                  padding: "14px",
-                  background: "#ef4444",
-                  color: "white",
+                  padding: "9px 10px",
+                  background: "#fef2f2",
+                  color: "#991b1b",
                   border: "none",
-                  borderRadius: "10px",
-                  fontSize: "1rem",
-                  fontWeight: "600",
+                  borderRadius: "8px",
+                  fontSize: "0.92rem",
+                  fontWeight: "500",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "10px"
+                  gap: "8px",
+                  transition: "all 0.16s ease",
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = "#fee2e2";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = "#fef2f2";
                 }}
               >
-                <HiLogout /> Logout
+                <HiLogout style={{ fontSize: "1.18rem" }} />
+                Logout
               </button>
             </li>
           </ul>
@@ -6277,7 +6321,7 @@ case "/user/gst-return":
               top: "68px",
               right: 0,
               width: "260px",
-              background: "rgba(30,41,59,0.97)",
+              background: "rgba(30,41,59,0.97) ",
               backdropFilter: "blur(16px)",
               borderRadius: "14px",
               border: "1px solid rgba(255,255,255,0.09)",
