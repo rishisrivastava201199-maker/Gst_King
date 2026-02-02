@@ -3393,114 +3393,133 @@ const handleClientSelect = () => {
     );
   };
   return (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.4)",          // ← bahut light black (dark theme mein 0.5–0.6 bhi try kar sakte ho)
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 9999,
+      // backdropFilter: "blur(4px)",         // ← optional – blur hata bhi sakte ho agar bilkul clean chahiye
+    }}
+    onClick={onClose}
+  >
     <div
       style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.75)",
+        width: "100vw",                        // ← pura width
+        height: "100vh",                       // ← pura height
+        background: "#ffffff",
+        overflow: "hidden",
+        boxShadow: "none",                     // ← shadow hata diya full-screen feel ke liye
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 9999,
-        backdropFilter: "blur(8px)",
+        flexDirection: "column",
+        borderRadius: 0,                       // ← zero radius → bilkul edge-to-edge
       }}
-      onClick={onClose}
+      onClick={(e) => e.stopPropagation()}
     >
+      {/* Header – thoda compact aur full-width feel */}
       <div
         style={{
-          width: "98vw",
-          maxWidth: "1480px",
-          height: "96vh",
-          background: "#ffffff",
-          borderRadius: "16px",
-          overflow: "hidden",
-          boxShadow: "0 25px 80px rgba(0,0,0,0.45)",
+          background: "linear-gradient(135deg, #4f46e5, #4338ca)",
+          color: "white",
+          padding: "12px 24px",
           display: "flex",
-          flexDirection: "column",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontSize: "1rem",
+          fontWeight: "600",
         }}
-        onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #4f46e5, #4338ca)",
-            color: "white",
-            padding: "12px 22px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontSize: "0.92rem",
-            fontWeight: "600",
-            boxShadow: "0 4px 12px rgba(79,70,229,0.35)",
-          }}
+        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: "rgba(255,255,255,0.25)",
+              border: "none",
+              color: "white",
+              padding: "8px 18px",
+              borderRadius: "8px",
+              fontSize: "0.98rem",
+              fontWeight: "700",
+              cursor: "pointer",
+            }}
+          >
+            ← Back to Clients
+          </button>
+
+          <div>
+            GSTIN: <strong>{dynamicClient.gstin}</strong>  |  
+            Reg Date: <strong>{dynamicClient.registrationDate}</strong>  |  
+            Name: <strong>{dynamicClient.company}</strong>  |  
+            Status: <strong style={{ color: "#a7f3d0" }}>{dynamicClient.status}</strong>
+          </div>
+        </div>
+
+        <a
+          href="https://services.gst.gov.in/services/login"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "white", textDecoration: "underline", fontWeight: "500" }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            <button
-              onClick={onClose}
-              style={{
-                background: "rgba(255,255,255,0.25)",
-                border: "none",
-                color: "white",
-                padding: "10px 20px",
-                borderRadius: "10px",
-                fontSize: "0.98rem",
-                fontWeight: "700",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              ← All Clients
-            </button>
-            <div>
-              GSTIN: <strong>{dynamicClient.gstin}</strong> | Reg Date: <strong>{dynamicClient.registrationDate}</strong> | Name: <strong>{dynamicClient.company}</strong> | Status: <strong style={{ color: "#a7f3d0" }}>{dynamicClient.status}</strong>
-            </div>
-          </div>
-          <a href="https://services.gst.gov.in/services/login" target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "underline", fontWeight: "500" }}>
-            Go to GST Portal →
-          </a>
-        </div>
-        {/* Menu Bar */}
-        <div style={{ background: "#eef2ff", padding: "0 20px", borderBottom: "1px solid #e5e7eb" }}>
-          <div style={{ display: "inline-flex", gap: "8px", padding: "14px 0" }}>
-            {menuItems.map((item) => {
-              const isActive = activeMenu === item;
-              return (
-                <button
-                  key={item}
-                  onClick={() => {
-                    setActiveMenu(item);
-                    setActiveSubTab("Manually");
-                    if (item === "Annual Return") setActiveAnnualSubTab("GSTR-9");
-                  }}
-                  onMouseEnter={() => setHoveredMenu(item)}
-                  onMouseLeave={() => setHoveredMenu(null)}
-                  style={{
-                    padding: "10px 20px",
-                    fontSize: "0.92rem",
-                    fontWeight: isActive ? "700" : "600",
-                    background: isActive ? "#4f46e5" : "#ffffff",
-                    color: isActive ? "#ffffff" : "#1e293b",
-                    border: isActive ? "none" : "1px solid #d1d5db",
-                    boxShadow: isActive ? "0 4px 12px rgba(79, 70, 229, 0.3)" : "0 2px 6px rgba(0,0,0,0.08)",
-                    cursor: "pointer",
-                    minWidth: "115px",
-                  }}
-                >
-                  {item.toUpperCase().replace(/-/g, " ")}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        {/* Main Content */}
-        <div style={{ flex: 1, overflowY: "auto", background: "#f9fafb" }}>
-          {renderContent()}
+          GST Portal →
+        </a>
+      </div>
+
+      {/* Menu Bar */}
+      <div style={{
+        background: "#eef2ff",
+        padding: "0 24px",
+        borderBottom: "1px solid #e5e7eb",
+      }}>
+        <div style={{
+          display: "flex",
+          gap: "10px",
+          padding: "14px 0",
+          flexWrap: "wrap",
+        }}>
+          {menuItems.map((item) => {
+            const isActive = activeMenu === item;
+            return (
+              <button
+                key={item}
+                onClick={() => {
+                  setActiveMenu(item);
+                  setActiveSubTab("Manually");
+                  if (item === "Annual Return") setActiveAnnualSubTab("GSTR-9");
+                }}
+                style={{
+                  padding: "10px 22px",
+                  fontSize: "0.95rem",
+                  fontWeight: isActive ? "700" : "600",
+                  background: isActive ? "#4f46e5" : "#ffffff",
+                  color: isActive ? "#ffffff" : "#1e293b",
+                  border: isActive ? "none" : "1px solid #d1d5db",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  minWidth: "120px",
+                }}
+              >
+                {item.toUpperCase().replace(/-/g, " ")}
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      {/* Content – pura bacha hua area */}
+      <div style={{
+        flex: 1,
+        overflowY: "auto",
+        background: "#f9fafb",
+        padding: "20px 24px",
+      }}>
+        {renderContent()}
+      </div>
     </div>
-  );
+  </div>
+);
 };
 
   const PendingVouchersModal = () => (
@@ -6130,116 +6149,257 @@ case "/user/gst-return":
   ))}
 </ul>
       </aside>
-      <main className={`dashboard-main ${sidebarCollapsed ? "collapsed" : ""}`}>
-        <header className="dashboard-navbar" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 30px", background: "#1E293B", borderBottom: "1px solid #eee" }}>
-          <div className="company-info">
-            <h2 style={{ margin: 0, fontWeight: 700, fontSize: "1.6rem" , color:"white" }}>{user.company}</h2>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
-              <span style={{ width: "10px", height: "10px", background: "#22c55e", borderRadius: "50%", display: "inline-block" }}></span>
-              <span style={{ fontSize: "0.95rem" }}>Status: Active</span>
+     <main className={`dashboard-main ${sidebarCollapsed ? "collapsed" : ""}`}>
+  <header
+    className="dashboard-navbar"
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "0 32px",
+      height: "74px",
+      background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+      borderBottom: "1px solid rgba(255,255,255,0.07)",
+      backdropFilter: "blur(12px)",
+      WebkitBackdropFilter: "blur(12px)",
+      boxShadow: "0 6px 25px rgba(0,0,0,0.28)",
+      position: "sticky",
+      top: 0,
+      zIndex: 1000,
+    }}
+  >
+    {/* Left - Company Info */}
+    <div className="company-info" style={{ display: "flex", alignItems: "center", gap: "18px" }}>
+      <div>
+        <h2
+          style={{
+            margin: 0,
+            fontWeight: 700,
+            fontSize: "1.6rem",
+            letterSpacing: "-0.02em",
+            background: "linear-gradient(90deg, #c084fc, #a78bfa)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          {user.company}
+        </h2>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "4px" }}>
+          <span
+            style={{
+              width: "10px",
+              height: "10px",
+              background: "#22c55e",
+              borderRadius: "50%",
+              boxShadow: "0 0 12px rgba(34,197,94,0.55)",
+              animation: "pulse 2.2s infinite",
+            }}
+          />
+          <span style={{ fontSize: "0.94rem", color: "rgba(255,255,255,0.78)", fontWeight: 500 }}>
+            Status: Active
+          </span>
+        </div>
+      </div>
+    </div>
+
+    {/* Right - Controls */}
+    <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
+     
+
+      {/* User Dropdown Trigger */}
+      <div style={{ position: "relative" }}>
+        <button
+          onClick={() => setShowUserDropdown(!showUserDropdown)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "14px",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: "6px 10px",
+            borderRadius: "12px",
+            transition: "background 0.25s ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.09)")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+        >
+          {/* Avatar */}
+          <div
+            style={{
+              width: "46px",
+              height: "46px",
+              background: "linear-gradient(135deg, #8b5cf6, #c084fc)",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "1.45rem",
+              fontWeight: "bold",
+              boxShadow: "0 4px 16px rgba(139,92,246,0.45)",
+              border: "2px solid rgba(255,255,255,0.20)",
+            }}
+          >
+            {user.name?.charAt(0)}
+          </div>
+
+          {/* Name & Role */}
+          <div style={{ textAlign: "left" }}>
+            <div
+              style={{
+                color: "white",
+                fontWeight: 600,
+                fontSize: "1.08rem",
+                lineHeight: 1.2,
+              }}
+            >
+              {user.name}
+            </div>
+            <div
+              style={{
+                color: "rgba(255,255,255,0.68)",
+                fontSize: "0.86rem",
+                fontWeight: 500,
+              }}
+            >
+              {user.role}
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "25px", position: "relative" }}>
-            <button className="dark-toggle" onClick={toggleDarkMode} style={{ background: "none", border: "none", fontSize: "1.6rem", cursor: "pointer" }}>
-              {darkMode ? <HiSun /> : <HiMoon />}
-            </button>
-            <div style={{ position: "relative" }}>
-              <button
-                onClick={() => setShowUserDropdown(!showUserDropdown)}
-                style={{ display: "flex", alignItems: "center", gap: "12px" }}
-              >
-                <div
-                  style={{
-                    width: "42px",
-                    height: "42px",
-                    background: "blue",
-                    color: "black",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "1.3rem",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {user.name?.charAt(0)}
-                </div>
+        </button>
 
-                <div style={{ textAlign: "left" }}>
-                  <div>{user.name}</div>
-                  <div style={{ fontSize: "0.85rem", opacity: 0.8 }}>
-                    {user.role}
-                  </div>
-                </div>
+        {/* Dropdown */}
+        {showUserDropdown && (
+          <div
+            style={{
+              position: "absolute",
+              top: "68px",
+              right: 0,
+              width: "260px",
+              background: "rgba(30,41,59,0.97)",
+              backdropFilter: "blur(16px)",
+              borderRadius: "14px",
+              border: "1px solid rgba(255,255,255,0.09)",
+              boxShadow: "0 16px 55px rgba(0,0,0,0.52)",
+              overflow: "hidden",
+              zIndex: 1000,
+            }}
+          >
+            <div style={{ padding: "8px 0" }}>
+              <button
+                onClick={() => {
+                  setEditProfileForm({ ...user });
+                  setShowEditProfileModal(true);
+                  setShowUserDropdown(false);
+                }}
+                style={{
+                  width: "100%",
+                  padding: "14px 20px",
+                  textAlign: "left",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  fontSize: "1rem",
+                  color: "white",
+                  transition: "background 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+              >
+                <HiUser style={{ fontSize: "1.3rem" }} /> Edit Profile
               </button>
 
-              {showUserDropdown && (
-                <div style={{
-                  position: "absolute",
-                  top: "65px",
-                  right: 0,
-                  background: "white",
-                  borderRadius: "12px",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                  width: "240px",
-                  zIndex: 1000,
-                  overflow: "hidden",
-                  border: "1px solid #eee",
-                }}>
-                  <button
-                    onClick={() => {
-                      setEditProfileForm({ ...user });
-                      setShowEditProfileModal(true);
-                      setShowUserDropdown(false);
-                    }}
-                    style={{ width: "100%", padding: "14px 18px", textAlign: "left", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", fontSize: "1rem" }}
-                  >
-                    <HiUser style={{ fontSize: "1.2rem" }} /> Edit Profile
-                  </button>
-                  <Link
-                    to="/user/settings"
-                    onClick={() => setShowUserDropdown(false)}
-                    style={{ display: "block", padding: "14px 18px", textDecoration: "none", color: "#333", display: "flex", alignItems: "center", gap: "12px", fontSize: "1rem" }}
-                  >
-                    <HiCog style={{ fontSize: "1.2rem" }} /> Settings
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setShowContactModal(true);
-                      setShowUserDropdown(false);
-                    }}
-                    style={{ width: "100%", padding: "14px 18px", textAlign: "left", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", fontSize: "1rem" }}
-                  >
-                    <HiPhone style={{ fontSize: "1.2rem" }} /> Contact Us
-                  </button>
-                  <hr style={{ margin: "8px 0", border: "none", borderTop: "1px solid #eee" }} />
-                  <button
-                    onClick={() => {
-                      toast.success("Logged out successfully!");
-                      setShowUserDropdown(false);
-                      localStorage.removeItem("token");
-                      localStorage.removeItem("user");
-                      navigate("/login");
+              <Link
+                to="/user/settings"
+                onClick={() => setShowUserDropdown(false)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  padding: "14px 20px",
+                  textDecoration: "none",
+                  color: "white",
+                  fontSize: "1rem",
+                  transition: "background 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+              >
+                <HiCog style={{ fontSize: "1.3rem" }} /> Settings
+              </Link>
 
-                      // Add real logout logic here
-                    }}
-                    style={{ width: "100%", padding: "14px 18px", textAlign: "left", background: "none", border: "none", cursor: "pointer", color: "#ef4444", display: "flex", alignItems: "center", gap: "12px", fontSize: "1rem" }}
-                  >
-                    <HiLogout style={{ fontSize: "1.2rem" }} /> Logout
-                  </button>
-                </div>
-              )}
-              
+              <button
+                onClick={() => {
+                  setShowContactModal(true);
+                  setShowUserDropdown(false);
+                }}
+                style={{
+                  width: "100%",
+                  padding: "14px 20px",
+                  textAlign: "left",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  fontSize: "1rem",
+                  color: "white",
+                  transition: "background 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+              >
+                <HiPhone style={{ fontSize: "1.3rem" }} /> Contact Us
+              </button>
+
+              <hr style={{ margin: "8px 0", border: "none", borderTop: "1px solid rgba(255,255,255,0.09)" }} />
+
+              <button
+                onClick={() => {
+                  toast.success("Logged out successfully!");
+                  setShowUserDropdown(false);
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("user");
+                  navigate("/login");
+                }}
+                style={{
+                  width: "100%",
+                  padding: "14px 20px",
+                  textAlign: "left",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  fontSize: "1rem",
+                  color: "#f87171",
+                  transition: "background 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(248,113,113,0.12)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+              >
+                <HiLogout style={{ fontSize: "1.3rem" }} /> Logout
+              </button>
             </div>
           </div>
-        </header>
-        
-        <div className="dashboard-content">
-          {pageContent}
-        </div>
-      </main>
-      {showContactModal && <ContactModal />}
-      {showEditProfileModal && <EditProfileModal />}
+        )}
+      </div>
+    </div>
+  </header>
+
+  <div className="dashboard-content">
+    {pageContent}
+  </div>
+</main>
+
+{showContactModal && <ContactModal />}
+{showEditProfileModal && <EditProfileModal />}
     </>
   );
 }
