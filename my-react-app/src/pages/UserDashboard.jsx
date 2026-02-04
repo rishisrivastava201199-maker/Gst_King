@@ -569,7 +569,7 @@ function UserDashboard() {
 const menuItems = [
   { text: "Dashboard", link: "/user", icon: HiHome },
   { text: "My Clients", link: "/user/clients", icon: HiUserGroup },
-  { text: "GSTR Filed", link: "/user/gst-return", icon: HiCheckCircle },
+  // { text: "GSTR Filed", link: "/user/gst-return", icon: HiCheckCircle },
   { text: "GST Return", link: "/user/returns", icon: HiDocumentText },
   { text: "News & Updates", link: "/user/news-updates", icon: HiNewspaper },
   { text: "Notifications", link: "/user/notifications", icon: HiBell },
@@ -2607,17 +2607,97 @@ const handleClientSelect = () => {
       </div>
     );
   };
-  const GSTRLayout = ({ title }) => (
-    <div style={{ padding: "20px", background: "#f8fafc" }}>
+  // ==============================================
+// GSTR Layout Component (with tabs: Manually, Import, Summary)
+// ==============================================
+const GSTRLayout = ({ title = "GST Returns" }) => {
+  const [activeSubTab, setActiveSubTab] = useState("Manually");
+  const [selectedFY, setSelectedFY] = useState("2025-26");
+  const [selectedQuarter, setSelectedQuarter] = useState("Quarter 4 (Jan - Mar)");
+  const [selectedPeriod, setSelectedPeriod] = useState("January");
+
+  // Step management for Manually tab flow
+  const [step, setStep] = useState('selection'); // 'selection' | 'summary' | 'detail'
+  const [selectedForm, setSelectedForm] = useState(null); // GSTR1, GSTR3B, AutoDraftedITC etc.
+
+  let content;
+  if (activeSubTab === "Manually") {
+    if (step === 'detail') {
+      content = (
+        <DetailedGSTView
+          formType={selectedForm}
+          fy={selectedFY}
+          period={selectedPeriod}
+          onBack={() => setStep('summary')}
+        />
+      );
+    } else if (step === 'summary') {
+      content = (
+        <ReturnsSummaryScreen
+          fy={selectedFY}
+          quarter={selectedQuarter}
+          period={selectedPeriod}
+          onBack={() => setStep('selection')}
+          onViewForm={(form) => {
+            setSelectedForm(form);
+            setStep('detail');
+          }}
+        />
+      );
+    } else {
+      // selection screen
+      content = (
+        <GSTReturnPeriodSelection
+          selectedFY={selectedFY}
+          setSelectedFY={setSelectedFY}
+          selectedQuarter={selectedQuarter}
+          setSelectedQuarter={setSelectedQuarter}
+          selectedPeriod={selectedPeriod}
+          setSelectedPeriod={setSelectedPeriod}
+          onSearch={() => setStep('summary')}
+        />
+      );
+    }
+  } else if (activeSubTab === "Import") {
+    content = (
+      <div style={{ padding: "100px 20px", textAlign: "center", color: "#64748b" }}>
+        <h2>Import functionality coming soon...</h2>
+        <p>(Excel / Tally / JSON import - under development)</p>
+      </div>
+    );
+  } else if (activeSubTab === "Summary") {
+    content = (
+      <div style={{ padding: "80px 20px", textAlign: "center", color: "#64748b" }}>
+        <h2>Overall Summary Dashboard</h2>
+        <p>Grand total liability, ITC credit, net payable view - to be implemented</p>
+      </div>
+    );
+  } else {
+    content = null;
+  }
+
+  return (
+    <div style={{ padding: "20px", background: "#f8fafc", minHeight: "100vh" }}>
       <div style={{ background: "#ffffff", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-          <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "700", color: "#7c3aed" }}>{title}</h2>
+        {/* Header + Year & Month Dropdowns */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "16px" }}>
+          <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "700", color: "#7c3aed" }}>
+            {title}
+          </h2>
           <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-            <select style={{ padding: "10px 16px", borderRadius: "8px", border: "1px solid #ccc", fontSize: "1rem" }}>
+            <select
+              value={selectedFY}
+              onChange={e => setSelectedFY(e.target.value)}
+              style={{ padding: "10px 16px", borderRadius: "8px", border: "1px solid #ccc", fontSize: "1rem" }}
+            >
               <option>FY 2024-25</option>
               <option>FY 2025-26</option>
             </select>
-            <select style={{ padding: "10px 16px", borderRadius: "8px", border: "1px solid #ccc", fontSize: "1rem" }}>
+            <select
+              value={selectedPeriod}
+              onChange={e => setSelectedPeriod(e.target.value)}
+              style={{ padding: "10px 16px", borderRadius: "8px", border: "1px solid #ccc", fontSize: "1rem" }}
+            >
               <option>Jan-2025</option>
               <option>Feb-2025</option>
               <option>Mar-2025</option>
@@ -2633,16 +2713,15 @@ const handleClientSelect = () => {
             </select>
           </div>
         </div>
+
+        {/* Tabs: Manually | Import | Summary */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "32px", borderBottom: "2px solid #e2e8f0" }}>
           {["Manually", "Import", "Summary"].map((tab) => (
             <button
               key={tab}
               onClick={() => {
                 setActiveSubTab(tab);
-                if (tab === "Import") {
-                  setImportStep("list");
-                  setSelectedImportType(null);
-                }
+                if (tab !== "Manually") setStep('selection');
               }}
               style={{
                 padding: "12px 28px",
@@ -2659,36 +2738,1266 @@ const handleClientSelect = () => {
             </button>
           ))}
         </div>
-        {activeSubTab === "Import" && (
-          <>
-            {importStep === "list" && <ImportOptionsList />}
-            {importStep === "upload" && <FileUploadScreen />}
-          </>
-        )}
-        {activeSubTab === "Summary" && (
-          <div style={{ textAlign: "center", padding: "80px 20px" }}>
-            <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-              <div style={{ background: "#fef3c7", padding: "24px", borderRadius: "12px", marginBottom: "40px", borderLeft: "5px solid #f59e0b" }}>
-                <p style={{ margin: "0 0 12px 0", fontWeight: "600", color: "#92400e" }}>Note :</p>
-                <ol style={{ margin: 0, paddingLeft: "24px", textAlign: "left", color: "#92400e" }}>
-                  <li>Total Amount is calculated by considering B2C-Small Amendments Details</li>
-                  <li>Total Amount is setting off by considering Credit And Debit Note Amount</li>
-                </ol>
+
+        {/* Main Content Area */}
+        <div style={{ minHeight: "60vh" }}>
+          {content}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==============================================
+// GST Return Period Selection (Selection Screen)
+// ==============================================
+const GSTReturnPeriodSelection = ({
+  selectedFY, setSelectedFY,
+  selectedQuarter, setSelectedQuarter,
+  selectedPeriod, setSelectedPeriod,
+  onSearch
+}) => (
+  <div style={{
+    padding: "24px 5%",
+    background: "linear-gradient(180deg,#f8fafc,#ffffff)",
+    minHeight: "100vh",
+    fontFamily: "system-ui, sans-serif"
+  }}>
+    <div style={{
+      maxWidth: "820px",
+      margin: "0 auto",
+      background: "#ffffff",
+      borderRadius: "16px",
+      overflow: "hidden",
+      boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
+      border: "1px solid #e5e7eb"
+    }}>
+      {/* Header */}
+      <div style={{
+        background: "linear-gradient(135deg,#eef2ff,#f8fafc)",
+        padding: "14px 22px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderBottom: "1px solid #e5e7eb"
+      }}>
+        <h1 style={{
+          margin: 0,
+          fontSize: "1.25rem",
+          fontWeight: 700,
+          color: "#0f172a"
+        }}>
+          File GST Returns
+        </h1>
+        <span style={{
+          fontSize: "0.8rem",
+          fontWeight: 600,
+          color: "#334155",
+          background: "#e0f2fe",
+          padding: "4px 10px",
+          borderRadius: "999px"
+        }}>
+          GSTIN: 09ACNPU2195H1ZY
+        </span>
+      </div>
+
+      {/* Form Area */}
+      <div style={{ padding: "22px 28px" }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "18px",
+          marginBottom: "26px"
+        }}>
+          <div>
+            <label style={{
+              display: "block",
+              marginBottom: "6px",
+              fontWeight: 600,
+              color: "#1e293b",
+              fontSize: "0.85rem"
+            }}>
+              Financial Year <span style={{ color: "#ef4444" }}>*</span>
+            </label>
+            <select
+              value={selectedFY}
+              onChange={e => setSelectedFY(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                borderRadius: "10px",
+                border: "1px solid #cbd5e1",
+                background: "#f8fafc",
+                fontSize: "0.9rem",
+                outline: "none",
+                boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)"
+              }}
+            >
+              <option>2025-26</option>
+              <option>2024-25</option>
+              <option>2023-24</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={{
+              display: "block",
+              marginBottom: "6px",
+              fontWeight: 600,
+              color: "#1e293b",
+              fontSize: "0.85rem"
+            }}>
+              Quarter <span style={{ color: "#ef4444" }}>*</span>
+            </label>
+            <select
+              value={selectedQuarter}
+              onChange={e => setSelectedQuarter(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                borderRadius: "10px",
+                border: "1px solid #cbd5e1",
+                background: "#f8fafc",
+                fontSize: "0.9rem",
+                outline: "none"
+              }}
+            >
+              <option>Quarter 4 (Jan - Mar)</option>
+              <option>Quarter 3 (Oct - Dec)</option>
+              <option>Quarter 2 (Jul - Sep)</option>
+              <option>Quarter 1 (Apr - Jun)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={{
+              display: "block",
+              marginBottom: "6px",
+              fontWeight: 600,
+              color: "#1e293b",
+              fontSize: "0.85rem"
+            }}>
+              Period <span style={{ color: "#ef4444" }}>*</span>
+            </label>
+            <select
+              value={selectedPeriod}
+              onChange={e => setSelectedPeriod(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                borderRadius: "10px",
+                border: "1px solid #cbd5e1",
+                background: "#f8fafc",
+                fontSize: "0.9rem",
+                outline: "none"
+              }}
+            >
+              {[
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ].map(m => (
+                <option key={m}>{m}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div style={{
+          background: "#eff6ff",
+          borderLeft: "4px solid #3b82f6",
+          padding: "10px 14px",
+          borderRadius: "10px",
+          fontSize: "0.8rem",
+          color: "#334155",
+          marginBottom: "22px",
+          maxWidth: "520px",
+          marginInline: "auto"
+        }}>
+          You have selected to file the return on monthly frequency.
+          GSTR-1 and GSTR-3B are required for each month of the quarter.
+        </div>
+
+        <div style={{ textAlign: "center" }}>
+          <button
+            onClick={onSearch}
+            style={{
+              background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
+              color: "white",
+              padding: "12px 56px",
+              fontSize: "1rem",
+              fontWeight: 700,
+              border: "none",
+              borderRadius: "999px",
+              cursor: "pointer",
+              boxShadow: "0 12px 30px rgba(37,99,235,0.45)",
+              transition: "all 0.2s ease"
+            }}
+            onMouseOver={e => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 18px 40px rgba(37,99,235,0.6)";
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 12px 30px rgba(37,99,235,0.45)";
+            }}
+          >
+            SEARCH RETURNS
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// ==============================================
+// Returns Summary Screen
+// ==============================================
+const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
+  const pastMonths = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const isPastPeriod = fy !== '2025-26' || pastMonths.includes(period);
+
+  return (
+    <div style={{
+      padding: "20px 5% 32px",
+      background: "linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%)",
+      minHeight: "100vh",
+      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+          flexWrap: "wrap",
+          gap: "12px"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button
+              onClick={onBack}
+              style={{
+                background: "white",
+                border: "1px solid #cbd5e1",
+                width: "44px",
+                height: "44px",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: "1.1rem",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+              }}
+            >
+              ←
+            </button>
+            <h1 style={{
+              margin: 0,
+              fontSize: "1.75rem",
+              fontWeight: 700,
+              color: "#0f172a"
+            }}>
+              Returns Dashboard
+            </h1>
+          </div>
+
+          <div style={{
+            background: "#eff6ff",
+            padding: "8px 16px",
+            borderRadius: "9999px",
+            fontSize: "0.95rem",
+            fontWeight: 600,
+            color: "#1d4ed8",
+            border: "1px solid #bfdbfe",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
+          }}>
+            FY {fy} · {quarter}
+          </div>
+        </div>
+
+        <div style={{
+          background: "white",
+          borderLeft: "4px solid #3b82f6",
+          padding: "12px 16px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          fontSize: "0.95rem",
+          color: "#1e40af",
+          fontWeight: 500
+        }}>
+          Monthly filing enabled. GSTR-1 & GSTR-3B required every month.
+        </div>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "20px"
+        }}>
+          {/* GSTR-1 Card */}
+          <div style={{
+            background: "white",
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "240px"
+          }}>
+            <div style={{
+              padding: "14px 20px",
+              background: "linear-gradient(90deg, #eff6ff, #dbeafe)",
+              color: "#1d4ed8",
+              fontSize: "1.05rem",
+              fontWeight: 700,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "10px"
+            }}>
+              <span>GSTR-1 · Outward Supplies</span>
+              <span style={{
+                background: "#ecfdf5",
+                color: "#065f46",
+                padding: "5px 12px",
+                borderRadius: "9999px",
+                fontSize: "0.8rem",
+                fontWeight: 600
+              }}>
+                Filed
+              </span>
+            </div>
+
+            <div style={{
+              padding: "16px 20px",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}>
+              <p style={{
+                fontSize: "0.9rem",
+                color: "#475569",
+                lineHeight: "1.45",
+                margin: 0
+              }}>
+                Summary of outward taxable supplies reported for the selected period.
+              </p>
+
+              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+                <button
+                  onClick={() => onViewForm("GSTR1")}
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    background: "#f1f5f9",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  View
+                </button>
+                <button style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}>
+                  Download
+                </button>
               </div>
-              <button style={{ background: "#16a34a", color: "white", padding: "16px 48px", border: "none", borderRadius: "12px", fontSize: "1.2rem", fontWeight: "600", boxShadow: "0 8px 25px rgba(22,163,74,0.3)" }}>
-                Download Excel
+            </div>
+          </div>
+
+          {/* Amendments Card (only if current period) */}
+          {!isPastPeriod && (
+            <div style={{
+              background: "white",
+              borderRadius: "12px",
+              overflow: "hidden",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+              border: "1px solid #e2e8f0",
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "240px"
+            }}>
+              <div style={{
+                padding: "14px 20px",
+                background: "linear-gradient(90deg, #fffbeb, #fef3c7)",
+                color: "#92400e",
+                fontSize: "1.05rem",
+                fontWeight: 700,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "10px"
+              }}>
+                <span>Amendments</span>
+                <span style={{
+                  background: "#fefce8",
+                  color: "#854d0e",
+                  padding: "5px 12px",
+                  borderRadius: "9999px",
+                  fontSize: "0.8rem",
+                  fontWeight: 600
+                }}>
+                  Open
+                </span>
+              </div>
+
+              <div style={{
+                padding: "16px 20px",
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
+              }}>
+                <p style={{
+                  fontSize: "0.9rem",
+                  color: "#475569",
+                  lineHeight: "1.45",
+                  margin: 0
+                }}>
+                  Update invoices, debit notes, or credit notes for the current tax period.
+                </p>
+
+                <button style={{
+                  width: "100%",
+                  padding: "10px 0",
+                  marginTop: "20px",
+                  background: "linear-gradient(90deg, #f59e0b, #d97706)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.92rem",
+                  cursor: "pointer"
+                }}>
+                  Prepare Online
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Auto-Drafted ITC Card */}
+          <div style={{
+            background: "white",
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "240px"
+          }}>
+            <div style={{
+              padding: "14px 20px",
+              background: "linear-gradient(90deg, #f0fdfa, #ccfbf1)",
+              color: "#0f766e",
+              fontSize: "1.05rem",
+              fontWeight: 700,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "10px"
+            }}>
+              <span>Auto-Drafted ITC</span>
+              <span style={{
+                background: "#f0fdfa",
+                color: "#0f766e",
+                padding: "5px 12px",
+                borderRadius: "9999px",
+                fontSize: "0.8rem",
+                fontWeight: 600
+              }}>
+                Available
+              </span>
+            </div>
+
+            <div style={{
+              padding: "16px 20px",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}>
+              <p style={{
+                fontSize: "0.9rem",
+                color: "#475569",
+                lineHeight: "1.45",
+                margin: 0
+              }}>
+                ITC statement auto-generated based on supplier filings.
+              </p>
+
+              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+                <button
+                  onClick={() => onViewForm("AutoDraftedITC")}
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    background: "#f1f5f9",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "8px",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  View
+                </button>
+                <button style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}>
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* GSTR-3B Card */}
+          <div style={{
+            background: "white",
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 6px 24px rgba(153,27,27,0.18)",
+            border: "1px solid #fecaca",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "240px"
+          }}>
+            <div style={{
+              padding: "14px 20px",
+              background: "linear-gradient(90deg, #fef2f2, #fee2e2)",
+              color: "#991b1b",
+              fontSize: "1.05rem",
+              fontWeight: 700,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "10px"
+            }}>
+              <span>GSTR-3B · Monthly Return</span>
+              <span style={{
+                background: "#fef2f2",
+                color: "#991b1b",
+                padding: "5px 12px",
+                borderRadius: "9999px",
+                fontSize: "0.8rem",
+                fontWeight: 600
+              }}>
+                Pending
+              </span>
+            </div>
+
+            <div style={{
+              padding: "16px 20px",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}>
+              <div>
+                <div style={{
+                  background: "#fefce8",
+                  color: "#854d0e",
+                  padding: "8px 12px",
+                  borderRadius: "8px",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  textAlign: "center",
+                  marginBottom: "16px"
+                }}>
+                  Due date: 20 {period} 2026
+                </div>
+
+                <p style={{
+                  fontSize: "0.9rem",
+                  color: "#475569",
+                  lineHeight: "1.45",
+                  margin: 0
+                }}>
+                  Summary of monthly return including liability, ITC and payment details.
+                </p>
+              </div>
+
+              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+                <button style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}>
+                  Prepare Online
+                </button>
+                <button style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  background: "#f1f5f9",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer"
+                }}>
+                  Prepare Offline
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==============================================
+// Detailed GST View - Main Form with Add Record Modal
+// ==============================================
+const DetailedGSTView = ({ formType, fy, period, onBack }) => {
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [records, setRecords] = useState({}); // sectionTitle → array of records
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const [form, setForm] = useState({
+    deemedExports: false,
+    sezWithPayment: false,
+    sezWithoutPayment: false,
+    reverseCharge: false,
+    intraStateIGST: false,
+    differentialPercent: false,
+    gstin: "",
+    recipientName: "",
+    nameInMaster: "",
+    invoiceNo: "",
+    invoiceDate: "",
+    totalValue: "",
+    pos: "09-Uttar Pradesh",
+    supplyType: "Intra-State",
+    source: "",
+    irn: "",
+    irnDate: "",
+    items: []
+  });
+
+  const saveRecord = () => {
+    if (!form.gstin || !form.invoiceNo || !form.totalValue) {
+      alert("GSTIN, Invoice No. aur Total Value fill karo bhai!");
+      return;
+    }
+
+    const sectionTitle = selectedSection?.title || "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices";
+
+    setRecords(prev => ({
+      ...prev,
+      [sectionTitle]: [
+        ...(prev[sectionTitle] || []),
+        { ...form, id: Date.now(), timestamp: new Date().toISOString() }
+      ]
+    }));
+
+    // Reset form
+    setForm({
+      deemedExports: false,
+      sezWithPayment: false,
+      sezWithoutPayment: false,
+      reverseCharge: false,
+      intraStateIGST: false,
+      differentialPercent: false,
+      gstin: "",
+      recipientName: "",
+      nameInMaster: "",
+      invoiceNo: "",
+      invoiceDate: "",
+      totalValue: "",
+      pos: "09-Uttar Pradesh",
+      supplyType: "Intra-State",
+      source: "",
+      irn: "",
+      irnDate: "",
+      items: []
+    });
+
+    setShowAddForm(false);
+    alert("Record successfully saved!");
+  };
+
+  const baseSections = [
+    "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
+    "5 - B2C (Large) Invoices",
+    "6A - Exports Invoices",
+    "7 - B2C (Others)",
+    "8A, 8B, 8C, 8D - Nil Rated Supplies",
+    "9B - Credit / Debit Notes (Registered)",
+    "9B - Credit / Debit Notes (Unregistered)",
+    "11A(1), 11A(2) - Tax Liability (Advances Received)",
+    "11B - Adjustment of Advances",
+    "12 - HSN-wise summary of outward supplies",
+    "13 - Documents Issued",
+    "14 - Supplies made through ECO",
+    "15 - Supplies U/s 9(5)"
+  ];
+
+  const sections = baseSections.map(title => ({
+    title,
+    count: records[title]?.length || 0
+  }));
+
+  return (
+    <div style={{
+      padding: "20px 5% 40px",
+      background: "#f9fafb",
+      minHeight: "100vh",
+      fontFamily: "system-ui, sans-serif"
+    }}>
+      <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+        {/* Back button */}
+        <button
+          onClick={onBack}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "10px 18px",
+            background: "white",
+            border: "1px solid #d1d5db",
+            borderRadius: "10px",
+            fontWeight: 600,
+            fontSize: "0.95rem",
+            cursor: "pointer",
+            marginBottom: "20px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+          }}
+        >
+          ← Back
+        </button>
+
+        {/* Main Info Card */}
+        <div style={{
+          background: "white",
+          borderRadius: "12px",
+          padding: "20px 24px",
+          marginBottom: "24px",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.07)",
+          border: "1px solid #e5e7eb"
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "16px" }}>
+            <h1 style={{ margin: 0, fontSize: "1.55rem", fontWeight: 700, color: "#1d4ed8" }}>
+              {formType}
+            </h1>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button style={{
+                padding: "8px 14px",
+                background: "#eff6ff",
+                color: "#1d4ed8",
+                border: "1px solid #bfdbfe",
+                borderRadius: "8px",
+                fontWeight: 600,
+                fontSize: "0.9rem",
+                cursor: "pointer"
+              }}>
+                Advisory
+              </button>
+              <button style={{
+                padding: "8px 14px",
+                background: "#1d4ed8",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: 600,
+                fontSize: "0.9rem",
+                cursor: "pointer"
+              }}>
+                Help
               </button>
             </div>
           </div>
-        )}
-        {activeSubTab === "Manually" && (
-          <div style={{ textAlign: "center", padding: "100px 20px", color: "#64748b" }}>
-            <h3 style={{ fontSize: "1.8rem" }}>Manual Entry - Coming Soon</h3>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "10px",
+            fontSize: "0.9rem"
+          }}>
+            <div><strong>GSTIN:</strong> 09ACNPU2195H1ZY</div>
+            <div><strong>Legal:</strong> Mohd Umair</div>
+            <div><strong>Trade:</strong> U.A.F ENTERPRISE'S</div>
+            <div><strong>FY:</strong> {fy}</div>
+            <div><strong>Period:</strong> {period}</div>
+            <div>
+              <strong>Status:</strong>
+              <span style={{
+                marginLeft: "8px",
+                padding: "4px 10px",
+                background: "#ecfdf5",
+                color: "#059669",
+                borderRadius: "6px",
+                fontWeight: 600,
+                fontSize: "0.85rem"
+              }}>
+                Filed
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Nil filing option */}
+        <div style={{
+          background: "white",
+          borderRadius: "10px",
+          padding: "12px 18px",
+          marginBottom: "20px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+          border: "1px solid #e5e7eb",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px"
+        }}>
+          <input type="checkbox" style={{ width: "16px", height: "16px", accentColor: "#3b82f6" }} />
+          <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#1e293b" }}>
+            File Nil {formType}
+          </span>
+        </div>
+
+        {/* Section Cards Grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gap: "16px"
+        }}>
+          {sections.map((item, index) => (
+            <div
+              key={index}
+              onClick={() => setSelectedSection(item)}
+              style={{
+                background: "white",
+                borderRadius: "12px",
+                border: item.count > 0 ? "1px solid #86efac" : "1px solid #e5e7eb",
+                overflow: "hidden",
+                cursor: "pointer",
+                boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
+                transition: "all 0.2s ease"
+              }}
+            >
+              <div style={{
+                background: item.count > 0
+                  ? "linear-gradient(135deg, #ecfdf5, #f0fdf4)"
+                  : "linear-gradient(135deg, #f8fafc, #f1f5f9)",
+                padding: "12px 14px",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                textAlign: "center",
+                minHeight: "54px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}>
+                {item.title}
+              </div>
+              <div style={{ padding: "16px", textAlign: "center" }}>
+                <div style={{
+                  width: "48px",
+                  height: "48px",
+                  lineHeight: "48px",
+                  borderRadius: "50%",
+                  margin: "0 auto",
+                  fontSize: "1.3rem",
+                  fontWeight: 700,
+                  background: item.count > 0 ? "#dcfce7" : "#f1f5f9",
+                  color: item.count > 0 ? "#15803d" : "#64748b",
+                  boxShadow: item.count > 0 ? "0 2px 8px rgba(34,197,94,0.25)" : "none"
+                }}>
+                  {item.count}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ADD RECORD MODAL - when section selected */}
+        {selectedSection && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.55)",
+              zIndex: 9999,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "auto",
+              padding: "20px"
+            }}
+            onClick={() => {
+              setSelectedSection(null);
+              setShowAddForm(false);
+            }}
+          >
+            <div
+              style={{
+                width: "95vw",
+                maxWidth: "1100px",
+                background: "#ffffff",
+                borderRadius: "18px",
+                overflow: "hidden",
+                boxShadow: "0 25px 70px rgba(0,0,0,0.35)",
+                maxHeight: "92vh",
+                display: "flex",
+                flexDirection: "column"
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div style={{
+                padding: "16px 28px",
+                background: "linear-gradient(135deg, #4f46e5, #4338ca)",
+                color: "white",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}>
+                <h2 style={{ margin: 0, fontSize: "1.4rem" }}>
+                  {selectedSection.title}
+                </h2>
+                <button
+                  onClick={() => {
+                    setSelectedSection(null);
+                    setShowAddForm(false);
+                  }}
+                  style={{
+                    background: "rgba(255,255,255,0.25)",
+                    border: "none",
+                    color: "white",
+                    padding: "8px 16px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    fontSize: "1.1rem"
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Body - Scrollable */}
+              <div style={{
+                padding: "28px 32px",
+                flex: 1,
+                overflowY: "auto"
+              }}>
+                {/* Supply Type Checkboxes */}
+                <div style={{ marginBottom: "32px" }}>
+                  <h4 style={{ margin: "0 0 16px", fontSize: "1.15rem", color: "#1e293b" }}>
+                    Supply Type
+                  </h4>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "20px 40px" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.deemedExports}
+                        onChange={e => setForm(prev => ({ ...prev, deemedExports: e.target.checked }))}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                      Deemed Exports
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.sezWithPayment}
+                        onChange={e => setForm(prev => ({ ...prev, sezWithPayment: e.target.checked }))}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                      SEZ with payment
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.sezWithoutPayment}
+                        onChange={e => setForm(prev => ({ ...prev, sezWithoutPayment: e.target.checked }))}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                      SEZ without payment
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.reverseCharge}
+                        onChange={e => setForm(prev => ({ ...prev, reverseCharge: e.target.checked }))}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                      Reverse Charge
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.intraStateIGST}
+                        onChange={e => setForm(prev => ({ ...prev, intraStateIGST: e.target.checked }))}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                      Intra-State IGST
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
+                      <input
+                        type="checkbox"
+                        checked={form.differentialPercent}
+                        onChange={e => setForm(prev => ({ ...prev, differentialPercent: e.target.checked }))}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                      Differential %
+                    </label>
+                  </div>
+                </div>
+
+                {/* Main Form Fields */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", marginBottom: "32px" }}>
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>GSTIN/UIN *</label>
+                    <input
+                      name="gstin"
+                      value={form.gstin}
+                      onChange={e => setForm(prev => ({ ...prev, gstin: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Recipient Name *</label>
+                    <input
+                      name="recipientName"
+                      value={form.recipientName}
+                      onChange={e => setForm(prev => ({ ...prev, recipientName: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Name in Master</label>
+                    <input
+                      disabled
+                      placeholder="Auto-filled from master"
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", background: "#f8fafc" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Invoice No. *</label>
+                    <input
+                      name="invoiceNo"
+                      value={form.invoiceNo}
+                      onChange={e => setForm(prev => ({ ...prev, invoiceNo: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Invoice Date *</label>
+                    <input
+                      type="date"
+                      name="invoiceDate"
+                      value={form.invoiceDate}
+                      onChange={e => setForm(prev => ({ ...prev, invoiceDate: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Total Value (₹) *</label>
+                    <input
+                      name="totalValue"
+                      value={form.totalValue}
+                      onChange={e => setForm(prev => ({ ...prev, totalValue: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>POS *</label>
+                    <select
+                      name="pos"
+                      value={form.pos}
+                      onChange={e => setForm(prev => ({ ...prev, pos: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                    >
+                      <option>09-Uttar Pradesh</option>
+                      <option>07-Delhi</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Supply Type</label>
+                    <select
+                      name="supplyType"
+                      value={form.supplyType}
+                      onChange={e => setForm(prev => ({ ...prev, supplyType: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                    >
+                      <option>Intra-State</option>
+                      <option>Inter-State</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Source</label>
+                    <input
+                      name="source"
+                      value={form.source}
+                      onChange={e => setForm(prev => ({ ...prev, source: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>IRN</label>
+                    <input
+                      name="irn"
+                      value={form.irn}
+                      onChange={e => setForm(prev => ({ ...prev, irn: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>IRN Date</label>
+                    <input
+                      type="date"
+                      name="irnDate"
+                      value={form.irnDate}
+                      onChange={e => setForm(prev => ({ ...prev, irnDate: e.target.value }))}
+                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
+                    />
+                  </div>
+                </div>
+
+                {/* Item Details Table */}
+                <div style={{ marginTop: "32px" }}>
+                  <h4 style={{ marginBottom: "16px", fontSize: "1.15rem", color: "#1e293b" }}>
+                    Item Details
+                  </h4>
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                      <thead>
+                        <tr style={{ background: "#f8fafc" }}>
+                          <th style={{ padding: "12px", textAlign: "left" }}>Rate (%)</th>
+                          <th style={{ padding: "12px", textAlign: "left" }}>Taxable Value *</th>
+                          <th style={{ padding: "12px", textAlign: "right" }}>CGST</th>
+                          <th style={{ padding: "12px", textAlign: "right" }}>SGST</th>
+                          <th style={{ padding: "12px", textAlign: "right" }}>Cess</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          0, 0.1, 0.25, 1, 1.5, 3, 5, 6, 7.5, 12, 18, 28, 40
+                        ].map((rate, index) => (
+                          <tr key={rate} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                            <td style={{ padding: "12px" }}>{rate}%</td>
+                            <td style={{ padding: "12px" }}>
+                              <input
+                                type="number"
+                                value={form.items[index]?.taxableValue || ""}
+                                onChange={e => {
+                                  const newItems = [...(form.items || [])];
+                                  newItems[index] = {
+                                    ...newItems[index],
+                                    taxableValue: e.target.value,
+                                    rate
+                                  };
+                                  setForm(prev => ({ ...prev, items: newItems }));
+                                }}
+                                style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #d1d5db" }}
+                              />
+                            </td>
+                            <td style={{ padding: "12px", textAlign: "right" }}>
+                              {(Number(form.items[index]?.taxableValue || 0) * (rate / 100) / 2).toFixed(2)}
+                            </td>
+                            <td style={{ padding: "12px", textAlign: "right" }}>
+                              {(Number(form.items[index]?.taxableValue || 0) * (rate / 100) / 2).toFixed(2)}
+                            </td>
+                            <td style={{ padding: "12px", textAlign: "right" }}>0.00</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer Buttons */}
+              <div style={{
+                padding: "16px 28px",
+                borderTop: "1px solid #e5e7eb",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "16px",
+                background: "#f8fafc"
+              }}>
+                <button
+                  onClick={() => {
+                    setSelectedSection(null);
+                    setShowAddForm(false);
+                  }}
+                  style={{
+                    padding: "12px 32px",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "10px",
+                    background: "white",
+                    fontWeight: 600,
+                    cursor: "pointer"
+                  }}
+                >
+                  BACK
+                </button>
+
+                <button
+                  onClick={saveRecord}
+                  style={{
+                    padding: "12px 40px",
+                    background: "linear-gradient(135deg, #16a34a, #22c55e)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "10px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    boxShadow: "0 4px 14px rgba(34,197,94,0.3)"
+                  }}
+                >
+                  SAVE
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
     </div>
   );
+};
+
   const [activeTurnoverView, setActiveTurnoverView] = useState('overview');
   const renderContent = () => {
     if (activeMenu !== "Dashboard") {
@@ -3000,9 +4309,9 @@ const handleClientSelect = () => {
             </>
           )}
           {activeDashboardTab === "summary" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "3fr ", gap: "24px" }}>
               {/* Electronic Ledger Card */}
-              <div style={{ borderRadius: "12px", background: "#ffffff", boxShadow: "0 3px 14px rgba(0,0,0,0.07)", padding: "20px" }}>
+              <div style={{ borderRadius: "12px", background: "#ffffff", boxShadow: "0 3px 14px rgba(0,0,0,0.07)", padding: "20px" ,width:"100%"}}>
                 <div style={{ display: "inline-block", background: "linear-gradient(135deg, #1e3a8a, #2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "18px", boxShadow: "0 4px 10px rgba(37,99,235,0.35)" }}>
                   Electronic Ledger Balances
                 </div>
@@ -3044,66 +4353,11 @@ const handleClientSelect = () => {
                   </div>
                 )}
               </div>
-              {/* Turnover Card */}
-              <div style={{ borderRadius: "12px", background: "#ffffff", boxShadow: "0 3px 14px rgba(0,0,0,0.07)", padding: "20px" }}>
-                <div style={{ display: "inline-block", background: "linear-gradient(135deg, #1e3a8a, #2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "18px", boxShadow: "0 4px 10px rgba(37,99,235,0.35)" }}>
-                  Turnover Balances
-                </div>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <tbody>
-                    <tr>
-                      <td style={{ padding: "14px", fontWeight: "600" }}>Turnover Estimated</td>
-                      <td style={{ padding: "14px", textAlign: "right", fontWeight: "700" }}>₹1,25,65,635.00</td>
-                    </tr>
-                    <tr style={{ background: "#f8fafc" }}>
-                      <td style={{ padding: "14px", fontWeight: "600" }}>Aggregate Turnover</td>
-                      <td style={{ padding: "14px", textAlign: "right", fontWeight: "700" }}>₹1,25,65,635.00</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              
+            
             </div>
           )}
-          {/* {activeDashboardTab === "elb" && (
-            <div style={{ padding: "28px" }}>
-              <div style={{ display: "inline-block", background: "linear-gradient(135deg,#1e40af,#2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "22px" }}>
-                Electronic Ledger Balances – Detailed View
-              </div>
-              <div style={{ background: "#ffffff", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", padding: "24px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "18px", fontSize: "1.05rem", fontWeight: "600" }}>
-                  <span>Cash Balance</span>
-                  <strong>₹58,756.00</strong>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "22px", fontSize: "1.05rem", fontWeight: "600" }}>
-                  <span>Credit Balance</span>
-                  <strong>₹36,845.00</strong>
-                </div>
-                <div style={{ display: "inline-block", background: "linear-gradient(135deg,#16a34a,#22c55e)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.9rem", marginBottom: "14px" }}>
-                  Balance of Electronic Credit Ledger
-                </div>
-                <table style={{ width: "100%", borderCollapse: "collapse", background: "#ecfdf5", borderRadius: "10px", overflow: "hidden" }}>
-                  <thead>
-                    <tr>
-                      <th style={{ padding: "12px", textAlign: "center" }}>IGST</th>
-                      <th style={{ padding: "12px", textAlign: "center" }}>CGST</th>
-                      <th style={{ padding: "12px", textAlign: "center" }}>SGST</th>
-                      <th style={{ padding: "12px", textAlign: "center" }}>CESS</th>
-                      <th style={{ padding: "12px", textAlign: "center" }}>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td style={{ padding: "12px", textAlign: "center" }}>₹25,165</td>
-                      <td style={{ padding: "12px", textAlign: "center" }}>₹12,324</td>
-                      <td style={{ padding: "12px", textAlign: "center" }}>₹5,632</td>
-                      <td style={{ padding: "12px", textAlign: "center" }}>₹15,635</td>
-                      <td style={{ padding: "12px", textAlign: "center", fontWeight: "700" }}>₹58,756</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div> */}
-            {/* </div>
-          )} */}
+           
           {activeDashboardTab === "turnover" && (
             <div style={{ padding: "28px" }}>
               <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "14px" }}>
@@ -5698,175 +6952,260 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
     setNotifications({ ...notifications, [key]: !notifications[key] });
     toast.success(`${key.replace(/([A-Z])/g, ' $1').trim()} notifications ${!notifications[key] ? "enabled" : "disabled"}`);
   };
- const SettingsPage = () => (
-  <div
-    className="full-width-page"
-    style={{
-      padding: "24px 20px",
-      minHeight: "100vh",
-      background: "#f8f9fc",
-      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-    }}
-  >
-    <div style={{
-      maxWidth: "1100px",
-      margin: "0 auto",
-      background: "#ffffff",
-      borderRadius: "16px",
-      boxShadow: "0 10px 30px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)",
-      overflow: "hidden",
-      border: "1px solid #e5e7eb",
-    }}>
-      {/* Header – ab bahut chhota (padding kam, text tight) */}
-      <div style={{
-        padding: "10px 32px",               // ← height ab minimal (top/bottom 10px)
-        textAlign: "center",
-        background: "#ffffff",
-        borderBottom: "1px solid #e5e7eb",
-      }}>
-        <h2 style={{
-          fontSize: "1.55rem",              // font bhi thoda chhota
-          margin: "0",
-          fontWeight: "700",
-          color: "#7c3aed",
-          letterSpacing: "-0.015em",
-        }}>
-          Settings
-        </h2>
-        <p style={{
-          margin: "2px 0 0 0",              // sub-text bahut tight
-          fontSize: "0.82rem",
-          color: "#6b7280",
-          fontWeight: "400",
-        }}>
-          Profile • Security • Notifications • Plan
-        </p>
-      </div>
+const SettingsPage = () => {
+  const [selectedSetting, setSelectedSetting] = React.useState('profile');
 
-      <div style={{ display: "flex" }}>
-        {/* Sidebar – pehle wala slim version */}
-        <div style={{
-          width: "180px",
-          background: "#ffffff",
-          borderRight: "1px solid #e5e7eb",
-          padding: "12px 8px",
-        }}>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            {[
-              { key: "profile", icon: HiUser, label: "Profile" },
-              { key: "password", icon: HiLockClosed, label: "Password" },
-              { key: "notifications", icon: HiBell, label: "Notifications" },
-              { key: "billing", icon: HiCreditCard, label: "Billing" },
-            ].map(item => (
-              <li key={item.key} style={{ marginBottom: "3px" }}>
-                <button
-                  onClick={() => setSelectedSetting(item.key)}
-                  style={{
-                    width: "100%",
-                    padding: "9px 10px",
-                    background: selectedSetting === item.key ? "#f3e8ff" : "transparent",
-                    color: selectedSetting === item.key ? "#6d28d9" : "#374151",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontSize: "0.92rem",
-                    fontWeight: selectedSetting === item.key ? "600" : "500",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    cursor: "pointer",
-                    transition: "all 0.16s ease",
-                  }}
-                  onMouseOver={(e) => {
-                    if (selectedSetting !== item.key) {
-                      e.currentTarget.style.background = "#f8f5ff";
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    if (selectedSetting !== item.key) {
-                      e.currentTarget.style.background = "transparent";
-                    }
-                  }}
-                >
-                  <item.icon style={{
-                    fontSize: "1.18rem",
-                    color: selectedSetting === item.key ? "#6d28d9" : "#6b7280",
-                    minWidth: "20px"
-                  }} />
-                  {item.label}
-                </button>
-              </li>
-            ))}
+  // Profile form
+  const [editProfileForm, setEditProfileForm] = React.useState({
+    name: '',
+    dob: '',
+    gender: '',
+    company: '',
+    gstin: '',
+    email: '',
+  });
 
-            <li style={{ marginTop: "24px" }}>
-              <button
-                onClick={() => {
-                  toast.success("Logged out successfully!");
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("user");
-                  navigate("/login");
-                }}
-                style={{
-                  width: "100%",
-                  padding: "9px 10px",
-                  background: "#fef2f2",
-                  color: "#991b1b",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "0.92rem",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  transition: "all 0.16s ease",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = "#fee2e2";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = "#fef2f2";
-                }}
-              >
-                <HiLogout style={{ fontSize: "1.18rem" }} />
-                Logout
-              </button>
-            </li>
-          </ul>
+  // Password form
+  const [passwordForm, setPasswordForm] = React.useState({
+    current: '',
+    newPass: '',
+    confirm: '',
+  });
+
+  // Notifications
+  const [notifications, setNotifications] = React.useState({
+    email: true,
+    sms: false,
+    whatsapp: true,
+    dueReminders: true,
+    voucherAlerts: true,
+    reportAlerts: false,
+  });
+
+  const handleEditProfileChange = (e) => {
+    const { name, value } = e.target;
+    setEditProfileForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const saveEditedProfile = () => {
+    // API call here
+    toast.success('Profile updated successfully!');
+  };
+
+  const handleChangePassword = () => {
+    if (passwordForm.newPass !== passwordForm.confirm) {
+      toast.error('Passwords do not match!');
+      return;
+    }
+    // API call here
+    toast.success('Password changed successfully!');
+  };
+
+  const toggleNotification = (key) => {
+    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const navItems = [
+    { key: 'profile', label: 'Profile' },
+    { key: 'password', label: 'Password' },
+    { key: 'notifications', label: 'Notifications' },
+    { key: 'billing', label: 'Billing' },
+  ];
+
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#f8f9fc',
+        padding: '24px 20px',
+        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '1100px',
+          margin: '0 auto',
+          background: '#ffffff',
+          borderRadius: '16px',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05)',
+          overflow: 'hidden',
+          border: '1px solid #e5e7eb',
+        }}
+      >
+        {/* Top Header + Logout */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '16px 32px',
+            borderBottom: '1px solid #e5e7eb',
+            background: 'linear-gradient(135deg, #ffffff, #fafafa)',
+          }}
+        >
+          <div>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: '1.65rem',
+                fontWeight: 700,
+                color: '#7c3aed',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Settings
+            </h2>
+            <p
+              style={{
+                margin: '4px 0 0 0',
+                fontSize: '0.88rem',
+                color: '#6b7280',
+              }}
+            >
+              Profile • Security • Notifications • Plan
+            </p>
+          </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={() => {
+              toast.success('Logged out successfully!');
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              navigate('/login');
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              background: '#fef2f2',
+              color: '#991b1b',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '0.95rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.18s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#fee2e2')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = '#fef2f2')}
+          >
+            <HiLogout style={{ fontSize: '1.2rem' }} />
+            Logout
+          </button>
         </div>
 
-        {/* Main Content Area */}
-        <div style={{ flex: 1, padding: "40px 50px" }}>
-          {selectedSetting === "profile" && (
+        {/* Top Navigation Pills */}
+        <div
+          style={{
+            padding: '12px 32px',
+            borderBottom: '1px solid #e5e7eb',
+            background: '#fafafa',
+            display: 'flex',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}
+        >
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => setSelectedSetting(item.key)}
+              style={{
+                padding: '9px 22px',
+                borderRadius: '999px',
+                border: 'none',
+                fontSize: '0.93rem',
+                fontWeight: selectedSetting === item.key ? 600 : 500,
+                background:
+                  selectedSetting === item.key
+                    ? 'linear-gradient(135deg, #7c3aed, #5b21b6)'
+                    : 'transparent',
+                color: selectedSetting === item.key ? 'white' : '#374151',
+                boxShadow:
+                  selectedSetting === item.key ? '0 4px 14px rgba(124,58,237,0.25)' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (selectedSetting !== item.key) {
+                  e.currentTarget.style.background = '#f3e8ff';
+                  e.currentTarget.style.color = '#6d28d9';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedSetting !== item.key) {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = '#374151';
+                }
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Main Content */}
+        <div style={{ padding: '40px 48px' }}>
+          {/* ────────────────────── PROFILE ────────────────────── */}
+          {selectedSetting === 'profile' && (
             <div>
-              <h3 style={{ fontSize: "1.7rem", color: "#333", marginBottom: "30px" }}>Edit Profile</h3>
-              <div style={{ maxWidth: "550px" }}>
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#444" }}>Name</label>
+              <h3 style={{ fontSize: '1.75rem', color: '#1f2937', marginBottom: '32px' }}>
+                Edit Profile
+              </h3>
+              <div style={{ maxWidth: '560px' }}>
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#374151' }}>
+                    Name
+                  </label>
                   <input
                     name="name"
-                    value={editProfileForm.name || ""}
+                    value={editProfileForm.name || ''}
                     onChange={handleEditProfileChange}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "1rem" }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #d1d5db',
+                      fontSize: '1rem',
+                    }}
                   />
                 </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#444" }}>Date of Birth</label>
+
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#374151' }}>
+                    Date of Birth
+                  </label>
                   <input
                     name="dob"
                     type="date"
-                    value={editProfileForm.dob || ""}
+                    value={editProfileForm.dob || ''}
                     onChange={handleEditProfileChange}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "1rem" }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #d1d5db',
+                      fontSize: '1rem',
+                    }}
                   />
                 </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#444" }}>Gender</label>
+
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#374151' }}>
+                    Gender
+                  </label>
                   <select
                     name="gender"
-                    value={editProfileForm.gender || ""}
+                    value={editProfileForm.gender || ''}
                     onChange={handleEditProfileChange}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "1rem" }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #d1d5db',
+                      fontSize: '1rem',
+                    }}
                   >
                     <option value="">Select</option>
                     <option>Male</option>
@@ -5874,45 +7213,73 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
                     <option>Other</option>
                   </select>
                 </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#444" }}>Company</label>
+
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#374151' }}>
+                    Company
+                  </label>
                   <input
                     name="company"
-                    value={editProfileForm.company || ""}
+                    value={editProfileForm.company || ''}
                     onChange={handleEditProfileChange}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "1rem" }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #d1d5db',
+                      fontSize: '1rem',
+                    }}
                   />
                 </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#444" }}>GSTIN</label>
+
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#374151' }}>
+                    GSTIN
+                  </label>
                   <input
                     name="gstin"
-                    value={editProfileForm.gstin || ""}
+                    value={editProfileForm.gstin || ''}
                     onChange={handleEditProfileChange}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "1rem" }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #d1d5db',
+                      fontSize: '1rem',
+                    }}
                   />
                 </div>
-                <div style={{ marginBottom: "30px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#444" }}>Email</label>
+
+                <div style={{ marginBottom: '32px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#374151' }}>
+                    Email
+                  </label>
                   <input
                     name="email"
                     type="email"
-                    value={editProfileForm.email || ""}
+                    value={editProfileForm.email || ''}
                     onChange={handleEditProfileChange}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid #ddd", fontSize: "1rem" }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #d1d5db',
+                      fontSize: '1rem',
+                    }}
                   />
                 </div>
+
                 <button
                   onClick={saveEditedProfile}
                   style={{
-                    background: "#7c3aed",
-                    color: "white",
-                    padding: "14px 40px",
-                    border: "none",
-                    borderRadius: "10px",
-                    fontSize: "1.1rem",
-                    fontWeight: "600",
-                    cursor: "pointer"
+                    background: '#7c3aed',
+                    color: 'white',
+                    padding: '14px 48px',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontSize: '1.05rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
                   }}
                 >
                   Save Changes
@@ -5921,48 +7288,78 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
             </div>
           )}
 
-          {selectedSetting === "password" && (
+          {/* ────────────────────── PASSWORD ────────────────────── */}
+          {selectedSetting === 'password' && (
             <div>
-              <h3 style={{ fontSize: "1.7rem", color: "#333", marginBottom: "30px" }}>Change Password</h3>
-              <div style={{ maxWidth: "500px" }}>
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#444" }}>Current Password</label>
+              <h3 style={{ fontSize: '1.75rem', color: '#1f2937', marginBottom: '32px' }}>
+                Change Password
+              </h3>
+              <div style={{ maxWidth: '520px' }}>
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#374151' }}>
+                    Current Password
+                  </label>
                   <input
                     type="password"
                     value={passwordForm.current}
                     onChange={(e) => setPasswordForm({ ...passwordForm, current: e.target.value })}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid #ddd" }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #d1d5db',
+                      fontSize: '1rem',
+                    }}
                   />
                 </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#444" }}>New Password</label>
+
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#374151' }}>
+                    New Password
+                  </label>
                   <input
                     type="password"
                     value={passwordForm.newPass}
                     onChange={(e) => setPasswordForm({ ...passwordForm, newPass: e.target.value })}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid #ddd" }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #d1d5db',
+                      fontSize: '1rem',
+                    }}
                   />
                 </div>
-                <div style={{ marginBottom: "30px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", color: "#444" }}>Confirm New Password</label>
+
+                <div style={{ marginBottom: '32px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#374151' }}>
+                    Confirm New Password
+                  </label>
                   <input
                     type="password"
                     value={passwordForm.confirm}
                     onChange={(e) => setPasswordForm({ ...passwordForm, confirm: e.target.value })}
-                    style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid #ddd" }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid #d1d5db',
+                      fontSize: '1rem',
+                    }}
                   />
                 </div>
+
                 <button
                   onClick={handleChangePassword}
                   style={{
-                    background: "#7c3aed",
-                    color: "white",
-                    padding: "14px 40px",
-                    border: "none",
-                    borderRadius: "10px",
-                    fontSize: "1.1rem",
-                    fontWeight: "600",
-                    cursor: "pointer"
+                    background: '#7c3aed',
+                    color: 'white',
+                    padding: '14px 48px',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontSize: '1.05rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
                   }}
                 >
                   Update Password
@@ -5971,61 +7368,114 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
             </div>
           )}
 
-          {selectedSetting === "notifications" && (
+          {/* ────────────────────── NOTIFICATIONS ────────────────────── */}
+          {selectedSetting === 'notifications' && (
             <div>
-              <h3 style={{ fontSize: "1.7rem", color: "#333", marginBottom: "30px" }}>Notification Preferences</h3>
-              <div style={{ maxWidth: "650px" }}>
-                <div style={{ background: "#f0f8ff", padding: "25px", borderRadius: "14px", marginBottom: "25px" }}>
-                  <h4 style={{ margin: "0 0 20px 0", color: "#1e40af", fontSize: "1.2rem" }}>Communication Channels</h4>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                    <span style={{ fontSize: "1.05rem", fontWeight: "500" }}>Email Notifications</span>
-                    <input type="checkbox" checked={notifications.email} onChange={() => toggleNotification("email")} style={{ width: "20px", height: "20px", cursor: "pointer" }} />
+              <h3 style={{ fontSize: '1.75rem', color: '#1f2937', marginBottom: '32px' }}>
+                Notification Preferences
+              </h3>
+              <div style={{ maxWidth: '680px' }}>
+                <div style={{ background: '#f0f8ff', padding: '28px', borderRadius: '14px', marginBottom: '28px' }}>
+                  <h4 style={{ margin: '0 0 22px 0', color: '#1e40af', fontSize: '1.25rem' }}>
+                    Communication Channels
+                  </h4>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                    <span style={{ fontSize: '1.05rem', fontWeight: 500 }}>Email Notifications</span>
+                    <input
+                      type="checkbox"
+                      checked={notifications.email}
+                      onChange={() => toggleNotification('email')}
+                      style={{ width: '22px', height: '22px', cursor: 'pointer' }}
+                    />
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                    <span style={{ fontSize: "1.05rem", fontWeight: "500" }}>SMS Alerts</span>
-                    <input type="checkbox" checked={notifications.sms} onChange={() => toggleNotification("sms")} style={{ width: "20px", height: "20px", cursor: "pointer" }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                    <span style={{ fontSize: '1.05rem', fontWeight: 500 }}>SMS Alerts</span>
+                    <input
+                      type="checkbox"
+                      checked={notifications.sms}
+                      onChange={() => toggleNotification('sms')}
+                      style={{ width: '22px', height: '22px', cursor: 'pointer' }}
+                    />
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "1.05rem", fontWeight: "500" }}>WhatsApp Messages</span>
-                    <input type="checkbox" checked={notifications.whatsapp} onChange={() => toggleNotification("whatsapp")} style={{ width: "20px", height: "20px", cursor: "pointer" }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '1.05rem', fontWeight: 500 }}>WhatsApp Messages</span>
+                    <input
+                      type="checkbox"
+                      checked={notifications.whatsapp}
+                      onChange={() => toggleNotification('whatsapp')}
+                      style={{ width: '22px', height: '22px', cursor: 'pointer' }}
+                    />
                   </div>
                 </div>
 
-                <div style={{ background: "#f0fdf4", padding: "25px", borderRadius: "14px" }}>
-                  <h4 style={{ margin: "0 0 20px 0", color: "#166534", fontSize: "1.2rem" }}>Alert Types</h4>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                    <span style={{ fontSize: "1.05rem", fontWeight: "500" }}>Return Due Reminders</span>
-                    <input type="checkbox" checked={notifications.dueReminders} onChange={() => toggleNotification("dueReminders")} style={{ width: "20px", height: "20px", cursor: "pointer" }} />
+                <div style={{ background: '#f0fdf4', padding: '28px', borderRadius: '14px' }}>
+                  <h4 style={{ margin: '0 0 22px 0', color: '#166534', fontSize: '1.25rem' }}>
+                    Alert Types
+                  </h4>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                    <span style={{ fontSize: '1.05rem', fontWeight: 500 }}>Return Due Reminders</span>
+                    <input
+                      type="checkbox"
+                      checked={notifications.dueReminders}
+                      onChange={() => toggleNotification('dueReminders')}
+                      style={{ width: '22px', height: '22px', cursor: 'pointer' }}
+                    />
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                    <span style={{ fontSize: "1.05rem", fontWeight: "500" }}>Pending Voucher Alerts</span>
-                    <input type="checkbox" checked={notifications.voucherAlerts} onChange={() => toggleNotification("voucherAlerts")} style={{ width: "20px", height: "20px", cursor: "pointer" }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                    <span style={{ fontSize: '1.05rem', fontWeight: 500 }}>Pending Voucher Alerts</span>
+                    <input
+                      type="checkbox"
+                      checked={notifications.voucherAlerts}
+                      onChange={() => toggleNotification('voucherAlerts')}
+                      style={{ width: '22px', height: '22px', cursor: 'pointer' }}
+                    />
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "1.05rem", fontWeight: "500" }}>Monthly Report Summary</span>
-                    <input type="checkbox" checked={notifications.reportAlerts} onChange={() => toggleNotification("reportAlerts")} style={{ width: "20px", height: "20px", cursor: "pointer" }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '1.05rem', fontWeight: 500 }}>Monthly Report Summary</span>
+                    <input
+                      type="checkbox"
+                      checked={notifications.reportAlerts}
+                      onChange={() => toggleNotification('reportAlerts')}
+                      style={{ width: '22px', height: '22px', cursor: 'pointer' }}
+                    />
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {selectedSetting === "billing" && (
+          {/* ────────────────────── BILLING ────────────────────── */}
+          {selectedSetting === 'billing' && (
             <div>
-              <h3 style={{ fontSize: "1.7rem", color: "#333", marginBottom: "30px" }}>Billing & Subscription Plan</h3>
-              <div style={{ background: "#f0f5ff", padding: "30px", borderRadius: "16px", maxWidth: "700px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
+              <h3 style={{ fontSize: '1.75rem', color: '#1f2937', marginBottom: '32px' }}>
+                Billing & Subscription Plan
+              </h3>
+              <div style={{ background: '#f0f5ff', padding: '32px', borderRadius: '16px', maxWidth: '720px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
                   <div>
-                    <h4 style={{ margin: 0, fontSize: "1.5rem", color: "#7c3aed" }}>Current Plan: <strong>Professional</strong></h4>
-                    <p style={{ margin: "10px 0", color: "#555" }}>Valid until: <strong>December 31, 2026</strong></p>
+                    <h4 style={{ margin: 0, fontSize: '1.5rem', color: '#7c3aed' }}>
+                      Current Plan: <strong>Professional</strong>
+                    </h4>
+                    <p style={{ margin: '10px 0 0', color: '#4b5563' }}>
+                      Valid until: <strong>December 31, 2026</strong>
+                    </p>
                   </div>
-                  <span style={{ padding: "12px 24px", background: "#d4edda", color: "#155724", borderRadius: "30px", fontSize: "1rem", fontWeight: "600" }}>
+                  <span
+                    style={{
+                      padding: '10px 24px',
+                      background: '#d1fae5',
+                      color: '#065f46',
+                      borderRadius: '999px',
+                      fontSize: '0.95rem',
+                      fontWeight: 600,
+                    }}
+                  >
                     Active
                   </span>
                 </div>
 
-                <h5 style={{ margin: "25px 0 15px 0", color: "#333" }}>Plan Features</h5>
-                <ul style={{ paddingLeft: "25px", lineHeight: "2", color: "#444", fontSize: "1.05rem" }}>
+                <h5 style={{ margin: '24px 0 16px 0', color: '#1f2937' }}>Plan Features</h5>
+                <ul style={{ paddingLeft: '24px', lineHeight: '2.1', color: '#4b5563', fontSize: '1.05rem' }}>
                   <li>Unlimited Clients</li>
                   <li>50 GB Document Storage</li>
                   <li>GSTR-1, 3B, 7 Filing Support</li>
@@ -6034,18 +7484,40 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
                   <li>Multi-User Access</li>
                 </ul>
 
-                <div style={{ display: "flex", gap: "20px", margin: "35px 0" }}>
-                  <button style={{ padding: "16px 35px", background: "#10b981", color: "white", border: "none", borderRadius: "12px", fontSize: "1.1rem", fontWeight: "600", cursor: "pointer" }}>
+                <div style={{ display: 'flex', gap: '20px', margin: '40px 0' }}>
+                  <button
+                    style={{
+                      padding: '16px 40px',
+                      background: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
                     Renew Plan
                   </button>
-                  <button style={{ padding: "16px 35px", background: "#7c3aed", color: "white", border: "none", borderRadius: "12px", fontSize: "1.1rem", fontWeight: "600", cursor: "pointer" }}>
+                  <button
+                    style={{
+                      padding: '16px 40px',
+                      background: '#7c3aed',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
                     Upgrade to Enterprise
                   </button>
                 </div>
 
-                <div style={{ paddingTop: "25px", borderTop: "1px solid #ddd" }}>
-                  <h5 style={{ margin: "0 0 10px 0" }}>Last Payment</h5>
-                  <p style={{ margin: 0, color: "#555" }}>₹24,999 - Paid on January 1, 2025</p>
+                <div style={{ paddingTop: '28px', borderTop: '1px solid #e5e7eb' }}>
+                  <h5 style={{ margin: '0 0 12px 0' }}>Last Payment</h5>
+                  <p style={{ margin: 0, color: '#4b5563' }}>₹24,999 - Paid on January 1, 2025</p>
                 </div>
               </div>
             </div>
@@ -6053,8 +7525,8 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 let pageContent;
 
