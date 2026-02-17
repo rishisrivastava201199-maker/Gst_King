@@ -2610,845 +2610,205 @@ const handleClientSelect = () => {
   // ==============================================
 // GSTR Layout Component (with tabs: Manually, Import, Summary)
 // ==============================================
+ 
+
+// LocalStorage keys
+const STORAGE_KEYS = {
+  b2b: "gstr_b2bRows",
+  b2cLarge: "gstr_b2cLargeRows",
+  b2cOthers: "gstr_b2cOthersRows",
+  nilExempt: "gstr_nilExemptRows",
+  creditDebitRegistered: "gstr_creditDebitRegisteredRows",
+  creditDebitUnregistered: "gstr_creditDebitUnregisteredRows",
+  advanceLiability: "gstr_advanceLiabilityRows",
+  advanceAdjustment: "gstr_advanceAdjustmentRows",
+  hsn: "gstr_hsnRows",
+  documents: "gstr_documentsRows",
+  eco: "gstr_ecoRows",
+  summaryTotals: "gstr_summaryTotals"
+};
+
+// Full State list for POS dropdown
+const stateList = [
+  { name: "ANDAMAN AND NICOBAR ISLANDS", code: "35", stateCode: "AN" },
+  { name: "ANDHRA PRADESH (NEW)", code: "37", stateCode: "AD" },
+  { name: "ARUNACHAL PRADESH", code: "12", stateCode: "AR" },
+  { name: "ASSAM", code: "18", stateCode: "AS" },
+  { name: "BIHAR", code: "10", stateCode: "BH" },
+  { name: "CHANDIGARH", code: "04", stateCode: "CH" },
+  { name: "CHHATTISGARH", code: "22", stateCode: "CT" },
+  { name: "DADRA AND NAGAR HAVELI AND DAMAN AND DIU", code: "26", stateCode: "DN" },
+  { name: "DELHI", code: "07", stateCode: "DL" },
+  { name: "GOA", code: "30", stateCode: "GA" },
+  { name: "GUJARAT", code: "24", stateCode: "GJ" },
+  { name: "HARYANA", code: "06", stateCode: "HR" },
+  { name: "HIMACHAL PRADESH", code: "02", stateCode: "HP" },
+  { name: "JAMMU AND KASHMIR", code: "01", stateCode: "JK" },
+  { name: "JHARKHAND", code: "20", stateCode: "JH" },
+  { name: "KARNATAKA", code: "29", stateCode: "KA" },
+  { name: "KERALA", code: "32", stateCode: "KL" },
+  { name: "LAKSHADWEEP", code: "31", stateCode: "LD" },
+  { name: "MADHYA PRADESH", code: "23", stateCode: "MP" },
+  { name: "MAHARASHTRA", code: "27", stateCode: "MH" },
+  { name: "MANIPUR", code: "14", stateCode: "MN" },
+  { name: "MEGHALAYA", code: "17", stateCode: "ME" },
+  { name: "MIZORAM", code: "15", stateCode: "MI" },
+  { name: "NAGALAND", code: "13", stateCode: "NL" },
+  { name: "ODISHA", code: "21", stateCode: "OR" },
+  { name: "PUDUCHERRY", code: "34", stateCode: "PY" },
+  { name: "PUNJAB", code: "03", stateCode: "PB" },
+  { name: "RAJASTHAN", code: "08", stateCode: "RJ" },
+  { name: "SIKKIM", code: "11", stateCode: "SK" },
+  { name: "TAMIL NADU", code: "33", stateCode: "TN" },
+  { name: "TELANGANA", code: "36", stateCode: "TS" },
+  { name: "TRIPURA", code: "16", stateCode: "TR" },
+  { name: "UTTAR PRADESH", code: "09", stateCode: "UP" },
+  { name: "UTTARAKHAND", code: "05", stateCode: "UT" },
+  { name: "WEST BENGAL", code: "19", stateCode: "WB" }
+];
+
+// Supply Type options for Credit/Debit Notes
+const supplyTypeOptions = [
+  "Regular B2B",
+  "SEZ Supply WPAY",
+  "SEZ Supply WOPAY",
+  "Deemed Export",
+  "Intra-State Supply Attracting IGST"
+];
+
+// Note Type options (Debit / Credit)
+const noteTypeOptions = ["Debit", "Credit"];
+
+// Nature of Supply options for ECO
+const natureOptions = [
+  "1 - Liable to Collect Tax u/s 52(TCS)",
+  "2 - Liable to Pay Tax u/s 9(5)"
+];
+
+// Nature of Documents options for Documents Issued
+const documentNatureOptions = [
+  "1 - Invoice for Outward Supply",
+  "2 - Invoices for Inward Supply from Unregistered Person",
+  "3 - Revised Invoice",
+  "4 - Debit Note",
+  "5 - Credit Note",
+  "6 - Receipt Voucher",
+  "7 - Payment Voucher",
+  "8 - Refund Voucher",
+  "9 - Delivery Challan for Job Work",
+  "10 - Delivery Challan for Supply on Approval",
+  "11 - Delivery Challan in case of Liquid Gas",
+  "12 - Delivery Challan in cases other than by way of Supply (Excluding at S no 9 to 11)"
+];
+
+// UR Type options for Credit/Debit Notes (Unregistered)
+const urTypeOptions = [
+  "1 - B2C (Large)",
+  "2 - Export WPAY",
+  "3 - Export WOPAY"
+];
+
 const GSTRLayout = ({ title = "GST Returns" }) => {
   const [activeSubTab, setActiveSubTab] = useState("Manually");
-  const [selectedFY, setSelectedFY] = useState("2025-26");
-  const [selectedQuarter, setSelectedQuarter] = useState("Quarter 4 (Jan - Mar)");
-  const [selectedPeriod, setSelectedPeriod] = useState("January");
+  const [selectedYear, setSelectedYear] = useState("2025-26");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
 
-  // Step management for Manually tab flow
-  const [step, setStep] = useState('selection'); // 'selection' | 'summary' | 'detail'
-  const [selectedForm, setSelectedForm] = useState(null); // GSTR1, GSTR3B, AutoDraftedITC etc.
-
-  let content;
-  if (activeSubTab === "Manually") {
-    if (step === 'detail') {
-      content = (
-        <DetailedGSTView
-          formType={selectedForm}
-          fy={selectedFY}
-          period={selectedPeriod}
-          onBack={() => setStep('summary')}
-        />
-      );
-    } else if (step === 'summary') {
-      content = (
-        <ReturnsSummaryScreen
-          fy={selectedFY}
-          quarter={selectedQuarter}
-          period={selectedPeriod}
-          onBack={() => setStep('selection')}
-          onViewForm={(form) => {
-            setSelectedForm(form);
-            setStep('detail');
-          }}
-        />
-      );
-    } else {
-      // selection screen
-      content = (
-        <GSTReturnPeriodSelection
-          selectedFY={selectedFY}
-          setSelectedFY={setSelectedFY}
-          selectedQuarter={selectedQuarter}
-          setSelectedQuarter={setSelectedQuarter}
-          selectedPeriod={selectedPeriod}
-          setSelectedPeriod={setSelectedPeriod}
-          onSearch={() => setStep('summary')}
-        />
-      );
-    }
-  } else if (activeSubTab === "Import") {
-    content = (
-      <div style={{ padding: "100px 20px", textAlign: "center", color: "#64748b" }}>
-        <h2>Import functionality coming soon...</h2>
-        <p>(Excel / Tally / JSON import - under development)</p>
-      </div>
-    );
-  } else if (activeSubTab === "Summary") {
-    content = (
-      <div style={{ padding: "80px 20px", textAlign: "center", color: "#64748b" }}>
-        <h2>Overall Summary Dashboard</h2>
-        <p>Grand total liability, ITC credit, net payable view - to be implemented</p>
-      </div>
-    );
-  } else {
-    content = null;
-  }
-
-  return (
-    <div style={{ padding: "20px", background: "#f8fafc", minHeight: "100vh" }}>
-      <div style={{ background: "#ffffff", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
-        {/* Header + Year & Month Dropdowns */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "16px" }}>
-          <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "700", color: "#7c3aed" }}>
-            {title}
-          </h2>
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-            <select
-              value={selectedFY}
-              onChange={e => setSelectedFY(e.target.value)}
-              style={{ padding: "10px 16px", borderRadius: "8px", border: "1px solid #ccc", fontSize: "1rem" }}
-            >
-              <option>FY 2024-25</option>
-              <option>FY 2025-26</option>
-            </select>
-            <select
-              value={selectedPeriod}
-              onChange={e => setSelectedPeriod(e.target.value)}
-              style={{ padding: "10px 16px", borderRadius: "8px", border: "1px solid #ccc", fontSize: "1rem" }}
-            >
-              <option>Jan-2025</option>
-              <option>Feb-2025</option>
-              <option>Mar-2025</option>
-              <option>Apr-2025</option>
-              <option>May-2025</option>
-              <option>Jun-2025</option>
-              <option>Jul-2025</option>
-              <option>Aug-2025</option>
-              <option>Sep-2025</option>
-              <option>Oct-2025</option>
-              <option>Nov-2025</option>
-              <option>Dec-2025</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Tabs: Manually | Import | Summary */}
-        <div style={{ display: "flex", gap: "12px", marginBottom: "32px", borderBottom: "2px solid #e2e8f0" }}>
-          {["Manually", "Import", "Summary"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveSubTab(tab);
-                if (tab !== "Manually") setStep('selection');
-              }}
-              style={{
-                padding: "12px 28px",
-                background: activeSubTab === tab ? "#7c3aed" : "transparent",
-                color: activeSubTab === tab ? "white" : "#475569",
-                border: "none",
-                borderRadius: "10px 10px 0 0",
-                fontSize: "1.1rem",
-                fontWeight: activeSubTab === tab ? "600" : "500",
-                cursor: "pointer",
-              }}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* Main Content Area */}
-        <div style={{ minHeight: "60vh" }}>
-          {content}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ==============================================
-// GST Return Period Selection (Selection Screen)
-// ==============================================
-const GSTReturnPeriodSelection = ({
-  selectedFY, setSelectedFY,
-  selectedQuarter, setSelectedQuarter,
-  selectedPeriod, setSelectedPeriod,
-  onSearch
-}) => (
-  <div style={{
-    padding: "24px 5%",
-    background: "linear-gradient(180deg,#f8fafc,#ffffff)",
-    minHeight: "100vh",
-    fontFamily: "system-ui, sans-serif"
-  }}>
-    <div style={{
-      maxWidth: "820px",
-      margin: "0 auto",
-      background: "#ffffff",
-      borderRadius: "16px",
-      overflow: "hidden",
-      boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
-      border: "1px solid #e5e7eb"
-    }}>
-      {/* Header */}
-      <div style={{
-        background: "linear-gradient(135deg,#eef2ff,#f8fafc)",
-        padding: "14px 22px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        borderBottom: "1px solid #e5e7eb"
-      }}>
-        <h1 style={{
-          margin: 0,
-          fontSize: "1.25rem",
-          fontWeight: 700,
-          color: "#0f172a"
-        }}>
-          File GST Returns
-        </h1>
-        <span style={{
-          fontSize: "0.8rem",
-          fontWeight: 600,
-          color: "#334155",
-          background: "#e0f2fe",
-          padding: "4px 10px",
-          borderRadius: "999px"
-        }}>
-          GSTIN: 09ACNPU2195H1ZY
-        </span>
-      </div>
-
-      {/* Form Area */}
-      <div style={{ padding: "22px 28px" }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "18px",
-          marginBottom: "26px"
-        }}>
-          <div>
-            <label style={{
-              display: "block",
-              marginBottom: "6px",
-              fontWeight: 600,
-              color: "#1e293b",
-              fontSize: "0.85rem"
-            }}>
-              Financial Year <span style={{ color: "#ef4444" }}>*</span>
-            </label>
-            <select
-              value={selectedFY}
-              onChange={e => setSelectedFY(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px 14px",
-                borderRadius: "10px",
-                border: "1px solid #cbd5e1",
-                background: "#f8fafc",
-                fontSize: "0.9rem",
-                outline: "none",
-                boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)"
-              }}
-            >
-              <option>2025-26</option>
-              <option>2024-25</option>
-              <option>2023-24</option>
-            </select>
-          </div>
-
-          <div>
-            <label style={{
-              display: "block",
-              marginBottom: "6px",
-              fontWeight: 600,
-              color: "#1e293b",
-              fontSize: "0.85rem"
-            }}>
-              Quarter <span style={{ color: "#ef4444" }}>*</span>
-            </label>
-            <select
-              value={selectedQuarter}
-              onChange={e => setSelectedQuarter(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px 14px",
-                borderRadius: "10px",
-                border: "1px solid #cbd5e1",
-                background: "#f8fafc",
-                fontSize: "0.9rem",
-                outline: "none"
-              }}
-            >
-              <option>Quarter 4 (Jan - Mar)</option>
-              <option>Quarter 3 (Oct - Dec)</option>
-              <option>Quarter 2 (Jul - Sep)</option>
-              <option>Quarter 1 (Apr - Jun)</option>
-            </select>
-          </div>
-
-          <div>
-            <label style={{
-              display: "block",
-              marginBottom: "6px",
-              fontWeight: 600,
-              color: "#1e293b",
-              fontSize: "0.85rem"
-            }}>
-              Period <span style={{ color: "#ef4444" }}>*</span>
-            </label>
-            <select
-              value={selectedPeriod}
-              onChange={e => setSelectedPeriod(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px 14px",
-                borderRadius: "10px",
-                border: "1px solid #cbd5e1",
-                background: "#f8fafc",
-                fontSize: "0.9rem",
-                outline: "none"
-              }}
-            >
-              {[
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-              ].map(m => (
-                <option key={m}>{m}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div style={{
-          background: "#eff6ff",
-          borderLeft: "4px solid #3b82f6",
-          padding: "10px 14px",
-          borderRadius: "10px",
-          fontSize: "0.8rem",
-          color: "#334155",
-          marginBottom: "22px",
-          maxWidth: "520px",
-          marginInline: "auto"
-        }}>
-          You have selected to file the return on monthly frequency.
-          GSTR-1 and GSTR-3B are required for each month of the quarter.
-        </div>
-
-        <div style={{ textAlign: "center" }}>
-          <button
-            onClick={onSearch}
-            style={{
-              background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
-              color: "white",
-              padding: "12px 56px",
-              fontSize: "1rem",
-              fontWeight: 700,
-              border: "none",
-              borderRadius: "999px",
-              cursor: "pointer",
-              boxShadow: "0 12px 30px rgba(37,99,235,0.45)",
-              transition: "all 0.2s ease"
-            }}
-            onMouseOver={e => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 18px 40px rgba(37,99,235,0.6)";
-            }}
-            onMouseOut={e => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 12px 30px rgba(37,99,235,0.45)";
-            }}
-          >
-            SEARCH RETURNS
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-// ==============================================
-// Returns Summary Screen
-// ==============================================
-const ReturnsSummaryScreen = ({ fy, quarter, period, onBack, onViewForm }) => {
-  const pastMonths = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const isPastPeriod = fy !== '2025-26' || pastMonths.includes(period);
-
-  return (
-    <div style={{
-      padding: "20px 5% 32px",
-      background: "linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%)",
-      minHeight: "100vh",
-      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-    }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "20px",
-          flexWrap: "wrap",
-          gap: "12px"
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <button
-              onClick={onBack}
-              style={{
-                background: "white",
-                border: "1px solid #cbd5e1",
-                width: "44px",
-                height: "44px",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                fontSize: "1.1rem",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
-              }}
-            >
-              ←
-            </button>
-            <h1 style={{
-              margin: 0,
-              fontSize: "1.75rem",
-              fontWeight: 700,
-              color: "#0f172a"
-            }}>
-              Returns Dashboard
-            </h1>
-          </div>
-
-          <div style={{
-            background: "#eff6ff",
-            padding: "8px 16px",
-            borderRadius: "9999px",
-            fontSize: "0.95rem",
-            fontWeight: 600,
-            color: "#1d4ed8",
-            border: "1px solid #bfdbfe",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.06)"
-          }}>
-            FY {fy} · {quarter}
-          </div>
-        </div>
-
-        <div style={{
-          background: "white",
-          borderLeft: "4px solid #3b82f6",
-          padding: "12px 16px",
-          borderRadius: "8px",
-          marginBottom: "24px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-          fontSize: "0.95rem",
-          color: "#1e40af",
-          fontWeight: 500
-        }}>
-          Monthly filing enabled. GSTR-1 & GSTR-3B required every month.
-        </div>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "20px"
-        }}>
-          {/* GSTR-1 Card */}
-          <div style={{
-            background: "white",
-            borderRadius: "12px",
-            overflow: "hidden",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-            border: "1px solid #e2e8f0",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "240px"
-          }}>
-            <div style={{
-              padding: "14px 20px",
-              background: "linear-gradient(90deg, #eff6ff, #dbeafe)",
-              color: "#1d4ed8",
-              fontSize: "1.05rem",
-              fontWeight: 700,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px"
-            }}>
-              <span>GSTR-1 · Outward Supplies</span>
-              <span style={{
-                background: "#ecfdf5",
-                color: "#065f46",
-                padding: "5px 12px",
-                borderRadius: "9999px",
-                fontSize: "0.8rem",
-                fontWeight: 600
-              }}>
-                Filed
-              </span>
-            </div>
-
-            <div style={{
-              padding: "16px 20px",
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }}>
-              <p style={{
-                fontSize: "0.9rem",
-                color: "#475569",
-                lineHeight: "1.45",
-                margin: 0
-              }}>
-                Summary of outward taxable supplies reported for the selected period.
-              </p>
-
-              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
-                <button
-                  onClick={() => onViewForm("GSTR1")}
-                  style={{
-                    flex: 1,
-                    padding: "10px 0",
-                    background: "#f1f5f9",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    fontSize: "0.9rem",
-                    cursor: "pointer"
-                  }}
-                >
-                  View
-                </button>
-                <button style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
-                }}>
-                  Download
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Amendments Card (only if current period) */}
-          {!isPastPeriod && (
-            <div style={{
-              background: "white",
-              borderRadius: "12px",
-              overflow: "hidden",
-              boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-              border: "1px solid #e2e8f0",
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "240px"
-            }}>
-              <div style={{
-                padding: "14px 20px",
-                background: "linear-gradient(90deg, #fffbeb, #fef3c7)",
-                color: "#92400e",
-                fontSize: "1.05rem",
-                fontWeight: 700,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: "10px"
-              }}>
-                <span>Amendments</span>
-                <span style={{
-                  background: "#fefce8",
-                  color: "#854d0e",
-                  padding: "5px 12px",
-                  borderRadius: "9999px",
-                  fontSize: "0.8rem",
-                  fontWeight: 600
-                }}>
-                  Open
-                </span>
-              </div>
-
-              <div style={{
-                padding: "16px 20px",
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between"
-              }}>
-                <p style={{
-                  fontSize: "0.9rem",
-                  color: "#475569",
-                  lineHeight: "1.45",
-                  margin: 0
-                }}>
-                  Update invoices, debit notes, or credit notes for the current tax period.
-                </p>
-
-                <button style={{
-                  width: "100%",
-                  padding: "10px 0",
-                  marginTop: "20px",
-                  background: "linear-gradient(90deg, #f59e0b, #d97706)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.92rem",
-                  cursor: "pointer"
-                }}>
-                  Prepare Online
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Auto-Drafted ITC Card */}
-          <div style={{
-            background: "white",
-            borderRadius: "12px",
-            overflow: "hidden",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-            border: "1px solid #e2e8f0",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "240px"
-          }}>
-            <div style={{
-              padding: "14px 20px",
-              background: "linear-gradient(90deg, #f0fdfa, #ccfbf1)",
-              color: "#0f766e",
-              fontSize: "1.05rem",
-              fontWeight: 700,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px"
-            }}>
-              <span>Auto-Drafted ITC</span>
-              <span style={{
-                background: "#f0fdfa",
-                color: "#0f766e",
-                padding: "5px 12px",
-                borderRadius: "9999px",
-                fontSize: "0.8rem",
-                fontWeight: 600
-              }}>
-                Available
-              </span>
-            </div>
-
-            <div style={{
-              padding: "16px 20px",
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }}>
-              <p style={{
-                fontSize: "0.9rem",
-                color: "#475569",
-                lineHeight: "1.45",
-                margin: 0
-              }}>
-                ITC statement auto-generated based on supplier filings.
-              </p>
-
-              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
-                <button
-                  onClick={() => onViewForm("AutoDraftedITC")}
-                  style={{
-                    flex: 1,
-                    padding: "10px 0",
-                    background: "#f1f5f9",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    fontSize: "0.9rem",
-                    cursor: "pointer"
-                  }}
-                >
-                  View
-                </button>
-                <button style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
-                }}>
-                  Download
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* GSTR-3B Card */}
-          <div style={{
-            background: "white",
-            borderRadius: "12px",
-            overflow: "hidden",
-            boxShadow: "0 6px 24px rgba(153,27,27,0.18)",
-            border: "1px solid #fecaca",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "240px"
-          }}>
-            <div style={{
-              padding: "14px 20px",
-              background: "linear-gradient(90deg, #fef2f2, #fee2e2)",
-              color: "#991b1b",
-              fontSize: "1.05rem",
-              fontWeight: 700,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "10px"
-            }}>
-              <span>GSTR-3B · Monthly Return</span>
-              <span style={{
-                background: "#fef2f2",
-                color: "#991b1b",
-                padding: "5px 12px",
-                borderRadius: "9999px",
-                fontSize: "0.8rem",
-                fontWeight: 600
-              }}>
-                Pending
-              </span>
-            </div>
-
-            <div style={{
-              padding: "16px 20px",
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }}>
-              <div>
-                <div style={{
-                  background: "#fefce8",
-                  color: "#854d0e",
-                  padding: "8px 12px",
-                  borderRadius: "8px",
-                  fontSize: "0.9rem",
-                  fontWeight: 600,
-                  textAlign: "center",
-                  marginBottom: "16px"
-                }}>
-                  Due date: 20 {period} 2026
-                </div>
-
-                <p style={{
-                  fontSize: "0.9rem",
-                  color: "#475569",
-                  lineHeight: "1.45",
-                  margin: 0
-                }}>
-                  Summary of monthly return including liability, ITC and payment details.
-                </p>
-              </div>
-
-              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
-                <button style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "linear-gradient(90deg, #3b82f6, #2563eb)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
-                }}>
-                  Prepare Online
-                </button>
-                <button style={{
-                  flex: 1,
-                  padding: "10px 0",
-                  background: "#f1f5f9",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "8px",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer"
-                }}>
-                  Prepare Offline
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ==============================================
-// Detailed GST View - Main Form with Add Record Modal
-// ==============================================
-const DetailedGSTView = ({ formType, fy, period, onBack }) => {
-  const [selectedSection, setSelectedSection] = useState(null);
-  const [records, setRecords] = useState({}); // sectionTitle → array of records
-  const [showAddForm, setShowAddForm] = useState(false);
-
-  const [form, setForm] = useState({
-    deemedExports: false,
-    sezWithPayment: false,
-    sezWithoutPayment: false,
-    reverseCharge: false,
-    intraStateIGST: false,
-    differentialPercent: false,
-    gstin: "",
-    recipientName: "",
-    nameInMaster: "",
-    invoiceNo: "",
-    invoiceDate: "",
-    totalValue: "",
-    pos: "09-Uttar Pradesh",
-    supplyType: "Intra-State",
-    source: "",
-    irn: "",
-    irnDate: "",
-    items: []
+  // Row states with localStorage persistence
+  const [b2bRows, setB2bRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.b2b);
+    return saved ? JSON.parse(saved) : [{ sl: 1, gstin: "", recipientName: "", invNo: "", invDate: "", invValue: 0, pos: "", rcm: "N", applicableTaxRate: "", invType: "", ecoGstin: "", gstRate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0 }];
   });
 
-  const saveRecord = () => {
-    if (!form.gstin || !form.invoiceNo || !form.totalValue) {
-      alert("GSTIN, Invoice No. aur Total Value fill karo bhai!");
-      return;
-    }
+  const [b2cLargeRows, setB2cLargeRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.b2cLarge);
+    return saved ? JSON.parse(saved) : [{ sl: 1, invNo: "", invDate: "", invValue: 0, pos: "State", applicableTaxRate: "0%/65%", gstRate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0 }];
+  });
 
-    const sectionTitle = selectedSection?.title || "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices";
+  const [b2cOthersRows, setB2cOthersRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.b2cOthers);
+    return saved ? JSON.parse(saved) : [{ sl: 1, type: "E/OF", pos: "", applicableTaxRate: "", rate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+  });
 
-    setRecords(prev => ({
-      ...prev,
-      [sectionTitle]: [
-        ...(prev[sectionTitle] || []),
-        { ...form, id: Date.now(), timestamp: new Date().toISOString() }
-      ]
-    }));
+  const [nilExemptRows, setNilExemptRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.nilExempt);
+    return saved ? JSON.parse(saved) : [{ sl: 1, description: "", nilRated: 0, exempted: 0, nonGst: 0 }];
+  });
 
-    // Reset form
-    setForm({
-      deemedExports: false,
-      sezWithPayment: false,
-      sezWithoutPayment: false,
-      reverseCharge: false,
-      intraStateIGST: false,
-      differentialPercent: false,
-      gstin: "",
-      recipientName: "",
-      nameInMaster: "",
-      invoiceNo: "",
-      invoiceDate: "",
-      totalValue: "",
-      pos: "09-Uttar Pradesh",
-      supplyType: "Intra-State",
-      source: "",
-      irn: "",
-      irnDate: "",
-      items: []
-    });
+  const [creditDebitRegisteredRows, setCreditDebitRegisteredRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.creditDebitRegistered);
+    return saved ? JSON.parse(saved) : [{ sl: 1, gstin: "", recipientName: "", noteNo: "", noteDate: "", noteType: "Debit", pos: "", rcm: "N", noteSupplyType: "Regular B2B", noteValue: 0, diffRatePercent: "", rate: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+  });
 
-    setShowAddForm(false);
-    alert("Record successfully saved!");
-  };
+  const [creditDebitUnregisteredRows, setCreditDebitUnregisteredRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.creditDebitUnregistered);
+    return saved ? JSON.parse(saved) : [{ sl: 1, urType: "1 - B2C (Large)", noteNo: "", noteDate: "", noteType: "Debit", pos: "", rcm: "N", noteSupplyType: "Regular B2B", noteValue: 0, diffRatePercent: "", rate: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+  });
 
-  const baseSections = [
+  const [advanceLiabilityRows, setAdvanceLiabilityRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.advanceLiability);
+    return saved ? JSON.parse(saved) : [{ sl: 1, pos: "", diffRatePercent: "", rate: 0, grossAdvance: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+  });
+
+  const [advanceAdjustmentRows, setAdvanceAdjustmentRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.advanceAdjustment);
+    return saved ? JSON.parse(saved) : [{ sl: 1, pos: "", diffRatePercent: "", rate: 0, grossAdvance: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+  });
+
+  const [hsnRows, setHsnRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.hsn);
+    return saved ? JSON.parse(saved) : [{ sl: 1, hsn: "", description: "", uqc: "", totalQty: 0, totalValue: 0, rate: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0 }];
+  });
+
+  const [documentsRows, setDocumentsRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.documents);
+    return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Invoice for Outward Supply", srFrom: "", srTo: "", totalNumber: 0, cancelled: 0 }];
+  });
+
+  const [ecoRows, setEcoRows] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.eco);
+    return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Liable to Collect Tax u/s 52(TCS)", gstinEco: "", nameEco: "", netValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+  });
+
+  const [summaryTotals, setSummaryTotals] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.summaryTotals);
+    return saved ? JSON.parse(saved) : {
+      b2b: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cLarge: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cOthers: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      hsn: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+    };
+  });
+
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+
+  // Dropdown controls
+  const [openPosDropdownRow, setOpenPosDropdownRow] = useState(null);
+  const [openSupplyTypeDropdownRow, setOpenSupplyTypeDropdownRow] = useState(null);
+  const [openNoteTypeDropdownRow, setOpenNoteTypeDropdownRow] = useState(null);
+  const [openNatureDropdownRow, setOpenNatureDropdownRow] = useState(null);
+  const [openDocumentNatureDropdownRow, setOpenDocumentNatureDropdownRow] = useState(null);
+  const [openUrTypeDropdownRow, setOpenUrTypeDropdownRow] = useState(null);
+
+  // Save to localStorage
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.b2b, JSON.stringify(b2bRows)), [b2bRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.b2cLarge, JSON.stringify(b2cLargeRows)), [b2cLargeRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.b2cOthers, JSON.stringify(b2cOthersRows)), [b2cOthersRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.nilExempt, JSON.stringify(nilExemptRows)), [nilExemptRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.creditDebitRegistered, JSON.stringify(creditDebitRegisteredRows)), [creditDebitRegisteredRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.creditDebitUnregistered, JSON.stringify(creditDebitUnregisteredRows)), [creditDebitUnregisteredRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.advanceLiability, JSON.stringify(advanceLiabilityRows)), [advanceLiabilityRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.advanceAdjustment, JSON.stringify(advanceAdjustmentRows)), [advanceAdjustmentRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.hsn, JSON.stringify(hsnRows)), [hsnRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.documents, JSON.stringify(documentsRows)), [documentsRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.eco, JSON.stringify(ecoRows)), [ecoRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.summaryTotals, JSON.stringify(summaryTotals)), [summaryTotals]);
+
+  const years = Array.from({ length: 10 }, (_, i) => 2017 + i).map(y => `${y}-${String(y + 1).slice(-2)}`);
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  const sections = [
     "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
     "5 - B2C (Large) Invoices",
     "6A - Exports Invoices",
@@ -3464,532 +2824,924 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
     "15 - Supplies U/s 9(5)"
   ];
 
-  const sections = baseSections.map(title => ({
-    title,
-    count: records[title]?.length || 0
-  }));
+  const canSelect = selectedYear && selectedMonth;
+
+  const tableColumns = {
+    "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": [
+      { key: "gstin", label: "GSTIN", align: "left" },
+      { key: "recipientName", label: "Recipient Name", align: "left" },
+      { key: "invNo", label: "Inv. No.", align: "left" },
+      { key: "invDate", label: "Inv. Date", align: "center" },
+      { key: "invValue", label: "Inv. Value", align: "right", type: "number" },
+      { key: "pos", label: "POS", align: "center" },
+      { key: "rcm", label: "RCM", align: "center" },
+      { key: "invType", label: "Inv. Type", align: "center" },
+      { key: "ecoGstin", label: "ECO GSTIN", align: "center" },
+      { key: "applicableTaxRate", label: "App. % Tax rate", align: "center" },
+      { key: "gstRate", label: "Rate", align: "right", type: "number" },
+      { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+      { key: "igst", label: "IGST", align: "right", type: "number" },
+      { key: "cgst", label: "CGST", align: "right", type: "number" },
+      { key: "sgst", label: "SGST", align: "right", type: "number" },
+      { key: "cess", label: "CESS", align: "right", type: "number" }
+    ],
+    "5 - B2C (Large) Invoices": [
+      { key: "invNo", label: "Inv. No.", align: "left" },
+      { key: "invDate", label: "Inv. Date", align: "center" },
+      { key: "invValue", label: "Inv. Value", align: "right", type: "number" },
+      { key: "pos", label: "POS", align: "center" },
+      { key: "applicableTaxRate", label: "Applicable % of Tax rate", align: "center" },
+      { key: "gstRate", label: "Rate", align: "right", type: "number" },
+      { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+      { key: "igst", label: "IGST", align: "right", type: "number" },
+      { key: "cgst", label: "CGST", align: "right", type: "number" },
+      { key: "sgst", label: "SGST", align: "right", type: "number" },
+      { key: "cess", label: "CESS", align: "right", type: "number" }
+    ],
+    "7 - B2C (Others)": [
+      { key: "type", label: "Type", align: "center" },
+      { key: "pos", label: "POS", align: "center" },
+      { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
+      { key: "rate", label: "Rate", align: "right", type: "number" },
+      { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+      { key: "igst", label: "IGST", align: "right", type: "number" },
+      { key: "cgst", label: "CGST", align: "right", type: "number" },
+      { key: "sgst", label: "SGST", align: "right", type: "number" },
+      { key: "cess", label: "Cess", align: "right", type: "number" },
+      { key: "total", label: "Total", align: "right", type: "number" }
+    ],
+    "8A, 8B, 8C, 8D - Nil Rated Supplies": [
+      { key: "description", label: "Description", align: "left" },
+      { key: "nilRated", label: "Nil Rated", align: "right", type: "number" },
+      { key: "exempted", label: "Exempted", align: "right", type: "number" },
+      { key: "nonGst", label: "Non-GST", align: "right", type: "number" }
+    ],
+    "9B - Credit / Debit Notes (Registered)": [
+      { key: "gstin", label: "GSTIN of Recipient", align: "left" },
+      { key: "recipientName", label: "Recipient Name", align: "left" },
+      { key: "noteNo", label: "Note No", align: "left" },
+      { key: "noteDate", label: "Note Date", align: "center" },
+      { key: "noteType", label: "Note Type", align: "center" },
+      { key: "pos", label: "POS", align: "center" },
+      { key: "rcm", label: "RCM", align: "center" },
+      { key: "noteSupplyType", label: "Note Supply Type", align: "left" },
+      { key: "noteValue", label: "Note Value", align: "right", type: "number" },
+      { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+      { key: "rate", label: "Rate", align: "right", type: "number" },
+      { key: "taxable", label: "Taxable", align: "right", type: "number" },
+      { key: "igst", label: "IGST", align: "right", type: "number" },
+      { key: "cgst", label: "CGST", align: "right", type: "number" },
+      { key: "sgst", label: "SGST", align: "right", type: "number" },
+      { key: "cess", label: "Cess", align: "right", type: "number" },
+      { key: "total", label: "Total", align: "right", type: "number" }
+    ],
+    "9B - Credit / Debit Notes (Unregistered)": [
+      { key: "urType", label: "UR Type", align: "center" },
+      { key: "noteNo", label: "Note No", align: "left" },
+      { key: "noteDate", label: "Note Date", align: "center" },
+      { key: "noteType", label: "Note Type", align: "center" },
+      { key: "pos", label: "POS", align: "center" },
+      { key: "rcm", label: "RCM", align: "center" },
+      { key: "noteSupplyType", label: "Note Supply Type", align: "left" },
+      { key: "noteValue", label: "Note Value", align: "right", type: "number" },
+      { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+      { key: "rate", label: "Rate", align: "right", type: "number" },
+      { key: "taxable", label: "Taxable", align: "right", type: "number" },
+      { key: "igst", label: "IGST", align: "right", type: "number" },
+      { key: "cgst", label: "CGST", align: "right", type: "number" },
+      { key: "sgst", label: "SGST", align: "right", type: "number" },
+      { key: "cess", label: "Cess", align: "right", type: "number" },
+      { key: "total", label: "Total", align: "right", type: "number" }
+    ],
+    "11A(1), 11A(2) - Tax Liability (Advances Received)": [
+      { key: "pos", label: "POS", align: "center" },
+      { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+      { key: "rate", label: "Rate", align: "right", type: "number" },
+      { key: "grossAdvance", label: "Gross Advance Received", align: "right", type: "number" },
+      { key: "taxable", label: "Taxable", align: "right", type: "number" },
+      { key: "igst", label: "IGST", align: "right", type: "number" },
+      { key: "cgst", label: "CGST", align: "right", type: "number" },
+      { key: "sgst", label: "SGST", align: "right", type: "number" },
+      { key: "cess", label: "Cess", align: "right", type: "number" },
+      { key: "total", label: "Total", align: "right", type: "number" }
+    ],
+    "11B - Adjustment of Advances": [
+      { key: "pos", label: "POS", align: "center" },
+      { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+      { key: "rate", label: "Rate", align: "right", type: "number" },
+      { key: "grossAdvance", label: "Gross Advance Received", align: "right", type: "number" },
+      { key: "taxable", label: "Taxable", align: "right", type: "number" },
+      { key: "igst", label: "IGST", align: "right", type: "number" },
+      { key: "cgst", label: "CGST", align: "right", type: "number" },
+      { key: "sgst", label: "SGST", align: "right", type: "number" },
+      { key: "cess", label: "Cess", align: "right", type: "number" },
+      { key: "total", label: "Total", align: "right", type: "number" }
+    ],
+    "12 - HSN-wise summary of outward supplies": [
+      { key: "hsn", label: "HSN", align: "center" },
+      { key: "description", label: "Description", align: "left" },
+      { key: "uqc", label: "UQC", align: "center" },
+      { key: "totalQty", label: "Total Qty", align: "right", type: "number" },
+      { key: "totalValue", label: "Total Value", align: "right", type: "number" },
+      { key: "rate", label: "Rate", align: "right", type: "number" },
+      { key: "taxable", label: "Taxable", align: "right", type: "number" },
+      { key: "igst", label: "IGST", align: "right", type: "number" },
+      { key: "cgst", label: "CGST", align: "right", type: "number" },
+      { key: "sgst", label: "SGST", align: "right", type: "number" },
+      { key: "cess", label: "Cess", align: "right", type: "number" }
+    ],
+    "13 - Documents Issued": [
+      { key: "nature", label: "Nature of Documents Issued", align: "left" },
+      { key: "srFrom", label: "Sr No from", align: "center" },
+      { key: "srTo", label: "Sr No. To", align: "center" },
+      { key: "totalNumber", label: "Total Number", align: "right", type: "number" },
+      { key: "cancelled", label: "Cancelled", align: "right", type: "number" }
+    ],
+    "14 - Supplies made through ECO": [
+      { key: "nature", label: "Nature of Supply", align: "left" },
+      { key: "gstinEco", label: "GSTIN of ECO", align: "left" },
+      { key: "nameEco", label: "Name of ECO", align: "left" },
+      { key: "netValue", label: "Net Value of Supply", align: "right", type: "number" },
+      { key: "igst", label: "IGST", align: "right", type: "number" },
+      { key: "cgst", label: "CGST", align: "right", type: "number" },
+      { key: "sgst", label: "SGST", align: "right", type: "number" },
+      { key: "cess", label: "Cess", align: "right", type: "number" },
+      { key: "total", label: "Total", align: "right", type: "number" }
+    ]
+  };
+
+  const currentColumns = tableColumns[selectedSection] || [];
+
+  const getRowsAndSetter = () => {
+    switch (selectedSection) {
+      case "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": return [b2bRows, setB2bRows];
+      case "5 - B2C (Large) Invoices": return [b2cLargeRows, setB2cLargeRows];
+      case "7 - B2C (Others)": return [b2cOthersRows, setB2cOthersRows];
+      case "8A, 8B, 8C, 8D - Nil Rated Supplies": return [nilExemptRows, setNilExemptRows];
+      case "9B - Credit / Debit Notes (Registered)": return [creditDebitRegisteredRows, setCreditDebitRegisteredRows];
+      case "9B - Credit / Debit Notes (Unregistered)": return [creditDebitUnregisteredRows, setCreditDebitUnregisteredRows];
+      case "11A(1), 11A(2) - Tax Liability (Advances Received)": return [advanceLiabilityRows, setAdvanceLiabilityRows];
+      case "11B - Adjustment of Advances": return [advanceAdjustmentRows, setAdvanceAdjustmentRows];
+      case "12 - HSN-wise summary of outward supplies": return [hsnRows, setHsnRows];
+      case "13 - Documents Issued": return [documentsRows, setDocumentsRows];
+      case "14 - Supplies made through ECO": return [ecoRows, setEcoRows];
+      default: return [[], () => {}];
+    }
+  };
+
+  const [rows, setRows] = getRowsAndSetter();
+
+  const addRow = () => {
+    const newSl = rows.length + 1;
+    let newRow = { sl: newSl };
+    if (selectedSection.includes("B2C (Others)")) newRow.type = "E/OF";
+    if (selectedSection.includes("Credit / Debit Notes (Registered)")) {
+      newRow.noteType = "Debit";
+      newRow.noteSupplyType = "Regular B2B";
+    }
+    if (selectedSection.includes("Credit / Debit Notes (Unregistered)")) {
+      newRow.urType = urTypeOptions[0];
+      newRow.noteType = "Debit";
+      newRow.noteSupplyType = "Regular B2B";
+    }
+    if (selectedSection.includes("Documents Issued")) newRow.nature = documentNatureOptions[0];
+    if (selectedSection.includes("ECO")) newRow.nature = natureOptions[0];
+    setRows([...rows, newRow]);
+  };
+
+  const updateCell = (index, key, value) => {
+    const newRows = [...rows];
+    newRows[index][key] = value;
+    setRows(newRows);
+  };
+
+  const deleteRow = (index) => {
+    if (rows.length > 1) setRows(rows.filter((_, i) => i !== index));
+  };
+
+  const handleSave = () => {
+    let taxable = 0, igst = 0, cgst = 0, sgst = 0, cess = 0, total = 0;
+
+    rows.forEach(row => {
+      taxable += Number(row.taxableValue || row.taxable || row.totalValue || row.netValue || row.nilRated || row.exempted || row.nonGst || row.grossAdvance || 0);
+      igst += Number(row.igst || 0);
+      cgst += Number(row.cgst || 0);
+      sgst += Number(row.sgst || 0);
+      cess += Number(row.cess || 0);
+      total += Number(row.total || (taxable + igst + cgst + sgst + cess));
+    });
+
+    let key = "";
+    if (selectedSection.includes("B2B")) key = "b2b";
+    else if (selectedSection.includes("B2C (Large)")) key = "b2cLarge";
+    else if (selectedSection.includes("B2C (Others)")) key = "b2cOthers";
+    else if (selectedSection.includes("HSN")) key = "hsn";
+
+    if (key && total > 0) {
+      setSummaryTotals(prev => ({
+        ...prev,
+        [key]: { taxable, igst, cgst, sgst, cess, total }
+      }));
+      alert("Saved successfully!");
+    }
+  };
+
+  const formatIndian = (num) => num === 0 ? "—" : Number(num).toLocaleString("en-IN");
+
+  // Visible Summary
+  const visibleSummary = [];
+  if (summaryTotals.b2b.total > 0) visibleSummary.push({ id: "b2b", label: "1. B2B Supplies", ...summaryTotals.b2b });
+  if (summaryTotals.b2cLarge.total > 0) visibleSummary.push({ id: "b2cLarge", label: "2. B2C (Large)", ...summaryTotals.b2cLarge });
+  if (summaryTotals.b2cOthers.total > 0) visibleSummary.push({ id: "b2cOthers", label: "3. B2C Small", ...summaryTotals.b2cOthers });
+  if (summaryTotals.hsn.total > 0) visibleSummary.push({ id: "hsn", label: "HSN wise", ...summaryTotals.hsn });
+
+  const grandTotal = visibleSummary.reduce((acc, item) => {
+    acc.taxable += item.taxable || 0;
+    acc.igst += item.igst || 0;
+    acc.cgst += item.cgst || 0;
+    acc.sgst += item.sgst || 0;
+    acc.cess += item.cess || 0;
+    acc.total += item.total || 0;
+    return acc;
+  }, { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 });
+
+  // Checkbox handlers
+  const toggleSelectAll = () => {
+    if (selectAll) {
+      setSelectedRows([]);
+    } else {
+      setSelectedRows(visibleSummary.map(item => item.id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const toggleRow = (id) => {
+    if (selectedRows.includes(id)) {
+      setSelectedRows(selectedRows.filter(r => r !== id));
+    } else {
+      setSelectedRows([...selectedRows, id]);
+    }
+  };
+
+  const handleBack = () => {
+    setActiveSubTab("Manually");
+  };
 
   return (
-    <div style={{
-      padding: "20px 5% 40px",
-      background: "#f9fafb",
-      minHeight: "100vh",
-      fontFamily: "system-ui, sans-serif"
-    }}>
-      <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
-        {/* Back button */}
-        <button
-          onClick={onBack}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "10px 18px",
-            background: "white",
-            border: "1px solid #d1d5db",
-            borderRadius: "10px",
-            fontWeight: 600,
-            fontSize: "0.95rem",
-            cursor: "pointer",
-            marginBottom: "20px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
-          }}
-        >
-          ← Back
-        </button>
-
-        {/* Main Info Card */}
-        <div style={{
-          background: "white",
-          borderRadius: "12px",
-          padding: "20px 24px",
-          marginBottom: "24px",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.07)",
-          border: "1px solid #e5e7eb"
-        }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "16px" }}>
-            <h1 style={{ margin: 0, fontSize: "1.55rem", fontWeight: 700, color: "#1d4ed8" }}>
-              {formType}
-            </h1>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button style={{
-                padding: "8px 14px",
-                background: "#eff6ff",
-                color: "#1d4ed8",
-                border: "1px solid #bfdbfe",
-                borderRadius: "8px",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                cursor: "pointer"
-              }}>
-                Advisory
-              </button>
-              <button style={{
-                padding: "8px 14px",
-                background: "#1d4ed8",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                cursor: "pointer"
-              }}>
-                Help
-              </button>
-            </div>
-          </div>
-
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "10px",
-            fontSize: "0.9rem"
-          }}>
-            <div><strong>GSTIN:</strong> 09ACNPU2195H1ZY</div>
-            <div><strong>Legal:</strong> Mohd Umair</div>
-            <div><strong>Trade:</strong> U.A.F ENTERPRISE'S</div>
-            <div><strong>FY:</strong> {fy}</div>
-            <div><strong>Period:</strong> {period}</div>
-            <div>
-              <strong>Status:</strong>
-              <span style={{
-                marginLeft: "8px",
-                padding: "4px 10px",
-                background: "#ecfdf5",
-                color: "#059669",
-                borderRadius: "6px",
-                fontWeight: 600,
-                fontSize: "0.85rem"
-              }}>
-                Filed
-              </span>
-            </div>
-          </div>
+    <div style={{ padding: "20px", background: "#f8fafc", minHeight: "100vh" }}>
+      <div style={{ background: "white", borderRadius: "16px", boxShadow: "0 10px 40px rgba(0,0,0,0.06)", overflow: "hidden" }}>
+        {/* Header */}
+        <div style={{ padding: "28px 36px", borderBottom: "1px solid #e2e8f0" }}>
+          <h1 style={{ margin: 0, fontSize: "2.2rem", fontWeight: 800, color: "#7c3aed" }}>{title}</h1>
         </div>
 
-        {/* Nil filing option */}
-        <div style={{
-          background: "white",
-          borderRadius: "10px",
-          padding: "12px 18px",
-          marginBottom: "20px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-          border: "1px solid #e5e7eb",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px"
-        }}>
-          <input type="checkbox" style={{ width: "16px", height: "16px", accentColor: "#3b82f6" }} />
-          <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#1e293b" }}>
-            File Nil {formType}
-          </span>
-        </div>
-
-        {/* Section Cards Grid */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-          gap: "16px"
-        }}>
-          {sections.map((item, index) => (
-            <div
-              key={index}
-              onClick={() => setSelectedSection(item)}
+        {/* Tabs */}
+        <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#fafbff" }}>
+          {["Manually", "Import", "Summary"].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveSubTab(tab)}
               style={{
-                background: "white",
-                borderRadius: "12px",
-                border: item.count > 0 ? "1px solid #86efac" : "1px solid #e5e7eb",
-                overflow: "hidden",
+                flex: 1,
+                padding: "16px",
+                background: activeSubTab === tab ? "white" : "transparent",
+                color: activeSubTab === tab ? "#4f46e5" : "#64748b",
+                border: "none",
+                fontSize: "1.08rem",
+                fontWeight: activeSubTab === tab ? 700 : 500,
                 cursor: "pointer",
-                boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
-                transition: "all 0.2s ease"
+                borderBottom: activeSubTab === tab ? "4px solid #7c3aed" : "none"
               }}
             >
-              <div style={{
-                background: item.count > 0
-                  ? "linear-gradient(135deg, #ecfdf5, #f0fdf4)"
-                  : "linear-gradient(135deg, #f8fafc, #f1f5f9)",
-                padding: "12px 14px",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-                textAlign: "center",
-                minHeight: "54px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
-                {item.title}
-              </div>
-              <div style={{ padding: "16px", textAlign: "center" }}>
-                <div style={{
-                  width: "48px",
-                  height: "48px",
-                  lineHeight: "48px",
-                  borderRadius: "50%",
-                  margin: "0 auto",
-                  fontSize: "1.3rem",
-                  fontWeight: 700,
-                  background: item.count > 0 ? "#dcfce7" : "#f1f5f9",
-                  color: item.count > 0 ? "#15803d" : "#64748b",
-                  boxShadow: item.count > 0 ? "0 2px 8px rgba(34,197,94,0.25)" : "none"
-                }}>
-                  {item.count}
-                </div>
-              </div>
-            </div>
+              {tab}
+            </button>
           ))}
         </div>
 
-        {/* ADD RECORD MODAL - when section selected */}
-        {selectedSection && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.55)",
-              zIndex: 9999,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              overflow: "auto",
-              padding: "20px"
-            }}
-            onClick={() => {
-              setSelectedSection(null);
-              setShowAddForm(false);
-            }}
-          >
-            <div
-              style={{
-                width: "95vw",
-                maxWidth: "1100px",
-                background: "#ffffff",
-                borderRadius: "18px",
-                overflow: "hidden",
-                boxShadow: "0 25px 70px rgba(0,0,0,0.35)",
-                maxHeight: "92vh",
-                display: "flex",
-                flexDirection: "column"
-              }}
-              onClick={e => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div style={{
-                padding: "16px 28px",
-                background: "linear-gradient(135deg, #4f46e5, #4338ca)",
-                color: "white",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}>
-                <h2 style={{ margin: 0, fontSize: "1.4rem" }}>
-                  {selectedSection.title}
-                </h2>
-                <button
-                  onClick={() => {
-                    setSelectedSection(null);
-                    setShowAddForm(false);
-                  }}
-                  style={{
-                    background: "rgba(255,255,255,0.25)",
-                    border: "none",
-                    color: "white",
-                    padding: "8px 16px",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontSize: "1.1rem"
-                  }}
-                >
-                  ×
-                </button>
+        {/* Manually Tab */}
+        {activeSubTab === "Manually" && (
+          <div style={{ padding: "24px 28px" }}>
+            {/* Selectors */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginBottom: "40px" }}>
+              <div style={{ width: 160 }}>
+                <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Financial Year</label>
+                <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
+                  {years.map(y => <option key={y}>{y}</option>)}
+                </select>
               </div>
+              <div style={{ width: 160 }}>
+                <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Month</label>
+                <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
+                  <option value="">Select</option>
+                  {months.map(m => <option key={m}>{m}</option>)}
+                </select>
+              </div>
+              <div style={{ flex: 1, minWidth: 400 }}>
+                <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Select sheet</label>
+                <select value={selectedSection} onChange={e => setSelectedSection(e.target.value)} disabled={!canSelect} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
+                  <option value="">{canSelect ? "Choose GSTR-1 Table..." : "Select period first"}</option>
+                  {sections.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>
 
-              {/* Body - Scrollable */}
-              <div style={{
-                padding: "28px 32px",
-                flex: 1,
-                overflowY: "auto"
-              }}>
-                {/* Supply Type Checkboxes */}
-                <div style={{ marginBottom: "32px" }}>
-                  <h4 style={{ margin: "0 0 16px", fontSize: "1.15rem", color: "#1e293b" }}>
-                    Supply Type
-                  </h4>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "20px 40px" }}>
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.deemedExports}
-                        onChange={e => setForm(prev => ({ ...prev, deemedExports: e.target.checked }))}
-                        style={{ width: "18px", height: "18px" }}
-                      />
-                      Deemed Exports
-                    </label>
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.sezWithPayment}
-                        onChange={e => setForm(prev => ({ ...prev, sezWithPayment: e.target.checked }))}
-                        style={{ width: "18px", height: "18px" }}
-                      />
-                      SEZ with payment
-                    </label>
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.sezWithoutPayment}
-                        onChange={e => setForm(prev => ({ ...prev, sezWithoutPayment: e.target.checked }))}
-                        style={{ width: "18px", height: "18px" }}
-                      />
-                      SEZ without payment
-                    </label>
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.reverseCharge}
-                        onChange={e => setForm(prev => ({ ...prev, reverseCharge: e.target.checked }))}
-                        style={{ width: "18px", height: "18px" }}
-                      />
-                      Reverse Charge
-                    </label>
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.intraStateIGST}
-                        onChange={e => setForm(prev => ({ ...prev, intraStateIGST: e.target.checked }))}
-                        style={{ width: "18px", height: "18px" }}
-                      />
-                      Intra-State IGST
-                    </label>
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.95rem" }}>
-                      <input
-                        type="checkbox"
-                        checked={form.differentialPercent}
-                        onChange={e => setForm(prev => ({ ...prev, differentialPercent: e.target.checked }))}
-                        style={{ width: "18px", height: "18px" }}
-                      />
-                      Differential %
-                    </label>
-                  </div>
-                </div>
+            {selectedSection && currentColumns.length > 0 && (
+              <>
+                <h2 style={{ margin: "0 0 24px", fontSize: 24, color: "#1e293b" }}>{selectedSection}</h2>
 
-                {/* Main Form Fields */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", marginBottom: "32px" }}>
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>GSTIN/UIN *</label>
-                    <input
-                      name="gstin"
-                      value={form.gstin}
-                      onChange={e => setForm(prev => ({ ...prev, gstin: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Recipient Name *</label>
-                    <input
-                      name="recipientName"
-                      value={form.recipientName}
-                      onChange={e => setForm(prev => ({ ...prev, recipientName: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Name in Master</label>
-                    <input
-                      disabled
-                      placeholder="Auto-filled from master"
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", background: "#f8fafc" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Invoice No. *</label>
-                    <input
-                      name="invoiceNo"
-                      value={form.invoiceNo}
-                      onChange={e => setForm(prev => ({ ...prev, invoiceNo: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Invoice Date *</label>
-                    <input
-                      type="date"
-                      name="invoiceDate"
-                      value={form.invoiceDate}
-                      onChange={e => setForm(prev => ({ ...prev, invoiceDate: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Total Value (₹) *</label>
-                    <input
-                      name="totalValue"
-                      value={form.totalValue}
-                      onChange={e => setForm(prev => ({ ...prev, totalValue: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>POS *</label>
-                    <select
-                      name="pos"
-                      value={form.pos}
-                      onChange={e => setForm(prev => ({ ...prev, pos: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                    >
-                      <option>09-Uttar Pradesh</option>
-                      <option>07-Delhi</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Supply Type</label>
-                    <select
-                      name="supplyType"
-                      value={form.supplyType}
-                      onChange={e => setForm(prev => ({ ...prev, supplyType: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                    >
-                      <option>Intra-State</option>
-                      <option>Inter-State</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Source</label>
-                    <input
-                      name="source"
-                      value={form.source}
-                      onChange={e => setForm(prev => ({ ...prev, source: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>IRN</label>
-                    <input
-                      name="irn"
-                      value={form.irn}
-                      onChange={e => setForm(prev => ({ ...prev, irn: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>IRN Date</label>
-                    <input
-                      type="date"
-                      name="irnDate"
-                      value={form.irnDate}
-                      onChange={e => setForm(prev => ({ ...prev, irnDate: e.target.value }))}
-                      style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db" }}
-                    />
-                  </div>
-                </div>
-
-                {/* Item Details Table */}
-                <div style={{ marginTop: "32px" }}>
-                  <h4 style={{ marginBottom: "16px", fontSize: "1.15rem", color: "#1e293b" }}>
-                    Item Details
-                  </h4>
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr style={{ background: "#f8fafc" }}>
-                          <th style={{ padding: "12px", textAlign: "left" }}>Rate (%)</th>
-                          <th style={{ padding: "12px", textAlign: "left" }}>Taxable Value *</th>
-                          <th style={{ padding: "12px", textAlign: "right" }}>CGST</th>
-                          <th style={{ padding: "12px", textAlign: "right" }}>SGST</th>
-                          <th style={{ padding: "12px", textAlign: "right" }}>Cess</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[
-                          0, 0.1, 0.25, 1, 1.5, 3, 5, 6, 7.5, 12, 18, 28, 40
-                        ].map((rate, index) => (
-                          <tr key={rate} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                            <td style={{ padding: "12px" }}>{rate}%</td>
-                            <td style={{ padding: "12px" }}>
-                              <input
-                                type="number"
-                                value={form.items[index]?.taxableValue || ""}
-                                onChange={e => {
-                                  const newItems = [...(form.items || [])];
-                                  newItems[index] = {
-                                    ...newItems[index],
-                                    taxableValue: e.target.value,
-                                    rate
-                                  };
-                                  setForm(prev => ({ ...prev, items: newItems }));
-                                }}
-                                style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #d1d5db" }}
-                              />
-                            </td>
-                            <td style={{ padding: "12px", textAlign: "right" }}>
-                              {(Number(form.items[index]?.taxableValue || 0) * (rate / 100) / 2).toFixed(2)}
-                            </td>
-                            <td style={{ padding: "12px", textAlign: "right" }}>
-                              {(Number(form.items[index]?.taxableValue || 0) * (rate / 100) / 2).toFixed(2)}
-                            </td>
-                            <td style={{ padding: "12px", textAlign: "right" }}>0.00</td>
-                          </tr>
+                <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10, background: "white", position: "relative" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                    <thead>
+                      <tr style={{ background: "#f8fafc", borderBottom: "2px solid #cbd5e1" }}>
+                        <th style={{ padding: "14px 10px", textAlign: "center", minWidth: 50 }}>SL</th>
+                        {currentColumns.map((col, i) => (
+                          <th key={i} style={{ padding: "14px 10px", textAlign: col.align, minWidth: 100, whiteSpace: "nowrap" }}>
+                            {col.label}
+                          </th>
                         ))}
-                      </tbody>
-                    </table>
+                        <th style={{ padding: "14px 10px", textAlign: "center", minWidth: 100 }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((row, rowIndex) => (
+                        <tr key={rowIndex} style={{ background: rowIndex % 2 === 0 ? "#fafcff" : "white" }}>
+                          <td style={{ padding: "12px 10px", textAlign: "center" }}>{row.sl}</td>
+                          {currentColumns.map((col, colIndex) => (
+                            <td key={colIndex} style={{ padding: "8px 10px", position: "relative" }}>
+                              {/* POS Dropdown */}
+                              {col.key === "pos" ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    readOnly
+                                    value={row[col.key] || ""}
+                                    placeholder="Select State"
+                                    onClick={() => setOpenPosDropdownRow(rowIndex)}
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: 6,
+                                      textAlign: "center",
+                                      cursor: "pointer",
+                                      background: "#f9fafb"
+                                    }}
+                                  />
+                                  {openPosDropdownRow === rowIndex && (
+                                    <div
+                                      style={{
+                                        position: "absolute",
+                                        top: "100%",
+                                        left: 0,
+                                        width: "280px",
+                                        maxHeight: "320px",
+                                        overflowY: "auto",
+                                        background: "white",
+                                        border: "1px solid #cbd5e1",
+                                        borderRadius: 6,
+                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                                        zIndex: 100,
+                                        marginTop: "4px"
+                                      }}
+                                    >
+                                      {stateList.map((state, idx) => (
+                                        <div
+                                          key={idx}
+                                          onClick={() => {
+                                            updateCell(rowIndex, col.key, state.code);
+                                            setOpenPosDropdownRow(null);
+                                          }}
+                                          style={{
+                                            padding: "8px 12px",
+                                            cursor: "pointer",
+                                            borderBottom: "1px solid #f0f0f0",
+                                            fontSize: "0.9rem"
+                                          }}
+                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
+                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
+                                        >
+                                          {state.name} ({state.code}) - {state.stateCode}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              ) : col.key === "noteSupplyType" &&
+                                (selectedSection === "9B - Credit / Debit Notes (Registered)" ||
+                                 selectedSection === "9B - Credit / Debit Notes (Unregistered)") ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    readOnly
+                                    value={row[col.key] || ""}
+                                    placeholder="Select Supply Type"
+                                    onClick={() => setOpenSupplyTypeDropdownRow(rowIndex)}
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: 6,
+                                      textAlign: "left",
+                                      cursor: "pointer",
+                                      background: "#f9fafb"
+                                    }}
+                                  />
+                                  {openSupplyTypeDropdownRow === rowIndex && (
+                                    <div
+                                      style={{
+                                        position: "absolute",
+                                        top: "100%",
+                                        left: 0,
+                                        width: "260px",
+                                        maxHeight: "220px",
+                                        overflowY: "auto",
+                                        background: "white",
+                                        border: "1px solid #cbd5e1",
+                                        borderRadius: 6,
+                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                                        zIndex: 100,
+                                        marginTop: "4px"
+                                      }}
+                                    >
+                                      {supplyTypeOptions.map((option, idx) => (
+                                        <div
+                                          key={idx}
+                                          onClick={() => {
+                                            updateCell(rowIndex, col.key, option);
+                                            setOpenSupplyTypeDropdownRow(null);
+                                          }}
+                                          style={{
+                                            padding: "8px 12px",
+                                            cursor: "pointer",
+                                            borderBottom: "1px solid #f0f0f0",
+                                            fontSize: "0.9rem"
+                                          }}
+                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
+                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
+                                        >
+                                          {option}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              ) : col.key === "noteType" &&
+                                (selectedSection === "9B - Credit / Debit Notes (Registered)" ||
+                                 selectedSection === "9B - Credit / Debit Notes (Unregistered)") ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    readOnly
+                                    value={row[col.key] || ""}
+                                    placeholder="Select Note Type"
+                                    onClick={() => setOpenNoteTypeDropdownRow(rowIndex)}
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: 6,
+                                      textAlign: "center",
+                                      cursor: "pointer",
+                                      background: "#f9fafb"
+                                    }}
+                                  />
+                                  {openNoteTypeDropdownRow === rowIndex && (
+                                    <div
+                                      style={{
+                                        position: "absolute",
+                                        top: "100%",
+                                        left: 0,
+                                        width: "180px",
+                                        maxHeight: "140px",
+                                        overflowY: "auto",
+                                        background: "white",
+                                        border: "1px solid #cbd5e1",
+                                        borderRadius: 6,
+                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                                        zIndex: 100,
+                                        marginTop: "4px"
+                                      }}
+                                    >
+                                      {noteTypeOptions.map((option, idx) => (
+                                        <div
+                                          key={idx}
+                                          onClick={() => {
+                                            updateCell(rowIndex, col.key, option);
+                                            setOpenNoteTypeDropdownRow(null);
+                                          }}
+                                          style={{
+                                            padding: "8px 12px",
+                                            cursor: "pointer",
+                                            borderBottom: "1px solid #f0f0f0",
+                                            fontSize: "0.95rem"
+                                          }}
+                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
+                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
+                                        >
+                                          {option}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              ) : col.key === "nature" && selectedSection === "14 - Supplies made through ECO" ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    readOnly
+                                    value={row[col.key] || ""}
+                                    placeholder="Select Nature"
+                                    onClick={() => setOpenNatureDropdownRow(rowIndex)}
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: 6,
+                                      textAlign: "left",
+                                      cursor: "pointer",
+                                      background: "#f9fafb"
+                                    }}
+                                  />
+                                  {openNatureDropdownRow === rowIndex && (
+                                    <div
+                                      style={{
+                                        position: "absolute",
+                                        top: "100%",
+                                        left: 0,
+                                        width: "300px",
+                                        maxHeight: "200px",
+                                        overflowY: "auto",
+                                        background: "white",
+                                        border: "1px solid #cbd5e1",
+                                        borderRadius: 6,
+                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                                        zIndex: 100,
+                                        marginTop: "4px"
+                                      }}
+                                    >
+                                      {natureOptions.map((option, idx) => (
+                                        <div
+                                          key={idx}
+                                          onClick={() => {
+                                            updateCell(rowIndex, col.key, option);
+                                            setOpenNatureDropdownRow(null);
+                                          }}
+                                          style={{
+                                            padding: "8px 12px",
+                                            cursor: "pointer",
+                                            borderBottom: "1px solid #f0f0f0",
+                                            fontSize: "0.9rem"
+                                          }}
+                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
+                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
+                                        >
+                                          {option}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              ) : col.key === "nature" && selectedSection === "13 - Documents Issued" ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    readOnly
+                                    value={row[col.key] || ""}
+                                    placeholder="Select Nature"
+                                    onClick={() => setOpenDocumentNatureDropdownRow(rowIndex)}
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: 6,
+                                      textAlign: "left",
+                                      cursor: "pointer",
+                                      background: "#f9fafb"
+                                    }}
+                                  />
+                                  {openDocumentNatureDropdownRow === rowIndex && (
+                                    <div
+                                      style={{
+                                        position: "absolute",
+                                        top: "100%",
+                                        left: 0,
+                                        width: "400px",
+                                        maxHeight: "300px",
+                                        overflowY: "auto",
+                                        background: "white",
+                                        border: "1px solid #cbd5e1",
+                                        borderRadius: 6,
+                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                                        zIndex: 100,
+                                        marginTop: "4px"
+                                      }}
+                                    >
+                                      {documentNatureOptions.map((option, idx) => (
+                                        <div
+                                          key={idx}
+                                          onClick={() => {
+                                            updateCell(rowIndex, col.key, option);
+                                            setOpenDocumentNatureDropdownRow(null);
+                                          }}
+                                          style={{
+                                            padding: "8px 12px",
+                                            cursor: "pointer",
+                                            borderBottom: "1px solid #f0f0f0",
+                                            fontSize: "0.9rem"
+                                          }}
+                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
+                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
+                                        >
+                                          {option}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              ) : col.key === "urType" && selectedSection === "9B - Credit / Debit Notes (Unregistered)" ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    readOnly
+                                    value={row[col.key] || ""}
+                                    placeholder="Select UR Type"
+                                    onClick={() => setOpenUrTypeDropdownRow(rowIndex)}
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: 6,
+                                      textAlign: "center",
+                                      cursor: "pointer",
+                                      background: "#f9fafb"
+                                    }}
+                                  />
+                                  {openUrTypeDropdownRow === rowIndex && (
+                                    <div
+                                      style={{
+                                        position: "absolute",
+                                        top: "100%",
+                                        left: 0,
+                                        width: "240px",
+                                        maxHeight: "180px",
+                                        overflowY: "auto",
+                                        background: "white",
+                                        border: "1px solid #cbd5e1",
+                                        borderRadius: 6,
+                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                                        zIndex: 100,
+                                        marginTop: "4px"
+                                      }}
+                                    >
+                                      {urTypeOptions.map((option, idx) => (
+                                        <div
+                                          key={idx}
+                                          onClick={() => {
+                                            updateCell(rowIndex, col.key, option);
+                                            setOpenUrTypeDropdownRow(null);
+                                          }}
+                                          style={{
+                                            padding: "8px 12px",
+                                            cursor: "pointer",
+                                            borderBottom: "1px solid #f0f0f0",
+                                            fontSize: "0.95rem"
+                                          }}
+                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
+                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
+                                        >
+                                          {option}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <input
+                                  type={col.type === "number" ? "number" : "text"}
+                                  value={row[col.key] ?? ""}
+                                  onChange={e => updateCell(rowIndex, col.key, e.target.value)}
+                                  style={{
+                                    width: "100%",
+                                    padding: "8px",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: 6,
+                                    textAlign: col.align === "right" ? "right" : col.align === "center" ? "center" : "left"
+                                  }}
+                                />
+                              )}
+                            </td>
+                          ))}
+                          <td style={{ padding: "12px 10px", textAlign: "center" }}>
+                            <span onClick={() => deleteRow(rowIndex)} style={{ color: "#ef4444", cursor: "pointer" }}>Delete</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr style={{ background: "#f1f5f9", fontWeight: 600 }}>
+                        <td colSpan={currentColumns.length + 1} style={{ padding: "14px 10px", textAlign: "right" }}>Total</td>
+                        <td style={{ padding: "14px 10px", textAlign: "right" }}>0.00</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <div style={{ marginTop: 28, display: "flex", justifyContent: "space-between" }}>
+                  <button
+                    onClick={addRow}
+                    style={{
+                      padding: "12px 32px",
+                      background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 10,
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    + Add Row
+                  </button>
+                  <div style={{ display: "flex", gap: 16 }}>
+                    <button
+                      onClick={handleSave}
+                      style={{
+                        padding: "12px 40px",
+                        background: "#10b981",
+                        color: "white",
+                        border: "none",
+                        borderRadius: 10,
+                        fontWeight: 600,
+                        cursor: "pointer"
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button
+                      style={{
+                        padding: "12px 40px",
+                        background: "#ef4444",
+                        color: "white",
+                        border: "none",
+                        borderRadius: 10,
+                        fontWeight: 600,
+                        cursor: "pointer"
+                      }}
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
-              </div>
+              </>
+            )}
+          </div>
+        )}
 
-              {/* Footer Buttons */}
-              <div style={{
-                padding: "16px 28px",
-                borderTop: "1px solid #e5e7eb",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "16px",
-                background: "#f8fafc"
-              }}>
-                <button
-                  onClick={() => {
-                    setSelectedSection(null);
-                    setShowAddForm(false);
-                  }}
-                  style={{
-                    padding: "12px 32px",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: "10px",
-                    background: "white",
-                    fontWeight: 600,
-                    cursor: "pointer"
-                  }}
-                >
-                  BACK
-                </button>
+        {/* Summary Tab */}
+        {activeSubTab === "Summary" && (
+          <div style={{ padding: "32px" }}>
+            <h2 style={{ textAlign: "center", marginBottom: "32px", fontSize: "2rem", color: "#1e293b" }}>GSTR-1 Summary</h2>
 
-                <button
-                  onClick={saveRecord}
-                  style={{
-                    padding: "12px 40px",
-                    background: "linear-gradient(135deg, #16a34a, #22c55e)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "10px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    boxShadow: "0 4px 14px rgba(34,197,94,0.3)"
-                  }}
-                >
-                  SAVE
-                </button>
-              </div>
+            <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
+                <thead>
+                  <tr style={{ background: "#f1f5f9", fontWeight: 700, borderBottom: "2px solid #cbd5e1" }}>
+                    <th style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
+                      <input
+                        type="checkbox"
+                        checked={selectAll}
+                        onChange={toggleSelectAll}
+                        style={{ cursor: "pointer" }}
+                      />
+                    </th>
+                    <th style={{ padding: "16px", textAlign: "left", border: "1px solid #cbd5e1" }}>Act</th>
+                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Taxable</th>
+                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>IGST</th>
+                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>CGST</th>
+                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>SGST</th>
+                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Cess</th>
+                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Total</th>
+                    <th style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleSummary.map((item, index) => (
+                    <tr key={index}>
+                      <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
+                        <input
+                          type="checkbox"
+                          checked={selectedRows.includes(item.id)}
+                          onChange={() => toggleRow(item.id)}
+                          style={{ cursor: "pointer" }}
+                        />
+                      </td>
+                      <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>{item.label}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.taxable)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.igst)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cgst)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.sgst)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cess)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.total)}</td>
+                      <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
+                    </tr>
+                  ))}
+
+                  {visibleSummary.length > 0 && (
+                    <tr style={{ background: "#e0f2fe", fontWeight: 700 }}>
+                      <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}></td>
+                      <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>Grand Total</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.taxable)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.igst)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cgst)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.sgst)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cess)}</td>
+                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.total)}</td>
+                      <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
+                    </tr>
+                  )}
+
+                  {visibleSummary.length === 0 && (
+                    <tr>
+                      <td colSpan={10} style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>
+                        No data saved yet
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Bottom Buttons */}
+            <div style={{ marginTop: 24, display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+              <button
+                onClick={handleBack}
+                style={{
+                  padding: "8px 20px",
+                  background: "#f3f4f6",
+                  border: "1px solid #9ca3af",
+                  borderRadius: 6,
+                  color: "#374151",
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  minWidth: "100px"
+                }}
+              >
+                Back
+              </button>
+
+              <button
+                style={{
+                  padding: "8px 20px",
+                  background: "#f3f4f6",
+                  border: "1px solid #10b981",
+                  borderRadius: 6,
+                  color: "#065f46",
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  minWidth: "140px"
+                }}
+              >
+                Upload on Portal
+              </button>
+
+              <button
+                style={{
+                  padding: "8px 16px",
+                  background: "#f3f4f6",
+                  border: "1px solid #3b82f6",
+                  borderRadius: 6,
+                  color: "#1d4ed8",
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6
+                }}
+                onClick={() => alert("Downloading Excel 📊 ...")}
+              >
+                Excel 📊
+              </button>
+
+              <button
+                style={{
+                  padding: "8px 16px",
+                  background: "#f3f4f6",
+                  border: "1px solid #3b82f6",
+                  borderRadius: 6,
+                  color: "#1d4ed8",
+                  fontSize: "0.9rem",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6
+                }}
+                onClick={() => alert("Downloading PDF 📄 ...")}
+              >
+                PDF 📄
+              </button>
             </div>
           </div>
         )}
