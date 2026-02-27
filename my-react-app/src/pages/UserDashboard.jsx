@@ -654,17 +654,7 @@ const GSTReturnPeriodSelection = ({
           }}
         >
           <div>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "6px",
-                fontWeight: 600,
-                color: "#1e293b",
-                fontSize: "0.85rem"
-              }}
-            >
-              Financial Year <span style={{ color: "#ef4444" }}>*</span>
-            </label>
+          
             <select
               value={selectedFY}
               onChange={e => setSelectedFY(e.target.value)}
@@ -2351,12 +2341,17 @@ const handleClientSelect = () => {
   const [showCreditLedger, setShowCreditLedger] = useState(false);
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
   const [selectedDemand, setSelectedDemand] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [dynamicClient, setDynamicClient] = useState({
     gstin: client?.gstin || "09ABMCS5888A1ZU",
     company: client?.company || "SALVIA GRAFIX PRIVATE LIMITED",
     registrationDate: "10-Feb-2020",
     status: "Active",
   });
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [selectAllImport, setSelectAllImport] = useState(false);
+  const [skipValidation, setSkipValidation] = useState(false);
   const [formData, setFormData] = useState({
     name: "SALVIA GRAFIX PRIVATE LIMITED",
     address: "Shop No. 13, First Floor, Royal Plaza, Haj...",
@@ -2415,6 +2410,7 @@ const handleClientSelect = () => {
     { id: "liability", label: "Liability Ledger" },
     { id: "payment", label: "Demand" },
   ];
+
   const outstandingDemands = [
     {
       sr: 1,
@@ -2529,6 +2525,8 @@ const handleClientSelect = () => {
     XLSX.writeFile(wb, "Client_Master_Template.xlsx");
     toast.success("Client Master Template Downloaded!");
   };
+
+
   const ImportOptionsList = () => {
     const options = [
       { title: "Bulk New File Creation for GST", hasTemplate: true },
@@ -2608,323 +2606,104 @@ const handleClientSelect = () => {
     );
   };
   // ==============================================
-// GSTR Layout Component (with tabs: Manually, Import, Summary)
-// ==============================================
- 
-// LocalStorage keys
-const STORAGE_KEYS = {
-  b2b: "gstr_b2bRows",
-  b2cLarge: "gstr_b2cLargeRows",
-  b2cOthers: "gstr_b2cOthersRows",
-  nilExempt: "gstr_nilExemptRows",
-  creditDebitRegistered: "gstr_creditDebitRegisteredRows",
-  creditDebitUnregistered: "gstr_creditDebitUnregisteredRows",
-  advanceLiability: "gstr_advanceLiabilityRows",
-  advanceAdjustment: "gstr_advanceAdjustmentRows",
-  hsn: "gstr_hsnRows",
-  documents: "gstr_documentsRows",
-  eco: "gstr_ecoRows",
-  summaryTotals: "gstr_summaryTotals",
-  outward: "gstr3b_outwardSupplies",
-  eco: "gstr3b_ecoSupplies",
-  interstate: "gstr3b_interstateSupplies",
-  itc: "gstr3b_itcDetails",
-  exempt: "gstr3b_exemptNonGst",
-  interestLateFee: "gstr3b_interestLateFee"
-};
+  // GSTR Layout Component (with tabs: Manually, Import, Summary)
+  // ==============================================
 
-// Full State list for POS dropdown
-const stateList = [
-  { name: "ANDAMAN AND NICOBAR ISLANDS", code: "35", stateCode: "AN" },
-  { name: "ANDHRA PRADESH (NEW)", code: "37", stateCode: "AD" },
-  { name: "ARUNACHAL PRADESH", code: "12", stateCode: "AR" },
-  { name: "ASSAM", code: "18", stateCode: "AS" },
-  { name: "BIHAR", code: "10", stateCode: "BH" },
-  { name: "CHANDIGARH", code: "04", stateCode: "CH" },
-  { name: "CHHATTISGARH", code: "22", stateCode: "CT" },
-  { name: "DADRA AND NAGAR HAVELI AND DAMAN AND DIU", code: "26", stateCode: "DN" },
-  { name: "DELHI", code: "07", stateCode: "DL" },
-  { name: "GOA", code: "30", stateCode: "GA" },
-  { name: "GUJARAT", code: "24", stateCode: "GJ" },
-  { name: "HARYANA", code: "06", stateCode: "HR" },
-  { name: "HIMACHAL PRADESH", code: "02", stateCode: "HP" },
-  { name: "JAMMU AND KASHMIR", code: "01", stateCode: "JK" },
-  { name: "JHARKHAND", code: "20", stateCode: "JH" },
-  { name: "KARNATAKA", code: "29", stateCode: "KA" },
-  { name: "KERALA", code: "32", stateCode: "KL" },
-  { name: "LAKSHADWEEP", code: "31", stateCode: "LD" },
-  { name: "MADHYA PRADESH", code: "23", stateCode: "MP" },
-  { name: "MAHARASHTRA", code: "27", stateCode: "MH" },
-  { name: "MANIPUR", code: "14", stateCode: "MN" },
-  { name: "MEGHALAYA", code: "17", stateCode: "ME" },
-  { name: "MIZORAM", code: "15", stateCode: "MI" },
-  { name: "NAGALAND", code: "13", stateCode: "NL" },
-  { name: "ODISHA", code: "21", stateCode: "OR" },
-  { name: "PUDUCHERRY", code: "34", stateCode: "PY" },
-  { name: "PUNJAB", code: "03", stateCode: "PB" },
-  { name: "RAJASTHAN", code: "08", stateCode: "RJ" },
-  { name: "SIKKIM", code: "11", stateCode: "SK" },
-  { name: "TAMIL NADU", code: "33", stateCode: "TN" },
-  { name: "TELANGASA", code: "36", stateCode: "TS" },
-  { name: "TRIPURA", code: "16", stateCode: "TR" },
-  { name: "UTTAR PRADESH", code: "09", stateCode: "UP" },
-  { name: "UTTARAKHAND", code: "05", stateCode: "UT" },
-  { name: "WEST BENGAL", code: "19", stateCode: "WB" }
-];
-
-// Supply Type options for Credit/Debit Notes
-const supplyTypeOptions = [
-  "Regular B2B",
-  "SEZ Supply WPAY",
-  "SEZ Supply WOPAY",
-  "Deemed Export",
-  "Intra-State Supply Attracting IGST"
-];
-
-// Note Type options (Debit / Credit)
-const noteTypeOptions = ["Debit", "Credit"];
-
-// Nature of Supply options for ECO
-const natureOptions = [
-  "1 - Liable to Collect Tax u/s 52(TCS)",
-  "2 - Liable to Pay Tax u/s 9(5)"
-];
-
-// Nature of Documents options for Documents Issued
-const documentNatureOptions = [
-  "1 - Invoice for Outward Supply",
-  "2 - Invoices for Inward Supply from Unregistered Person",
-  "3 - Revised Invoice",
-  "4 - Debit Note",
-  "5 - Credit Note",
-  "6 - Receipt Voucher",
-  "7 - Payment Voucher",
-  "8 - Refund Voucher",
-  "9 - Delivery Challan for Job Work",
-  "10 - Delivery Challan for Supply on Approval",
-  "11 - Delivery Challan in case of Liquid Gas",
-  "12 - Delivery Challan in cases other than by way of Supply (Excluding at S no 9 to 11)"
-];
-
-// UR Type options for Credit/Debit Notes (Unregistered)
-const urTypeOptions = [
-  "1 - B2C (Large)",
-  "2 - Export WPAY",
-  "3 - Export WOPAY"
-];
-
-// GSTR-3B ke 6 options
-const gstr3bSections = [
-  "1- tax on outward supplies & reverse charge inward",
-  "2- Supplies notified u/s 9(5) of the CGST Act 2017",
-  "3- Inter State Supplies",
-  "4- Eligible ITC",
-  "5- Exempt , Nil Rated and Non - Gst Supplies",
-  "6- Intrest and Late fee For Previous Tax Period"
-];
-
-const GSTRLayout = ({ title = "GST Returns" }) => {
-  const [activeSubTab, setActiveSubTab] = useState("Manually");
-  const [selectedYear, setSelectedYear] = useState("2025-26");
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedSection, setSelectedSection] = useState("");
-
-  // Row states with localStorage persistence
-  const [b2bRows, setB2bRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.b2b);
-    return saved ? JSON.parse(saved) : [{ sl: 1, gstin: "", recipientName: "", invNo: "", invDate: "", invValue: 0, pos: "", rcm: "N", applicableTaxRate: "", invType: "", ecoGstin: "", gstRate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0 }];
-  });
-  const [b2cLargeRows, setB2cLargeRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.b2cLarge);
-    return saved ? JSON.parse(saved) : [{ sl: 1, invNo: "", invDate: "", invValue: 0, pos: "State", applicableTaxRate: "0%/65%", gstRate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0 }];
-  });
-  const [b2cOthersRows, setB2cOthersRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.b2cOthers);
-    return saved ? JSON.parse(saved) : [{ sl: 1, type: "E/OF", pos: "", applicableTaxRate: "", rate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
-  });
-  const [nilExemptRows, setNilExemptRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.nilExempt);
-    return saved ? JSON.parse(saved) : [{ sl: 1, description: "", nilRated: 0, exempted: 0, nonGst: 0 }];
-  });
-  const [creditDebitRegisteredRows, setCreditDebitRegisteredRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.creditDebitRegistered);
-    return saved ? JSON.parse(saved) : [{ sl: 1, gstin: "", recipientName: "", noteNo: "", noteDate: "", noteType: "Debit", pos: "", rcm: "N", noteSupplyType: "Regular B2B", noteValue: 0, diffRatePercent: "", rate: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
-  });
-  const [creditDebitUnregisteredRows, setCreditDebitUnregisteredRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.creditDebitUnregistered);
-    return saved ? JSON.parse(saved) : [{ sl: 1, urType: "1 - B2C (Large)", noteNo: "", noteDate: "", noteType: "Debit", pos: "", rcm: "N", noteSupplyType: "Regular B2B", noteValue: 0, diffRatePercent: "", rate: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
-  });
-  const [advanceLiabilityRows, setAdvanceLiabilityRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.advanceLiability);
-    return saved ? JSON.parse(saved) : [{ sl: 1, pos: "", diffRatePercent: "", rate: 0, grossAdvance: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
-  });
-  const [advanceAdjustmentRows, setAdvanceAdjustmentRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.advanceAdjustment);
-    return saved ? JSON.parse(saved) : [{ sl: 1, pos: "", diffRatePercent: "", rate: 0, grossAdvance: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
-  });
-  const [hsnRows, setHsnRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.hsn);
-    return saved ? JSON.parse(saved) : [{ sl: 1, hsn: "", description: "", uqc: "", totalQty: 0, totalValue: 0, rate: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0 }];
-  });
-  const [documentsRows, setDocumentsRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.documents);
-    return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Invoice for Outward Supply", srFrom: "", srTo: "", totalNumber: 0, cancelled: 0 }];
-  });
-  const [ecoRows, setEcoRows] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.eco);
-    return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Liable to Collect Tax u/s 52(TCS)", gstinEco: "", nameEco: "", netValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
-  });
-  const [summaryTotals, setSummaryTotals] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.summaryTotals);
-    return saved ? JSON.parse(saved) : {
-      b2b: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
-      b2cLarge: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
-      b2cOthers: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
-      hsn: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
-    };
-  });
-   const [outwardSupplies, setOutwardSupplies] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.outward);
-    return saved ? JSON.parse(saved) : [
-      { nature: "(a) Total Taxable Supplies (Other than Zero Rated, Nil Rated and Exempted supplies)", taxable: "", igst: "", cgst: "", sgst: "", cess: "" },
-      { nature: "(b) Total Taxable Supplies (Zero Rated)", taxable: "", igst: "", cgst: "Hide", sgst: "Hide", cess: "" },
-      { nature: "(c) Total Exempt Supplies (Nil Rated and Exempted)", taxable: "", igst: "Hide", cgst: "Hide", sgst: "Hide", cess: "Hide" },
-      { nature: "(d) Inward Supplies (Liable to Reverse Charge)", taxable: "", igst: "", cgst: "", sgst: "", cess: "" },
-      { nature: "(e) Non-GST Outward Supplies", taxable: "", igst: "Hide", cgst: "Hide", sgst: "Hide", cess: "Hide" }
-    ];
-  });
-
-  // 2. ECO u/s 9(5)
-  const [ecoSupplies, setEcoSupplies] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.eco);
-    return saved ? JSON.parse(saved) : [
-      { nature: "1- Taxable Supplies on which ECO pays tax u/s 9(5) [To be furnished by ECO]", taxable: "", igst: "", cgst: "", sgst: "", cess: "", total: "" },
-      { nature: "2- Taxable Supplies made by registered person through ECO, on which ECO is required to pay tax u/s 9(5) [To be furnished by Registered person making Supplies through ECO]", taxable: "", igst: "", cgst: "", sgst: "", cess: "", total: "" }
-    ];
-  });
-
-  // 3. Inter-State Supplies (composition, exempt, nil, non-GST)
-  const [interstateSupplies, setInterstateSupplies] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.interstate);
-    return saved ? JSON.parse(saved) : [
-      { nature: "From a supplier under composition scheme, Exempt and NIL Rated Supply", interstate: "", intrastate: "" },
-      { nature: "Non GST Supply", interstate: "", intrastate: "" }
-    ];
-  });
-
-  // 4. Eligible ITC (sabse bada table)
-  const [itcDetails, setItcDetails] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.itc);
-    return saved ? JSON.parse(saved) : {
-      available: [
-        { desc: "(1) Import of Goods", igst: "", cgst: "", sgst: "", cess: "" },
-        { desc: "(2) Import of Services", igst: "", cgst: "", sgst: "", cess: "" },
-        { desc: "(3) Inward Supplies liable to Reverse Charge (other than 1 & 2 above)", igst: "", cgst: "", sgst: "", cess: "" },
-        { desc: "(4) Inward Supplies from ISD", igst: "", cgst: "", sgst: "", cess: "" },
-        { desc: "(5) All other ITC", igst: "", cgst: "", sgst: "", cess: "" }
-      ],
-      reversed: [
-        { desc: "(1) As per Rule 42,43 & 44 of CGST Rules & section 17(5) of CGST Act", igst: "", cgst: "", sgst: "", cess: "" },
-        { desc: "(2) Others", igst: "", cgst: "", sgst: "", cess: "" }
-      ],
-      netItc: { igst: "", cgst: "", sgst: "", cess: "" },
-      ineligible: [
-        { desc: "(1) ITC Reclaimed which was reversed under Table 4(A)(5) in earlier tax period", igst: "", cgst: "", sgst: "", cess: "" },
-        { desc: "(2) Ineligible ITC under section 16(4) & ITC restricted due to POS rules", igst: "", cgst: "", sgst: "", cess: "" }
-      ]
-    };
-  });
-
-  // 5. Exempt, Nil Rated, Non-GST Supplies
-  const [exemptNonGst, setExemptNonGst] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.exempt);
-    return saved ? JSON.parse(saved) : [
-      { nature: "From a supplier under composition scheme, Exempt and NIL Rated Supply", interstate: "", intrastate: "" },
-      { nature: "Non GST Supply", interstate: "", intrastate: "" }
-    ];
-  });
-
-  // 6. Interest & Late Fee
-  const [interestLateFee, setInterestLateFee] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.interestLateFee);
-    return saved ? JSON.parse(saved) : [
-      { desc: "Interest", igst: "", cgst: "", sgst: "", cess: "" },
-      { desc: "Late Fees", igst: "", cgst: "", sgst: "", cess: "" }
-    ];
-  });
-
-  // Save all states to localStorage
-  
-
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
-
-  // Dropdown controls
-  const [openPosDropdownRow, setOpenPosDropdownRow] = useState(null);
-  const [openSupplyTypeDropdownRow, setOpenSupplyTypeDropdownRow] = useState(null);
-  const [openNoteTypeDropdownRow, setOpenNoteTypeDropdownRow] = useState(null);
-  const [openNatureDropdownRow, setOpenNatureDropdownRow] = useState(null);
-  const [openDocumentNatureDropdownRow, setOpenDocumentNatureDropdownRow] = useState(null);
-  const [openUrTypeDropdownRow, setOpenUrTypeDropdownRow] = useState(null);
-
-  // Save to localStorage
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.b2b, JSON.stringify(b2bRows)), [b2bRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.b2cLarge, JSON.stringify(b2cLargeRows)), [b2cLargeRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.b2cOthers, JSON.stringify(b2cOthersRows)), [b2cOthersRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.nilExempt, JSON.stringify(nilExemptRows)), [nilExemptRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.creditDebitRegistered, JSON.stringify(creditDebitRegisteredRows)), [creditDebitRegisteredRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.creditDebitUnregistered, JSON.stringify(creditDebitUnregisteredRows)), [creditDebitUnregisteredRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.advanceLiability, JSON.stringify(advanceLiabilityRows)), [advanceLiabilityRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.advanceAdjustment, JSON.stringify(advanceAdjustmentRows)), [advanceAdjustmentRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.hsn, JSON.stringify(hsnRows)), [hsnRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.documents, JSON.stringify(documentsRows)), [documentsRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.eco, JSON.stringify(ecoRows)), [ecoRows]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.summaryTotals, JSON.stringify(summaryTotals)), [summaryTotals]);
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.outward, JSON.stringify(outwardSupplies));
-  }, [outwardSupplies]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.eco, JSON.stringify(ecoSupplies));
-  }, [ecoSupplies]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.interstate, JSON.stringify(interstateSupplies));
-  }, [interstateSupplies]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.itc, JSON.stringify(itcDetails));
-  }, [itcDetails]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.exempt, JSON.stringify(exemptNonGst));
-  }, [exemptNonGst]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.interestLateFee, JSON.stringify(interestLateFee));
-  }, [interestLateFee]);
-
-
-  const years = Array.from({ length: 10 }, (_, i) => 2017 + i).map(y => `${y}-${String(y + 1).slice(-2)}`);
-  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-
-  // GSTR-1 sections (normal case)
-  const gstr1Sections = [
-    "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
-    "5 - B2C (Large) Invoices",
-    "6A - Exports Invoices",
-    "7 - B2C (Others)",
-    "8A, 8B, 8C, 8D - Nil Rated Supplies",
-    "9B - Credit / Debit Notes (Registered)",
-    "9B - Credit / Debit Notes (Unregistered)",
-    "11A(1), 11A(2) - Tax Liability (Advances Received)",
-    "11B - Adjustment of Advances",
-    "12 - HSN-wise summary of outward supplies",
-    "13 - Documents Issued",
-    "14 - Supplies made through ECO",
-    "15 - Supplies U/s 9(5)"
+  // LocalStorage keys
+  const STORAGE_KEYS = {
+    b2b: "gstr_b2bRows",
+    b2cLarge: "gstr_b2cLargeRows",
+    b2cOthers: "gstr_b2cOthersRows",
+    nilExempt: "gstr_nilExemptRows",
+    creditDebitRegistered: "gstr_creditDebitRegisteredRows",
+    creditDebitUnregistered: "gstr_creditDebitUnregisteredRows",
+    advanceLiability: "gstr_advanceLiabilityRows",
+    advanceAdjustment: "gstr_advanceAdjustmentRows",
+    hsn: "gstr_hsnRows",
+    documents: "gstr_documentsRows",
+    eco: "gstr_ecoRows",
+    summaryTotals: "gstr_summaryTotals",
+    outward: "gstr3b_outwardSupplies",
+    eco: "gstr3b_ecoSupplies",
+    interstate: "gstr3b_interstateSupplies",
+    itc: "gstr3b_itcDetails",
+    exempt: "gstr3b_exemptNonGst",
+    interestLateFee: "gstr3b_interestLateFee"
+  };
+  // Full State list for POS dropdown
+  const stateList = [
+    { name: "ANDAMAN AND NICOBAR ISLANDS", code: "35", stateCode: "AN" },
+    { name: "ANDHRA PRADESH (NEW)", code: "37", stateCode: "AD" },
+    { name: "ARUNACHAL PRADESH", code: "12", stateCode: "AR" },
+    { name: "ASSAM", code: "18", stateCode: "AS" },
+    { name: "BIHAR", code: "10", stateCode: "BH" },
+    { name: "CHANDIGARH", code: "04", stateCode: "CH" },
+    { name: "CHHATTISGARH", code: "22", stateCode: "CT" },
+    { name: "DADRA AND NAGAR HAVELI AND DAMAN AND DIU", code: "26", stateCode: "DN" },
+    { name: "DELHI", code: "07", stateCode: "DL" },
+    { name: "GOA", code: "30", stateCode: "GA" },
+    { name: "GUJARAT", code: "24", stateCode: "GJ" },
+    { name: "HARYANA", code: "06", stateCode: "HR" },
+    { name: "HIMACHAL PRADESH", code: "02", stateCode: "HP" },
+    { name: "JAMMU AND KASHMIR", code: "01", stateCode: "JK" },
+    { name: "JHARKHAND", code: "20", stateCode: "JH" },
+    { name: "KARNATAKA", code: "29", stateCode: "KA" },
+    { name: "KERALA", code: "32", stateCode: "KL" },
+    { name: "LAKSHADWEEP", code: "31", stateCode: "LD" },
+    { name: "MADHYA PRADESH", code: "23", stateCode: "MP" },
+    { name: "MAHARASHTRA", code: "27", stateCode: "MH" },
+    { name: "MANIPUR", code: "14", stateCode: "MN" },
+    { name: "MEGHALAYA", code: "17", stateCode: "ME" },
+    { name: "MIZORAM", code: "15", stateCode: "MI" },
+    { name: "NAGALAND", code: "13", stateCode: "NL" },
+    { name: "ODISHA", code: "21", stateCode: "OR" },
+    { name: "PUDUCHERRY", code: "34", stateCode: "PY" },
+    { name: "PUNJAB", code: "03", stateCode: "PB" },
+    { name: "RAJASTHAN", code: "08", stateCode: "RJ" },
+    { name: "SIKKIM", code: "11", stateCode: "SK" },
+    { name: "TAMIL NADU", code: "33", stateCode: "TN" },
+    { name: "TELANGASA", code: "36", stateCode: "TS" },
+    { name: "TRIPURA", code: "16", stateCode: "TR" },
+    { name: "UTTAR PRADESH", code: "09", stateCode: "UP" },
+    { name: "UTTARAKHAND", code: "05", stateCode: "UT" },
+    { name: "WEST BENGAL", code: "19", stateCode: "WB" }
   ];
-
+  // Supply Type options for Credit/Debit Notes
+  const supplyTypeOptions = [
+    "Regular B2B",
+    "SEZ Supply WPAY",
+    "SEZ Supply WOPAY",
+    "Deemed Export",
+    "Intra-State Supply Attracting IGST"
+  ];
+  // Note Type options (Debit / Credit)
+  const noteTypeOptions = ["Debit", "Credit"];
+  // Nature of Supply options for ECO
+  const natureOptions = [
+    "1 - Liable to Collect Tax u/s 52(TCS)",
+    "2 - Liable to Pay Tax u/s 9(5)"
+  ];
+  // Nature of Documents options for Documents Issued
+  const documentNatureOptions = [
+    "1 - Invoice for Outward Supply",
+    "2 - Invoices for Inward Supply from Unregistered Person",
+    "3 - Revised Invoice",
+    "4 - Debit Note",
+    "5 - Credit Note",
+    "6 - Receipt Voucher",
+    "7 - Payment Voucher",
+    "8 - Refund Voucher",
+    "9 - Delivery Challan for Job Work",
+    "10 - Delivery Challan for Supply on Approval",
+    "11 - Delivery Challan in case of Liquid Gas",
+    "12 - Delivery Challan in cases other than by way of Supply (Excluding at S no 9 to 11)"
+  ];
+  // UR Type options for Credit/Debit Notes (Unregistered)
+  const urTypeOptions = [
+    "1 - B2C (Large)",
+    "2 - Export WPAY",
+    "3 - Export WOPAY"
+  ];
   // GSTR-3B ke 6 options
   const gstr3bSections = [
     "1- tax on outward supplies & reverse charge inward",
@@ -2934,406 +2713,1073 @@ const GSTRLayout = ({ title = "GST Returns" }) => {
     "5- Exempt , Nil Rated and Non - Gst Supplies",
     "6- Intrest and Late fee For Previous Tax Period"
   ];
-
-  // Yeh logic decide karega ki GSTR-3B ke 6 options dikhane hain ya GSTR-1 ke
-  const currentSections = title.toUpperCase().includes("3B") ? gstr3bSections : gstr1Sections;
-
-  const canSelect = selectedYear && selectedMonth;
-  const isGSTR3B = title.toUpperCase().includes("3B");
-  
-
-  const tableColumns = {
-    "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": [
-      { key: "gstin", label: "GSTIN", align: "left" },
-      { key: "recipientName", label: "Recipient Name", align: "left" },
-      { key: "invNo", label: "Inv. No.", align: "left" },
-      { key: "invDate", label: "Inv. Date", align: "center" },
-      { key: "invValue", label: "Inv. Value", align: "right", type: "number" },
-      { key: "pos", label: "POS", align: "center" },
-      { key: "rcm", label: "RCM", align: "center" },
-      { key: "invType", label: "Inv. Type", align: "center" },
-      { key: "ecoGstin", label: "ECO GSTIN", align: "center" },
-      { key: "applicableTaxRate", label: "App. % Tax rate", align: "center" },
-      { key: "gstRate", label: "Rate", align: "right", type: "number" },
-      { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
-      { key: "igst", label: "IGST", align: "right", type: "number" },
-      { key: "cgst", label: "CGST", align: "right", type: "number" },
-      { key: "sgst", label: "SGST", align: "right", type: "number" },
-      { key: "cess", label: "CESS", align: "right", type: "number" }
-    ],
-    "5 - B2C (Large) Invoices": [
-      { key: "invNo", label: "Inv. No.", align: "left" },
-      { key: "invDate", label: "Inv. Date", align: "center" },
-      { key: "invValue", label: "Inv. Value", align: "right", type: "number" },
-      { key: "pos", label: "POS", align: "center" },
-      { key: "applicableTaxRate", label: "Applicable % of Tax rate", align: "center" },
-      { key: "gstRate", label: "Rate", align: "right", type: "number" },
-      { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
-      { key: "igst", label: "IGST", align: "right", type: "number" },
-      { key: "cgst", label: "CGST", align: "right", type: "number" },
-      { key: "sgst", label: "SGST", align: "right", type: "number" },
-      { key: "cess", label: "CESS", align: "right", type: "number" }
-    ],
-    "7 - B2C (Others)": [
-      { key: "type", label: "Type", align: "center" },
-      { key: "pos", label: "POS", align: "center" },
-      { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
-      { key: "rate", label: "Rate", align: "right", type: "number" },
-      { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
-      { key: "igst", label: "IGST", align: "right", type: "number" },
-      { key: "cgst", label: "CGST", align: "right", type: "number" },
-      { key: "sgst", label: "SGST", align: "right", type: "number" },
-      { key: "cess", label: "Cess", align: "right", type: "number" },
-      { key: "total", label: "Total", align: "right", type: "number" }
-    ],
-    "8A, 8B, 8C, 8D - Nil Rated Supplies": [
-      { key: "description", label: "Description", align: "left" },
-      { key: "nilRated", label: "Nil Rated", align: "right", type: "number" },
-      { key: "exempted", label: "Exempted", align: "right", type: "number" },
-      { key: "nonGst", label: "Non-GST", align: "right", type: "number" }
-    ],
-    "9B - Credit / Debit Notes (Registered)": [
-      { key: "gstin", label: "GSTIN of Recipient", align: "left" },
-      { key: "recipientName", label: "Recipient Name", align: "left" },
-      { key: "noteNo", label: "Note No", align: "left" },
-      { key: "noteDate", label: "Note Date", align: "center" },
-      { key: "noteType", label: "Note Type", align: "center" },
-      { key: "pos", label: "POS", align: "center" },
-      { key: "rcm", label: "RCM", align: "center" },
-      { key: "noteSupplyType", label: "Note Supply Type", align: "left" },
-      { key: "noteValue", label: "Note Value", align: "right", type: "number" },
-      { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
-      { key: "rate", label: "Rate", align: "right", type: "number" },
-      { key: "taxable", label: "Taxable", align: "right", type: "number" },
-      { key: "igst", label: "IGST", align: "right", type: "number" },
-      { key: "cgst", label: "CGST", align: "right", type: "number" },
-      { key: "sgst", label: "SGST", align: "right", type: "number" },
-      { key: "cess", label: "Cess", align: "right", type: "number" },
-      { key: "total", label: "Total", align: "right", type: "number" }
-    ],
-    "9B - Credit / Debit Notes (Unregistered)": [
-      { key: "urType", label: "UR Type", align: "center" },
-      { key: "noteNo", label: "Note No", align: "left" },
-      { key: "noteDate", label: "Note Date", align: "center" },
-      { key: "noteType", label: "Note Type", align: "center" },
-      { key: "pos", label: "POS", align: "center" },
-      { key: "rcm", label: "RCM", align: "center" },
-      { key: "noteSupplyType", label: "Note Supply Type", align: "left" },
-      { key: "noteValue", label: "Note Value", align: "right", type: "number" },
-      { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
-      { key: "rate", label: "Rate", align: "right", type: "number" },
-      { key: "taxable", label: "Taxable", align: "right", type: "number" },
-      { key: "igst", label: "IGST", align: "right", type: "number" },
-      { key: "cgst", label: "CGST", align: "right", type: "number" },
-      { key: "sgst", label: "SGST", align: "right", type: "number" },
-      { key: "cess", label: "Cess", align: "right", type: "number" },
-      { key: "total", label: "Total", align: "right", type: "number" }
-    ],
-    "11A(1), 11A(2) - Tax Liability (Advances Received)": [
-      { key: "pos", label: "POS", align: "center" },
-      { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
-      { key: "rate", label: "Rate", align: "right", type: "number" },
-      { key: "grossAdvance", label: "Gross Advance Received", align: "right", type: "number" },
-      { key: "taxable", label: "Taxable", align: "right", type: "number" },
-      { key: "igst", label: "IGST", align: "right", type: "number" },
-      { key: "cgst", label: "CGST", align: "right", type: "number" },
-      { key: "sgst", label: "SGST", align: "right", type: "number" },
-      { key: "cess", label: "Cess", align: "right", type: "number" },
-      { key: "total", label: "Total", align: "right", type: "number" }
-    ],
-    "11B - Adjustment of Advances": [
-      { key: "pos", label: "POS", align: "center" },
-      { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
-      { key: "rate", label: "Rate", align: "right", type: "number" },
-      { key: "grossAdvance", label: "Gross Advance Received", align: "right", type: "number" },
-      { key: "taxable", label: "Taxable", align: "right", type: "number" },
-      { key: "igst", label: "IGST", align: "right", type: "number" },
-      { key: "cgst", label: "CGST", align: "right", type: "number" },
-      { key: "sgst", label: "SGST", align: "right", type: "number" },
-      { key: "cess", label: "Cess", align: "right", type: "number" },
-      { key: "total", label: "Total", align: "right", type: "number" }
-    ],
-    "12 - HSN-wise summary of outward supplies": [
-      { key: "hsn", label: "HSN", align: "center" },
-      { key: "description", label: "Description", align: "left" },
-      { key: "uqc", label: "UQC", align: "center" },
-      { key: "totalQty", label: "Total Qty", align: "right", type: "number" },
-      { key: "totalValue", label: "Total Value", align: "right", type: "number" },
-      { key: "rate", label: "Rate", align: "right", type: "number" },
-      { key: "taxable", label: "Taxable", align: "right", type: "number" },
-      { key: "igst", label: "IGST", align: "right", type: "number" },
-      { key: "cgst", label: "CGST", align: "right", type: "number" },
-      { key: "sgst", label: "SGST", align: "right", type: "number" },
-      { key: "cess", label: "Cess", align: "right", type: "number" }
-    ],
-    "13 - Documents Issued": [
-      { key: "nature", label: "Nature of Documents Issued", align: "left" },
-      { key: "srFrom", label: "Sr No from", align: "center" },
-      { key: "srTo", label: "Sr No. To", align: "center" },
-      { key: "totalNumber", label: "Total Number", align: "right", type: "number" },
-      { key: "cancelled", label: "Cancelled", align: "right", type: "number" }
-    ],
-    "14 - Supplies made through ECO": [
-      { key: "nature", label: "Nature of Supply", align: "left" },
-      { key: "gstinEco", label: "GSTIN of ECO", align: "left" },
-      { key: "nameEco", label: "Name of ECO", align: "left" },
-      { key: "netValue", label: "Net Value of Supply", align: "right", type: "number" },
-      { key: "igst", label: "IGST", align: "right", type: "number" },
-      { key: "cgst", label: "CGST", align: "right", type: "number" },
-      { key: "sgst", label: "SGST", align: "right", type: "number" },
-      { key: "cess", label: "Cess", align: "right", type: "number" },
-      { key: "total", label: "Total", align: "right", type: "number" }
-    ]
-  };
-
-  const currentColumns = tableColumns[selectedSection] || [];
-
-  const getRowsAndSetter = () => {
-    switch (selectedSection) {
-      case "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": return [b2bRows, setB2bRows];
-      case "5 - B2C (Large) Invoices": return [b2cLargeRows, setB2cLargeRows];
-      case "7 - B2C (Others)": return [b2cOthersRows, setB2cOthersRows];
-      case "8A, 8B, 8C, 8D - Nil Rated Supplies": return [nilExemptRows, setNilExemptRows];
-      case "9B - Credit / Debit Notes (Registered)": return [creditDebitRegisteredRows, setCreditDebitRegisteredRows];
-      case "9B - Credit / Debit Notes (Unregistered)": return [creditDebitUnregisteredRows, setCreditDebitUnregisteredRows];
-      case "11A(1), 11A(2) - Tax Liability (Advances Received)": return [advanceLiabilityRows, setAdvanceLiabilityRows];
-      case "11B - Adjustment of Advances": return [advanceAdjustmentRows, setAdvanceAdjustmentRows];
-      case "12 - HSN-wise summary of outward supplies": return [hsnRows, setHsnRows];
-      case "13 - Documents Issued": return [documentsRows, setDocumentsRows];
-      case "14 - Supplies made through ECO": return [ecoRows, setEcoRows];
-      default: return [[], () => {}];
-    }
-  };
-
-  const [rows, setRows] = getRowsAndSetter();
-
-  const addRow = () => {
-    const newSl = rows.length + 1;
-    let newRow = { sl: newSl };
-    if (selectedSection.includes("B2C (Others)")) newRow.type = "E/OF";
-    if (selectedSection.includes("Credit / Debit Notes (Registered)")) {
-      newRow.noteType = "Debit";
-      newRow.noteSupplyType = "Regular B2B";
-    }
-    if (selectedSection.includes("Credit / Debit Notes (Unregistered)")) {
-      newRow.urType = urTypeOptions[0];
-      newRow.noteType = "Debit";
-      newRow.noteSupplyType = "Regular B2B";
-    }
-    if (selectedSection.includes("Documents Issued")) newRow.nature = documentNatureOptions[0];
-    if (selectedSection.includes("ECO")) newRow.nature = natureOptions[0];
-    setRows([...rows, newRow]);
-  };
-
-  const updateCell = (index, key, value) => {
-    const newRows = [...rows];
-    newRows[index][key] = value;
-    setRows(newRows);
-  };
-
-  const deleteRow = (index) => {
-    if (rows.length > 1) setRows(rows.filter((_, i) => i !== index));
-  };
-
-  const handleSave = () => {
-    let taxable = 0, igst = 0, cgst = 0, sgst = 0, cess = 0, total = 0;
-    rows.forEach(row => {
-      taxable += Number(row.taxableValue || row.taxable || row.totalValue || row.netValue || row.nilRated || row.exempted || row.nonGst || row.grossAdvance || 0);
-      igst += Number(row.igst || 0);
-      cgst += Number(row.cgst || 0);
-      sgst += Number(row.sgst || 0);
-      cess += Number(row.cess || 0);
-      total += Number(row.total || (taxable + igst + cgst + sgst + cess));
+  const GSTRLayout = ({ title = "GST Returns" }) => {
+    const [activeSubTab, setActiveSubTab] = useState("Manually");
+    const [selectedYear, setSelectedYear] = useState("2025-26");
+    const [selectedMonth, setSelectedMonth] = useState("");
+    const [selectedSection, setSelectedSection] = useState("");
+    const importOptions = [
+      "B2B",
+      "B2CL",
+      "B2C",
+      "Export",
+      "SEZ",
+      "Deemed Export",
+      "Credit/debit note",
+      "Credit/debit note unreg",
+      "Nil rated",
+      "Advance received",
+      "Advance adjusted",
+      "HSN Summary",
+      "Document issued",
+      "Ecom CollectTax",
+      "Ecom PayTax",
+      "E-com B2B",
+      "E-com B2C",
+      "E-com URP2B",
+      "E-com URP2C"
+    ];
+    const handleSelectAllImport = () => {
+      if (selectAllImport) {
+        setSelectedOptions([]);
+      } else {
+        setSelectedOptions(importOptions);
+      }
+      setSelectAllImport(!selectAllImport);
+    };
+    const handleOptionToggle = (option) => {
+      if (selectedOptions.includes(option)) {
+        setSelectedOptions(selectedOptions.filter(o => o !== option));
+      } else {
+        setSelectedOptions([...selectedOptions, option]);
+      }
+    };
+    // Row states with localStorage persistence
+    const [b2bRows, setB2bRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.b2b);
+      return saved ? JSON.parse(saved) : [{ sl: 1, gstin: "", recipientName: "", invNo: "", invDate: "", invValue: 0, pos: "", rcm: "N", applicableTaxRate: "", invType: "", ecoGstin: "", gstRate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0 }];
     });
-    let key = "";
-    if (selectedSection.includes("B2B")) key = "b2b";
-    else if (selectedSection.includes("B2C (Large)")) key = "b2cLarge";
-    else if (selectedSection.includes("B2C (Others)")) key = "b2cOthers";
-    else if (selectedSection.includes("HSN")) key = "hsn";
-    if (key && total > 0) {
-      setSummaryTotals(prev => ({
+    const [b2cLargeRows, setB2cLargeRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.b2cLarge);
+      return saved ? JSON.parse(saved) : [{ sl: 1, invNo: "", invDate: "", invValue: 0, pos: "State", applicableTaxRate: "0%/65%", gstRate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0 }];
+    });
+    const [b2cOthersRows, setB2cOthersRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.b2cOthers);
+      return saved ? JSON.parse(saved) : [{ sl: 1, type: "E/OF", pos: "", applicableTaxRate: "", rate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+    });
+    const [nilExemptRows, setNilExemptRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.nilExempt);
+      return saved ? JSON.parse(saved) : [{ sl: 1, description: "", nilRated: 0, exempted: 0, nonGst: 0 }];
+    });
+    const [creditDebitRegisteredRows, setCreditDebitRegisteredRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.creditDebitRegistered);
+      return saved ? JSON.parse(saved) : [{ sl: 1, gstin: "", recipientName: "", noteNo: "", noteDate: "", noteType: "Debit", pos: "", rcm: "N", noteSupplyType: "Regular B2B", noteValue: 0, diffRatePercent: "", rate: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+    });
+    const [creditDebitUnregisteredRows, setCreditDebitUnregisteredRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.creditDebitUnregistered);
+      return saved ? JSON.parse(saved) : [{ sl: 1, urType: "1 - B2C (Large)", noteNo: "", noteDate: "", noteType: "Debit", pos: "", rcm: "N", noteSupplyType: "Regular B2B", noteValue: 0, diffRatePercent: "", rate: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+    });
+    const [advanceLiabilityRows, setAdvanceLiabilityRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.advanceLiability);
+      return saved ? JSON.parse(saved) : [{ sl: 1, pos: "", diffRatePercent: "", rate: 0, grossAdvance: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+    });
+    const [advanceAdjustmentRows, setAdvanceAdjustmentRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.advanceAdjustment);
+      return saved ? JSON.parse(saved) : [{ sl: 1, pos: "", diffRatePercent: "", rate: 0, grossAdvance: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+    });
+    const [hsnRows, setHsnRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.hsn);
+      return saved ? JSON.parse(saved) : [{ sl: 1, hsn: "", description: "", uqc: "", totalQty: 0, totalValue: 0, rate: 0, taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0 }];
+    });
+    const [documentsRows, setDocumentsRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.documents);
+      return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Invoice for Outward Supply", srFrom: "", srTo: "", totalNumber: 0, cancelled: 0 }];
+    });
+    const [ecoRows, setEcoRows] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.eco);
+      return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Liable to Collect Tax u/s 52(TCS)", gstinEco: "", nameEco: "", netValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+    });
+    const [summaryTotals, setSummaryTotals] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.summaryTotals);
+      return saved ? JSON.parse(saved) : {
+        b2b: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+        b2cLarge: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+        b2cOthers: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+        hsn: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+      };
+    });
+     const [outwardSupplies, setOutwardSupplies] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.outward);
+      return saved ? JSON.parse(saved) : [
+        { nature: "(a) Total Taxable Supplies (Other than Zero Rated, Nil Rated and Exempted supplies)", taxable: "", igst: "", cgst: "", sgst: "", cess: "" },
+        { nature: "(b) Total Taxable Supplies (Zero Rated)", taxable: "", igst: "", cgst: "Hide", sgst: "Hide", cess: "" },
+        { nature: "(c) Total Exempt Supplies (Nil Rated and Exempted)", taxable: "", igst: "Hide", cgst: "Hide", sgst: "Hide", cess: "Hide" },
+        { nature: "(d) Inward Supplies (Liable to Reverse Charge)", taxable: "", igst: "", cgst: "", sgst: "", cess: "" },
+        { nature: "(e) Non-GST Outward Supplies", taxable: "", igst: "Hide", cgst: "Hide", sgst: "Hide", cess: "Hide" }
+      ];
+    });
+    // 2. ECO u/s 9(5)
+    const [ecoSupplies, setEcoSupplies] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.eco);
+      return saved ? JSON.parse(saved) : [
+        { nature: "1- Taxable Supplies on which ECO pays tax u/s 9(5) [To be furnished by ECO]", taxable: "", igst: "", cgst: "", sgst: "", cess: "", total: "" },
+        { nature: "2- Taxable Supplies made by registered person through ECO, on which ECO is required to pay tax u/s 9(5) [To be furnished by Registered person making Supplies through ECO]", taxable: "", igst: "", cgst: "", sgst: "", cess: "", total: "" }
+      ];
+    });
+    // 3. Inter-State Supplies (composition, exempt, nil, non-GST)
+    const [interstateSupplies, setInterstateSupplies] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.interstate);
+      return saved ? JSON.parse(saved) : [
+        { nature: "From a supplier under composition scheme, Exempt and NIL Rated Supply", interstate: "", intrastate: "" },
+        { nature: "Non GST Supply", interstate: "", intrastate: "" }
+      ];
+    });
+    // 4. Eligible ITC (sabse bada table)
+    const [itcDetails, setItcDetails] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.itc);
+      return saved ? JSON.parse(saved) : {
+        available: [
+          { desc: "(1) Import of Goods", igst: "", cgst: "", sgst: "", cess: "" },
+          { desc: "(2) Import of Services", igst: "", cgst: "", sgst: "", cess: "" },
+          { desc: "(3) Inward Supplies liable to Reverse Charge (other than 1 & 2 above)", igst: "", cgst: "", sgst: "", cess: "" },
+          { desc: "(4) Inward Supplies from ISD", igst: "", cgst: "", sgst: "", cess: "" },
+          { desc: "(5) All other ITC", igst: "", cgst: "", sgst: "", cess: "" }
+        ],
+        reversed: [
+          { desc: "(1) As per Rule 42,43 & 44 of CGST Rules & section 17(5) of CGST Act", igst: "", cgst: "", sgst: "", cess: "" },
+          { desc: "(2) Others", igst: "", cgst: "", sgst: "", cess: "" }
+        ],
+        netItc: { igst: "", cgst: "", sgst: "", cess: "" },
+        ineligible: [
+          { desc: "(1) ITC Reclaimed which was reversed under Table 4(A)(5) in earlier tax period", igst: "", cgst: "", sgst: "", cess: "" },
+          { desc: "(2) Ineligible ITC under section 16(4) & ITC restricted due to POS rules", igst: "", cgst: "", sgst: "", cess: "" }
+        ]
+      };
+    });
+    // 5. Exempt, Nil Rated, Non-GST Supplies
+    const [exemptNonGst, setExemptNonGst] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.exempt);
+      return saved ? JSON.parse(saved) : [
+        { nature: "From a supplier under composition scheme, Exempt and NIL Rated Supply", interstate: "", intrastate: "" },
+        { nature: "Non GST Supply", interstate: "", intrastate: "" }
+      ];
+    });
+    // 6. Interest & Late Fee
+    const [interestLateFee, setInterestLateFee] = useState(() => {
+      const saved = localStorage.getItem(STORAGE_KEYS.interestLateFee);
+      return saved ? JSON.parse(saved) : [
+        { desc: "Interest", igst: "", cgst: "", sgst: "", cess: "" },
+        { desc: "Late Fees", igst: "", cgst: "", sgst: "", cess: "" }
+      ];
+    });
+    // Save all states to localStorage
+    const [importStep, setImportStep] = useState("sources"); // start with source selection
+const [selectedSource, setSelectedSource] = useState(null);
+const [uploadedFile, setUploadedFile] = useState(null);
+const [isUploading, setIsUploading] = useState(false);
+
+// Keep your existing ones
+const [selectedOptions, setSelectedOptions] = useState([]);
+const [selectAllImport, setSelectAllImport] = useState(false);
+const [skipValidation, setSkipValidation] = useState(false);
+
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+    // Dropdown controls
+    const [openPosDropdownRow, setOpenPosDropdownRow] = useState(null);
+    const [openSupplyTypeDropdownRow, setOpenSupplyTypeDropdownRow] = useState(null);
+    const [openNoteTypeDropdownRow, setOpenNoteTypeDropdownRow] = useState(null);
+    const [openNatureDropdownRow, setOpenNatureDropdownRow] = useState(null);
+    const [openDocumentNatureDropdownRow, setOpenDocumentNatureDropdownRow] = useState(null);
+    const [openUrTypeDropdownRow, setOpenUrTypeDropdownRow] = useState(null);
+    // Save to localStorage
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.b2b, JSON.stringify(b2bRows)), [b2bRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.b2cLarge, JSON.stringify(b2cLargeRows)), [b2cLargeRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.b2cOthers, JSON.stringify(b2cOthersRows)), [b2cOthersRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.nilExempt, JSON.stringify(nilExemptRows)), [nilExemptRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.creditDebitRegistered, JSON.stringify(creditDebitRegisteredRows)), [creditDebitRegisteredRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.creditDebitUnregistered, JSON.stringify(creditDebitUnregisteredRows)), [creditDebitUnregisteredRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.advanceLiability, JSON.stringify(advanceLiabilityRows)), [advanceLiabilityRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.advanceAdjustment, JSON.stringify(advanceAdjustmentRows)), [advanceAdjustmentRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.hsn, JSON.stringify(hsnRows)), [hsnRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.documents, JSON.stringify(documentsRows)), [documentsRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.eco, JSON.stringify(ecoRows)), [ecoRows]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.summaryTotals, JSON.stringify(summaryTotals)), [summaryTotals]);
+    useEffect(() => {
+      localStorage.setItem(STORAGE_KEYS.outward, JSON.stringify(outwardSupplies));
+    }, [outwardSupplies]);
+    useEffect(() => {
+      localStorage.setItem(STORAGE_KEYS.eco, JSON.stringify(ecoSupplies));
+    }, [ecoSupplies]);
+    useEffect(() => {
+      localStorage.setItem(STORAGE_KEYS.interstate, JSON.stringify(interstateSupplies));
+    }, [interstateSupplies]);
+    useEffect(() => {
+      localStorage.setItem(STORAGE_KEYS.itc, JSON.stringify(itcDetails));
+    }, [itcDetails]);
+    useEffect(() => {
+      localStorage.setItem(STORAGE_KEYS.exempt, JSON.stringify(exemptNonGst));
+    }, [exemptNonGst]);
+    useEffect(() => {
+      localStorage.setItem(STORAGE_KEYS.interestLateFee, JSON.stringify(interestLateFee));
+    }, [interestLateFee]);
+    const years = Array.from({ length: 10 }, (_, i) => 2017 + i).map(y => `${y}-${String(y + 1).slice(-2)}`);
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    // GSTR-1 sections (normal case)
+    const gstr1Sections = [
+      "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
+      "5 - B2C (Large) Invoices",
+      "6A - Exports Invoices",
+      "7 - B2C (Others)",
+      "8A, 8B, 8C, 8D - Nil Rated Supplies",
+      "9B - Credit / Debit Notes (Registered)",
+      "9B - Credit / Debit Notes (Unregistered)",
+      "11A(1), 11A(2) - Tax Liability (Advances Received)",
+      "11B - Adjustment of Advances",
+      "12 - HSN-wise summary of outward supplies",
+      "13 - Documents Issued",
+      "14 - Supplies made through ECO",
+      "15 - Supplies U/s 9(5)"
+    ];
+    // GSTR-3B ke 6 options
+    const gstr3bSections = [
+      "1- tax on outward supplies & reverse charge inward",
+      "2- Supplies notified u/s 9(5) of the CGST Act 2017",
+      "3- Inter State Supplies",
+      "4- Eligible ITC",
+      "5- Exempt , Nil Rated and Non - Gst Supplies",
+      "6- Intrest and Late fee For Previous Tax Period"
+    ];
+    // Yeh logic decide karega ki GSTR-3B ke 6 options dikhane hain ya GSTR-1 ke
+    const currentSections = title.toUpperCase().includes("3B") ? gstr3bSections : gstr1Sections;
+    const canSelect = selectedYear && selectedMonth;
+    const isGSTR3B = title.toUpperCase().includes("3B");
+
+    const tableColumns = {
+      "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": [
+        { key: "gstin", label: "GSTIN", align: "left" },
+        { key: "recipientName", label: "Recipient Name", align: "left" },
+        { key: "invNo", label: "Inv. No.", align: "left" },
+        { key: "invDate", label: "Inv. Date", align: "center" },
+        { key: "invValue", label: "Inv. Value", align: "right", type: "number" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rcm", label: "RCM", align: "center" },
+        { key: "invType", label: "Inv. Type", align: "center" },
+        { key: "ecoGstin", label: "ECO GSTIN", align: "center" },
+        { key: "applicableTaxRate", label: "App. % Tax rate", align: "center" },
+        { key: "gstRate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+      "5 - B2C (Large) Invoices": [
+        { key: "invNo", label: "Inv. No.", align: "left" },
+        { key: "invDate", label: "Inv. Date", align: "center" },
+        { key: "invValue", label: "Inv. Value", align: "right", type: "number" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "applicableTaxRate", label: "Applicable % of Tax rate", align: "center" },
+        { key: "gstRate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+      "7 - B2C (Others)": [
+        { key: "type", label: "Type", align: "center" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "Cess", align: "right", type: "number" },
+        { key: "total", label: "Total", align: "right", type: "number" }
+      ],
+      "8A, 8B, 8C, 8D - Nil Rated Supplies": [
+        { key: "description", label: "Description", align: "left" },
+        { key: "nilRated", label: "Nil Rated", align: "right", type: "number" },
+        { key: "exempted", label: "Exempted", align: "right", type: "number" },
+        { key: "nonGst", label: "Non-GST", align: "right", type: "number" }
+      ],
+      "9B - Credit / Debit Notes (Registered)": [
+        { key: "gstin", label: "GSTIN of Recipient", align: "left" },
+        { key: "recipientName", label: "Recipient Name", align: "left" },
+        { key: "noteNo", label: "Note No", align: "left" },
+        { key: "noteDate", label: "Note Date", align: "center" },
+        { key: "noteType", label: "Note Type", align: "center" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rcm", label: "RCM", align: "center" },
+        { key: "noteSupplyType", label: "Note Supply Type", align: "left" },
+        { key: "noteValue", label: "Note Value", align: "right", type: "number" },
+        { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxable", label: "Taxable", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "Cess", align: "right", type: "number" },
+        { key: "total", label: "Total", align: "right", type: "number" }
+      ],
+      "9B - Credit / Debit Notes (Unregistered)": [
+        { key: "urType", label: "UR Type", align: "center" },
+        { key: "noteNo", label: "Note No", align: "left" },
+        { key: "noteDate", label: "Note Date", align: "center" },
+        { key: "noteType", label: "Note Type", align: "center" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rcm", label: "RCM", align: "center" },
+        { key: "noteSupplyType", label: "Note Supply Type", align: "left" },
+        { key: "noteValue", label: "Note Value", align: "right", type: "number" },
+        { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxable", label: "Taxable", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "Cess", align: "right", type: "number" },
+        { key: "total", label: "Total", align: "right", type: "number" }
+      ],
+      "11A(1), 11A(2) - Tax Liability (Advances Received)": [
+        { key: "pos", label: "POS", align: "center" },
+        { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "grossAdvance", label: "Gross Advance Received", align: "right", type: "number" },
+        { key: "taxable", label: "Taxable", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "Cess", align: "right", type: "number" },
+        { key: "total", label: "Total", align: "right", type: "number" }
+      ],
+      "11B - Adjustment of Advances": [
+        { key: "pos", label: "POS", align: "center" },
+        { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "grossAdvance", label: "Gross Advance Received", align: "right", type: "number" },
+        { key: "taxable", label: "Taxable", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "Cess", align: "right", type: "number" },
+        { key: "total", label: "Total", align: "right", type: "number" }
+      ],
+      "12 - HSN-wise summary of outward supplies": [
+        { key: "hsn", label: "HSN", align: "center" },
+        { key: "description", label: "Description", align: "left" },
+        { key: "uqc", label: "UQC", align: "center" },
+        { key: "totalQty", label: "Total Qty", align: "right", type: "number" },
+        { key: "totalValue", label: "Total Value", align: "right", type: "number" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxable", label: "Taxable", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "Cess", align: "right", type: "number" }
+      ],
+      "13 - Documents Issued": [
+        { key: "nature", label: "Nature of Documents Issued", align: "left" },
+        { key: "srFrom", label: "Sr No from", align: "center" },
+        { key: "srTo", label: "Sr No. To", align: "center" },
+        { key: "totalNumber", label: "Total Number", align: "right", type: "number" },
+        { key: "cancelled", label: "Cancelled", align: "right", type: "number" }
+      ],
+      "14 - Supplies made through ECO": [
+        { key: "nature", label: "Nature of Supply", align: "left" },
+        { key: "gstinEco", label: "GSTIN of ECO", align: "left" },
+        { key: "nameEco", label: "Name of ECO", align: "left" },
+        { key: "netValue", label: "Net Value of Supply", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "Cess", align: "right", type: "number" },
+        { key: "total", label: "Total", align: "right", type: "number" }
+      ]
+    };
+    const currentColumns = tableColumns[selectedSection] || [];
+    const getRowsAndSetter = () => {
+      switch (selectedSection) {
+        case "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": return [b2bRows, setB2bRows];
+        case "5 - B2C (Large) Invoices": return [b2cLargeRows, setB2cLargeRows];
+        case "7 - B2C (Others)": return [b2cOthersRows, setB2cOthersRows];
+        case "8A, 8B, 8C, 8D - Nil Rated Supplies": return [nilExemptRows, setNilExemptRows];
+        case "9B - Credit / Debit Notes (Registered)": return [creditDebitRegisteredRows, setCreditDebitRegisteredRows];
+        case "9B - Credit / Debit Notes (Unregistered)": return [creditDebitUnregisteredRows, setCreditDebitUnregisteredRows];
+        case "11A(1), 11A(2) - Tax Liability (Advances Received)": return [advanceLiabilityRows, setAdvanceLiabilityRows];
+        case "11B - Adjustment of Advances": return [advanceAdjustmentRows, setAdvanceAdjustmentRows];
+        case "12 - HSN-wise summary of outward supplies": return [hsnRows, setHsnRows];
+        case "13 - Documents Issued": return [documentsRows, setDocumentsRows];
+        case "14 - Supplies made through ECO": return [ecoRows, setEcoRows];
+        default: return [[], () => {}];
+      }
+    };
+    
+    const addRow = () => {
+      const newSl = rows.length + 1;
+      let newRow = { sl: newSl };
+      if (selectedSection.includes("B2C (Others)")) newRow.type = "E/OF";
+      if (selectedSection.includes("Credit / Debit Notes (Registered)")) {
+        newRow.noteType = "Debit";
+        newRow.noteSupplyType = "Regular B2B";
+      }
+      if (selectedSection.includes("Credit / Debit Notes (Unregistered)")) {
+        newRow.urType = urTypeOptions[0];
+        newRow.noteType = "Debit";
+        newRow.noteSupplyType = "Regular B2B";
+      }
+      if (selectedSection.includes("Documents Issued")) newRow.nature = documentNatureOptions[0];
+      if (selectedSection.includes("ECO")) newRow.nature = natureOptions[0];
+      setRows([...rows, newRow]);
+    };
+    const updateCell = (index, key, value) => {
+      const newRows = [...rows];
+      newRows[index][key] = value;
+      setRows(newRows);
+    };
+    const deleteRow = (index) => {
+      if (rows.length > 1) setRows(rows.filter((_, i) => i !== index));
+    };
+    const handleSave = () => {
+      let taxable = 0, igst = 0, cgst = 0, sgst = 0, cess = 0, total = 0;
+      rows.forEach(row => {
+        taxable += Number(row.taxableValue || row.taxable || row.totalValue || row.netValue || row.nilRated || row.exempted || row.nonGst || row.grossAdvance || 0);
+        igst += Number(row.igst || 0);
+        cgst += Number(row.cgst || 0);
+        sgst += Number(row.sgst || 0);
+        cess += Number(row.cess || 0);
+        total += Number(row.total || (taxable + igst + cgst + sgst + cess));
+      });
+      let key = "";
+      if (selectedSection.includes("B2B")) key = "b2b";
+      else if (selectedSection.includes("B2C (Large)")) key = "b2cLarge";
+      else if (selectedSection.includes("B2C (Others)")) key = "b2cOthers";
+      else if (selectedSection.includes("HSN")) key = "hsn";
+      if (key && total > 0) {
+        setSummaryTotals(prev => ({
+          ...prev,
+          [key]: { taxable, igst, cgst, sgst, cess, total }
+        }));
+        alert("Saved successfully!");
+      }
+    };
+    const formatIndian = (num) => num === 0 ? "—" : Number(num).toLocaleString("en-IN");
+    // Visible Summary
+    const visibleSummary = [];
+    if (summaryTotals.b2b.total > 0) visibleSummary.push({ id: "b2b", label: "1. B2B Supplies", ...summaryTotals.b2b });
+    if (summaryTotals.b2cLarge.total > 0) visibleSummary.push({ id: "b2cLarge", label: "2. B2C (Large)", ...summaryTotals.b2cLarge });
+    if (summaryTotals.b2cOthers.total > 0) visibleSummary.push({ id: "b2cOthers", label: "3. B2C Small", ...summaryTotals.b2cOthers });
+    if (summaryTotals.hsn.total > 0) visibleSummary.push({ id: "hsn", label: "HSN wise", ...summaryTotals.hsn });
+    const grandTotal = visibleSummary.reduce((acc, item) => {
+      acc.taxable += item.taxable || 0;
+      acc.igst += item.igst || 0;
+      acc.cgst += item.cgst || 0;
+      acc.sgst += item.sgst || 0;
+      acc.cess += item.cess || 0;
+      acc.total += item.total || 0;
+      return acc;
+    }, { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 });
+    // Checkbox handlers
+    const toggleSelectAll = () => {
+      if (selectAll) {
+        setSelectedRows([]);
+      } else {
+        setSelectedRows(visibleSummary.map(item => item.id));
+      }
+      setSelectAll(!selectAll);
+    };
+    const toggleRow = (id) => {
+      if (selectedRows.includes(id)) {
+        setSelectedRows(selectedRows.filter(r => r !== id));
+      } else {
+        setSelectedRows([...selectedRows, id]);
+      }
+    };
+     const handleChange = (setter, data, index, field, value) => {
+      const newData = [...data];
+      newData[index][field] = value;
+      setter(newData);
+    };
+    const handleItcAvailableChange = (index, field, value) => {
+      const newItc = { ...itcDetails };
+      newItc.available[index][field] = value;
+      setItcDetails(newItc);
+    };
+    const handleItcReversedChange = (index, field, value) => {
+      const newItc = { ...itcDetails };
+      newItc.reversed[index][field] = value;
+      setItcDetails(newItc);
+    };
+    const handleNetItcChange = (field, value) => {
+      setItcDetails(prev => ({
         ...prev,
-        [key]: { taxable, igst, cgst, sgst, cess, total }
+        netItc: { ...prev.netItc, [field]: value }
       }));
-      alert("Saved successfully!");
-    }
-  };
-
-  const formatIndian = (num) => num === 0 ? "—" : Number(num).toLocaleString("en-IN");
-
-  // Visible Summary
-  const visibleSummary = [];
-  if (summaryTotals.b2b.total > 0) visibleSummary.push({ id: "b2b", label: "1. B2B Supplies", ...summaryTotals.b2b });
-  if (summaryTotals.b2cLarge.total > 0) visibleSummary.push({ id: "b2cLarge", label: "2. B2C (Large)", ...summaryTotals.b2cLarge });
-  if (summaryTotals.b2cOthers.total > 0) visibleSummary.push({ id: "b2cOthers", label: "3. B2C Small", ...summaryTotals.b2cOthers });
-  if (summaryTotals.hsn.total > 0) visibleSummary.push({ id: "hsn", label: "HSN wise", ...summaryTotals.hsn });
-
-  const grandTotal = visibleSummary.reduce((acc, item) => {
-    acc.taxable += item.taxable || 0;
-    acc.igst += item.igst || 0;
-    acc.cgst += item.cgst || 0;
-    acc.sgst += item.sgst || 0;
-    acc.cess += item.cess || 0;
-    acc.total += item.total || 0;
-    return acc;
-  }, { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 });
-
-  // Checkbox handlers
-  const toggleSelectAll = () => {
-    if (selectAll) {
-      setSelectedRows([]);
-    } else {
-      setSelectedRows(visibleSummary.map(item => item.id));
-    }
-    setSelectAll(!selectAll);
-  };
-
-  const toggleRow = (id) => {
-    if (selectedRows.includes(id)) {
-      setSelectedRows(selectedRows.filter(r => r !== id));
-    } else {
-      setSelectedRows([...selectedRows, id]);
-    }
-  };
-   const handleChange = (setter, data, index, field, value) => {
-    const newData = [...data];
-    newData[index][field] = value;
-    setter(newData);
-  };
-
-  const handleItcAvailableChange = (index, field, value) => {
-    const newItc = { ...itcDetails };
-    newItc.available[index][field] = value;
-    setItcDetails(newItc);
-  };
-
-  const handleItcReversedChange = (index, field, value) => {
-    const newItc = { ...itcDetails };
-    newItc.reversed[index][field] = value;
-    setItcDetails(newItc);
-  };
-
-  const handleNetItcChange = (field, value) => {
-    setItcDetails(prev => ({
-      ...prev,
-      netItc: { ...prev.netItc, [field]: value }
-    }));
-  };
-
-  const handleItcIneligibleChange = (index, field, value) => {
-    const newItc = { ...itcDetails };
-    newItc.ineligible[index][field] = value;
-    setItcDetails(newItc);
-  };
-
-  const renderInput = (value, onChange) => (
-    <input
-      type="number"
-      value={value}
-      onChange={e => onChange(e.target.value)}
-      placeholder="0.00"
-      style={{
-        width: "100%",
-        padding: "8px",
-        textAlign: "right",
-        border: "1px solid #cbd5e1",
-        borderRadius: "4px",
-        fontSize: "14px"
-      }}
-    />
-  );
-
-  const renderHide = () => <span style={{ color: "#94a3b8", fontStyle: "italic" }}>Hide</span>;
-
-  const tableActions = (
-    <div style={{ padding: "20px", display: "flex", justifyContent: "flex-end", gap: 16, borderTop: "1px solid #e5e7eb" }}>
-      <button
-        onClick={() => alert("Data Saved Successfully!")}
+    };
+    const handleItcIneligibleChange = (index, field, value) => {
+      const newItc = { ...itcDetails };
+      newItc.ineligible[index][field] = value;
+      setItcDetails(newItc);
+    };
+    const renderInput = (value, onChange) => (
+      <input
+        type="number"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder="0.00"
         style={{
-          padding: "12px 36px",
-          background: "#10b981",
-          color: "white",
-          border: "none",
-          borderRadius: 8,
-          fontWeight: 600,
-          cursor: "pointer",
-          minWidth: "120px"
+          width: "100%",
+          padding: "8px",
+          textAlign: "right",
+          border: "1px solid #cbd5e1",
+          borderRadius: "4px",
+          fontSize: "14px"
         }}
-      >
-        Save
-      </button>
-      <button
-        onClick={() => alert("Delete functionality coming soon...")}
-        style={{
-          padding: "12px 36px",
-          background: "#ef4444",
-          color: "white",
-          border: "none",
-          borderRadius: 8,
-          fontWeight: 600,
-          cursor: "pointer",
-          minWidth: "120px"
-        }}
-      >
-        Delete
-      </button>
-    </div>
-  );
+      />
+    );
+    const renderHide = () => <span style={{ color: "#94a3b8", fontStyle: "italic" }}>Hide</span>;
+    const tableActions = (
+      <div style={{ padding: "20px", display: "flex", justifyContent: "flex-end", gap: 16, borderTop: "1px solid #e5e7eb" }}>
+        <button
+          onClick={() => alert("Data Saved Successfully!")}
+          style={{
+            padding: "12px 36px",
+            background: "#10b981",
+            color: "white",
+            border: "none",
+            borderRadius: 8,
+            fontWeight: 600,
+            cursor: "pointer",
+            minWidth: "120px"
+          }}
+        >
+          Save
+        </button>
+        <button
+          onClick={() => alert("Delete functionality coming soon...")}
+          style={{
+            padding: "12px 36px",
+            background: "#ef4444",
+            color: "white",
+            border: "none",
+            borderRadius: 8,
+            fontWeight: 600,
+            cursor: "pointer",
+            minWidth: "120px"
+          }}
+        >
+          Delete
+        </button>
+      </div>
+    );
+    const handleBack = () => {
+      setActiveSubTab("Manually");
+    };
+    return (
+      <div style={{ padding: "20px", background: "#f8fafc", minHeight: "100vh" }}>
+        <div style={{ background: "white", borderRadius: "16px", boxShadow: "0 10px 40px rgba(0,0,0,0.06)", overflow: "hidden" }}>
+          {/* Header */}
+          <div style={{ padding: "28px 36px", borderBottom: "1px solid #e2e8f0" }}>
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              flexWrap: "wrap",
+              gap: "24px"
+            }}>
+              <h1 style={{ margin: 0, fontSize: "2.2rem", fontWeight: 800, color: "#7c3aed" }}>
+                {title}
+              </h1>
+              {/* Financial Year + Month → title ke right side pe sabke liye */}
+              {activeSubTab === "Manually" && (
+                <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+                  <div style={{ width: 160 }}>
+                    <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Financial Year</label>
+                    <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
+                      {years.map(y => <option key={y}>{y}</option>)}
+                    </select>
+                  </div>
+                  <div style={{ width: 160 }}>
+                    <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Month</label>
+                    <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
+                      <option value="">Select</option>
+                      {months.map(m => <option key={m}>{m}</option>)}
+                    </select>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          {/* Tabs */}
+          <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#fafbff" }}>
+            {["Manually", "Import", "Summary"].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveSubTab(tab)}
+                style={{
+                  flex: 1,
+                  padding: "16px",
+                  background: activeSubTab === tab ? "white" : "transparent",
+                  color: activeSubTab === tab ? "#4f46e5" : "#64748b",
+                  border: "none",
+                  fontSize: "1.08rem",
+                  fontWeight: activeSubTab === tab ? 700 : 500,
+                  cursor: "pointer",
+                  borderBottom: activeSubTab === tab ? "4px solid #7c3aed" : "none"
+                }}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
 
+{activeSubTab === "Import" && (
+  <div style={{ padding: "24px 16px", background: "#f9fafb", minHeight: "80vh" }}>
 
-  const handleBack = () => {
-    setActiveSubTab("Manually");
-  };
+    {/* ────────────────────────────── */}
+    {/* SOURCE SELECTION (compact) */}
+    {/* ────────────────────────────── */}
+    {importStep === "sources" && (
+      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <h2
+          style={{
+            textAlign: "center",
+            fontSize: "1.75rem",
+            fontWeight: 700,
+            color: "#111827",
+            marginBottom: "28px"
+          }}
+        >
+          Import GSTR-1 Data
+        </h2>
 
-  return (
-    <div style={{ padding: "20px", background: "#f8fafc", minHeight: "100vh" }}>
-      <div style={{ background: "white", borderRadius: "16px", boxShadow: "0 10px 40px rgba(0,0,0,0.06)", overflow: "hidden" }}>
-        {/* Header */}
-        <div style={{ padding: "28px 36px", borderBottom: "1px solid #e2e8f0" }}>
-          <h1 style={{ margin: 0, fontSize: "2.2rem", fontWeight: 800, color: "#7c3aed" }}>{title}</h1>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: "20px"
+          }}
+        >
+          {/* Excel Imports */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: "10px",
+              padding: "18px 20px",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+              transition: "all 0.18s ease",
+              border: "1px solid #e5e7eb"
+            }}
+          >
+            <h3 style={{ margin: "0 0 14px 0", fontSize: "1.25rem", color: "#1d4ed8", fontWeight: 600 }}>
+              Excel Imports
+            </h3>
+            {[
+              "Taxoza Excel", "Govt. Excel", "Tally Excel", "Busy Excel",
+              "Vyapar Excel", "ECO Excel", "Department (V2.2)"
+            ].map((name) => (
+              <div
+                key={name}
+                style={{
+                  marginBottom: "10px",
+                  padding: "10px 12px",
+                  borderRadius: "6px",
+                  transition: "all 0.15s"
+                }}
+              >
+                <div style={{ fontWeight: 500, fontSize: "0.98rem", marginBottom: "8px", color: "#1f2937" }}>
+                  {name}
+                </div>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                  <button
+                    onClick={() => {
+                      setSelectedSource(name);
+                      setImportStep("list");
+                    }}
+                    style={{
+                      padding: "7px 16px",
+                      background: "#3b82f6",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      transition: "background 0.15s"
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#2563eb"}
+                    onMouseLeave={e => e.currentTarget.style.background = "#3b82f6"}
+                  >
+                    Import
+                  </button>
+                  <button
+                    onClick={() => alert(`Template: ${name}`)}
+                    style={{
+                      padding: "7px 16px",
+                      background: "#10b981",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    Template
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* JSON Imports */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: "10px",
+              padding: "18px 20px",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+              border: "1px solid #e5e7eb"
+            }}
+          >
+            <h3 style={{ margin: "0 0 14px 0", fontSize: "1.25rem", color: "#1d4ed8", fontWeight: 600 }}>
+              JSON Imports
+            </h3>
+            {[
+              "Govt. JSON", "Tally JSON", "Busy JSON",
+              "Taxoza JSON", "Vyapar JSON", "Other software JSON"
+            ].map((name) => (
+              <div key={name} style={{ marginBottom: "10px", padding: "10px 12px", borderRadius: "6px" }}>
+                <div style={{ fontWeight: 500, fontSize: "0.98rem", marginBottom: "8px", color: "#1f2937" }}>
+                  {name}
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedSource(name);
+                    setImportStep("list");
+                  }}
+                  style={{
+                    padding: "7px 16px",
+                    background: "#3b82f6",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    cursor: "pointer"
+                  }}
+                >
+                  Import
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Direct from Software */}
+          <div
+            style={{
+              background: "white",
+              borderRadius: "10px",
+              padding: "18px 20px",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+              border: "1px solid #e5e7eb"
+            }}
+          >
+            <h3 style={{ margin: "0 0 14px 0", fontSize: "1.25rem", color: "#1d4ed8", fontWeight: 600 }}>
+              Direct from Software
+            </h3>
+            {[
+              "Taxoza Book", "Tally", "Busy", "Mank ERP", "Other Software"
+            ].map((name) => (
+              <div key={name} style={{ marginBottom: "10px", padding: "10px 12px", borderRadius: "6px" }}>
+                <div style={{ fontWeight: 500, fontSize: "0.98rem", marginBottom: "8px", color: "#1f2937" }}>
+                  {name}
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedSource(name);
+                    setImportStep("list");
+                  }}
+                  style={{
+                    padding: "7px 16px",
+                    background: "#3b82f6",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    cursor: "pointer"
+                  }}
+                >
+                  Import
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
+      </div>
+    )}
 
-        {/* Tabs */}
-        <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#fafbff" }}>
-          {["Manually", "Import", "Summary"].map(tab => (
+    {/* ────────────────────────────── */}
+    {/* CHECKBOX SELECTION (compact) */}
+    {/* ────────────────────────────── */}
+    {importStep === "list" && (
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "720px",
+            background: "white",
+            borderRadius: "12px",
+            padding: "28px",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)"
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+            <h2 style={{ margin: 0, fontSize: "1.45rem", fontWeight: 700, color: "#111827" }}>
+              Select Sections
+            </h2>
+            <div style={{ fontSize: "0.95rem", color: "#4b5563" }}>
+              For: <strong>{selectedSource || "—"}</strong>
+            </div>
+          </div>
+
+          <div style={{ height: "1px", background: "#e5e7eb", margin: "0 0 20px 0" }} />
+
+          <label style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={selectAllImport}
+              onChange={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSelectAllImport();
+              }}
+              style={{ width: "16px", height: "16px", accentColor: "#4f46e5" }}
+            />
+            <span style={{ fontWeight: 600, fontSize: "0.98rem" }}>Select All</span>
+          </label>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px 20px" }}>
+            {importOptions.map((option, idx) => (
+              <div
+                key={idx}
+                onClick={() => handleOptionToggle(option)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  background: selectedOptions.includes(option) ? "#eff6ff" : "transparent",
+                  border: selectedOptions.includes(option) ? "1px solid #bfdbfe" : "1px solid #e5e7eb",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedOptions.includes(option)}
+                  readOnly
+                  style={{ width: "14px", height: "14px", accentColor: "#4f46e5", pointerEvents: "none" }}
+                />
+                <span style={{ fontSize: "0.92rem", color: "#374151" }}>{option}</span>
+              </div>
+            ))}
+          </div>
+
+          {selectedOptions.length > 0 && (
+            <div style={{ marginTop: "28px", textAlign: "center" }}>
+              <button
+                onClick={() => setImportStep("upload")}
+                style={{
+                  background: "#4f46e5",
+                  color: "white",
+                  padding: "12px 48px",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(79,70,229,0.2)"
+                }}
+              >
+                Proceed to Upload →
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+
+    {/* ────────────────────────────── */}
+    {/* UPLOAD SCREEN (compact) */}
+    {/* ────────────────────────────── */}
+    {importStep === "upload" && (
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "640px",
+            background: "white",
+            borderRadius: "12px",
+            padding: "28px",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)"
+          }}
+        >
+          <h2 style={{ margin: "0 0 16px 0", fontSize: "1.5rem", fontWeight: 700, color: "#111827" }}>
+            Upload File
+          </h2>
+
+          <div style={{ marginBottom: "20px", color: "#4b5563", fontSize: "0.98rem" }}>
+            <strong>{selectedSource || "—"}</strong> • Sections: {selectedOptions.join(", ") || "None"}
+          </div>
+
+          <div
+            id="dropzone"
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              e.currentTarget.style.borderColor = "#6366f1";
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.currentTarget.style.borderColor = "#d1d5db";
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (e.dataTransfer.files?.[0]) setUploadedFile(e.dataTransfer.files[0]);
+            }}
+            style={{
+              border: "2px dashed #d1d5db",
+              borderRadius: "10px",
+              padding: "50px 30px",
+              textAlign: "center",
+              transition: "border-color 0.2s",
+              cursor: "pointer"
+            }}
+            onClick={() => document.getElementById("fileInput")?.click()}
+          >
+            <input
+              type="file"
+              id="fileInput"
+              style={{ display: "none" }}
+              accept=".xlsx,.xls,.csv,.zip,.json"
+              onChange={(e) => e.target.files?.[0] && setUploadedFile(e.target.files[0])}
+            />
+
+            {!uploadedFile ? (
+              <>
+                <p style={{ color: "#4f46e5", fontSize: "1.1rem", marginBottom: "12px" }}>
+                  Click or drag file here
+                </p>
+                <div style={{ fontSize: "2.8rem", color: "#9ca3af" }}>↓</div>
+              </>
+            ) : (
+              <div style={{ padding: "16px", background: "#f0fdfa", borderRadius: "8px" }}>
+                <p style={{ fontWeight: 600, color: "#0f766e" }}>Selected:</p>
+                <p style={{ margin: "4px 0", fontSize: "1rem" }}>{uploadedFile.name}</p>
+                <p style={{ color: "#6b7280", fontSize: "0.9rem" }}>
+                  {(uploadedFile.size / 1048576).toFixed(2)} MB
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px" }}>
             <button
-              key={tab}
-              onClick={() => setActiveSubTab(tab)}
+              disabled={!uploadedFile || isUploading}
+              onClick={() => {
+                setIsUploading(true);
+                setTimeout(() => {
+                  setIsUploading(false);
+                  alert(`Uploaded successfully for ${selectedSource}`);
+                  setUploadedFile(null);
+                  setImportStep("sources");
+                }, 1400);
+              }}
               style={{
-                flex: 1,
-                padding: "16px",
-                background: activeSubTab === tab ? "white" : "transparent",
-                color: activeSubTab === tab ? "#4f46e5" : "#64748b",
+                padding: "10px 40px",
+                background: uploadedFile && !isUploading ? "#4f46e5" : "#9ca3af",
+                color: "white",
                 border: "none",
-                fontSize: "1.08rem",
-                fontWeight: activeSubTab === tab ? 700 : 500,
-                cursor: "pointer",
-                borderBottom: activeSubTab === tab ? "4px solid #7c3aed" : "none"
+                borderRadius: "8px",
+                fontSize: "0.98rem",
+                fontWeight: 600,
+                cursor: uploadedFile && !isUploading ? "pointer" : "not-allowed"
               }}
             >
-              {tab}
+              {isUploading ? "Uploading..." : "Upload"}
             </button>
-          ))}
-        </div>
 
-        {/* Manually Tab */}
-        {activeSubTab === "Manually" && (
-          <div style={{ padding: "24px 28px" }}>
-            {/* Selectors */}
+            <button
+              onClick={() => {
+                setUploadedFile(null);
+                setImportStep("sources");
+              }}
+              style={{
+                padding: "10px 32px",
+                background: "#ef4444",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "0.98rem",
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+)}
+      {/* Manually Tab */}
+      {activeSubTab === "Manually" && (
+        <div style={{ padding: "24px 28px" }}>
+
+          {/* Sirf GSTR-3B ke liye dropdown ki jagah buttons */}
+          {isGSTR3B && selectedMonth && (
+            <div style={{
+              padding: "16px 0 24px 0",
+              background: "#f8fafc",
+              overflowX: "auto",
+              whiteSpace: "nowrap",
+              marginBottom: "20px"
+            }}>
+              <div style={{ display: "inline-flex", gap: "12px" }}>
+                {gstr3bSections.map((section, idx) => (
+                  <button
+                    key={section}
+                    onClick={() => setSelectedSection(section)}
+                    style={{
+                      padding: "10px 20px",
+                      background: selectedSection === section ? "#7c3aed" : "white",
+                      color: selectedSection === section ? "white" : "#4f46e5",
+                      border: selectedSection === section ? "none" : "1px solid #c7d2fe",
+                      borderRadius: "8px",
+                      fontSize: "0.95rem",
+                      fontWeight: selectedSection === section ? 600 : 500,
+                      cursor: "pointer",
+                      boxShadow: selectedSection === section ? "0 2px 8px rgba(124,58,237,0.2)" : "none",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    {idx + 1}. {section}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* GSTR-3B ke alawa sabke liye purana dropdown */}
+          {!isGSTR3B && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginBottom: "40px" }}>
-              <div style={{ width: 160 }}>
-                <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Financial Year</label>
-                <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
-                  {years.map(y => <option key={y}>{y}</option>)}
-                </select>
-              </div>
-              <div style={{ width: 160 }}>
-                <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Month</label>
-                <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
-                  <option value="">Select</option>
-                  {months.map(m => <option key={m}>{m}</option>)}
-                </select>
-              </div>
+           
               <div style={{ flex: 1, minWidth: 400 }}>
                 <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Select sheet</label>
                 <select value={selectedSection} onChange={e => setSelectedSection(e.target.value)} disabled={!canSelect} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
@@ -3342,240 +3788,233 @@ const GSTRLayout = ({ title = "GST Returns" }) => {
                 </select>
               </div>
             </div>
+          )}
 
-            {selectedSection && isGSTR3B && (
-              <>
-                <h2 style={{ margin: "0 0 24px", fontSize: 24, color: "#1e293b" }}>{selectedSection}</h2>
-
-                {/* ───────────────────────────────────────────────
-                    SECTION 1: Outward Supplies + RCM
-                ─────────────────────────────────────────────── */}
-                {selectedSection === gstr3bSections[0] && (
-                  <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-                      <thead>
-                        <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Total Taxable Value</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
-                          <th style={{ padding: "14px", textAlign: "right" }}>CESS</th>
+          {selectedSection && isGSTR3B && (
+            <>
+              <h2 style={{ margin: "0 0 24px", fontSize: 24, color: "#1e293b" }}>{selectedSection}</h2>
+              {/* ───────────────────────────────────────────────
+                  SECTION 1: Outward Supplies + RCM
+              ─────────────────────────────────────────────── */}
+              {selectedSection === gstr3bSections[0] && (
+                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                    <thead>
+                      <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Total Taxable Value</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
+                        <th style={{ padding: "14px", textAlign: "right" }}>CESS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {outwardSupplies.map((row, i) => (
+                        <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                            {row.taxable !== "Hide" ? renderInput(row.taxable, v => handleChange(setOutwardSupplies, outwardSupplies, i, "taxable", v)) : "—"}
+                          </td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                            {row.igst !== "Hide" ? renderInput(row.igst, v => handleChange(setOutwardSupplies, outwardSupplies, i, "igst", v)) : renderHide()}
+                          </td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                            {row.cgst !== "Hide" ? renderInput(row.cgst, v => handleChange(setOutwardSupplies, outwardSupplies, i, "cgst", v)) : renderHide()}
+                          </td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                            {row.sgst !== "Hide" ? renderInput(row.sgst, v => handleChange(setOutwardSupplies, outwardSupplies, i, "sgst", v)) : renderHide()}
+                          </td>
+                          <td style={{ padding: "14px", textAlign: "right" }}>
+                            {row.cess !== "Hide" ? renderInput(row.cess, v => handleChange(setOutwardSupplies, outwardSupplies, i, "cess", v)) : renderHide()}
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {outwardSupplies.map((row, i) => (
-                          <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                              {row.taxable !== "Hide" ? renderInput(row.taxable, v => handleChange(setOutwardSupplies, outwardSupplies, i, "taxable", v)) : "—"}
-                            </td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                              {row.igst !== "Hide" ? renderInput(row.igst, v => handleChange(setOutwardSupplies, outwardSupplies, i, "igst", v)) : renderHide()}
-                            </td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                              {row.cgst !== "Hide" ? renderInput(row.cgst, v => handleChange(setOutwardSupplies, outwardSupplies, i, "cgst", v)) : renderHide()}
-                            </td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                              {row.sgst !== "Hide" ? renderInput(row.sgst, v => handleChange(setOutwardSupplies, outwardSupplies, i, "sgst", v)) : renderHide()}
-                            </td>
-                            <td style={{ padding: "14px", textAlign: "right" }}>
-                              {row.cess !== "Hide" ? renderInput(row.cess, v => handleChange(setOutwardSupplies, outwardSupplies, i, "cess", v)) : renderHide()}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {tableActions}
-                  </div>
-                )}
-
-                {/* ───────────────────────────────────────────────
-                    SECTION 2: ECO u/s 9(5)
-                ─────────────────────────────────────────────── */}
-                {selectedSection === gstr3bSections[1] && (
-                  <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-                      <thead>
-                        <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 380 }}>Nature of Supplies (ECO)</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Taxable Value</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CESS</th>
-                          <th style={{ padding: "14px", textAlign: "right" }}>Total</th>
+                      ))}
+                    </tbody>
+                  </table>
+                  {tableActions}
+                </div>
+              )}
+              {/* ───────────────────────────────────────────────
+                  SECTION 2: ECO u/s 9(5)
+              ─────────────────────────────────────────────── */}
+              {selectedSection === gstr3bSections[1] && (
+                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                    <thead>
+                      <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 380 }}>Nature of Supplies (ECO)</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Taxable Value</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CESS</th>
+                        <th style={{ padding: "14px", textAlign: "right" }}>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ecoSupplies.map((row, i) => (
+                        <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.taxable, v => handleChange(setEcoSupplies, ecoSupplies, i, "taxable", v))}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleChange(setEcoSupplies, ecoSupplies, i, "igst", v))}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleChange(setEcoSupplies, ecoSupplies, i, "cgst", v))}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleChange(setEcoSupplies, ecoSupplies, i, "sgst", v))}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cess, v => handleChange(setEcoSupplies, ecoSupplies, i, "cess", v))}</td>
+                          <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.total, v => handleChange(setEcoSupplies, ecoSupplies, i, "total", v))}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {ecoSupplies.map((row, i) => (
-                          <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.taxable, v => handleChange(setEcoSupplies, ecoSupplies, i, "taxable", v))}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleChange(setEcoSupplies, ecoSupplies, i, "igst", v))}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleChange(setEcoSupplies, ecoSupplies, i, "cgst", v))}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleChange(setEcoSupplies, ecoSupplies, i, "sgst", v))}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cess, v => handleChange(setEcoSupplies, ecoSupplies, i, "cess", v))}</td>
-                            <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.total, v => handleChange(setEcoSupplies, ecoSupplies, i, "total", v))}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {tableActions}
-                  </div>
-                )}
-
-                {/* ───────────────────────────────────────────────
-                    SECTION 3: Inter-State Supplies
-                ─────────────────────────────────────────────── */}
-                {selectedSection === gstr3bSections[2] && (
-                  <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-                      <thead>
-                        <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Inter-State Supplies</th>
-                          <th style={{ padding: "14px", textAlign: "right" }}>Intra-State Supplies</th>
+                      ))}
+                    </tbody>
+                  </table>
+                  {tableActions}
+                </div>
+              )}
+              {/* ───────────────────────────────────────────────
+                  SECTION 3: Inter-State Supplies
+              ─────────────────────────────────────────────── */}
+              {selectedSection === gstr3bSections[2] && (
+                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                    <thead>
+                      <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Inter-State Supplies</th>
+                        <th style={{ padding: "14px", textAlign: "right" }}>Intra-State Supplies</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {interstateSupplies.map((row, i) => (
+                        <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.interstate, v => handleChange(setInterstateSupplies, interstateSupplies, i, "interstate", v))}</td>
+                          <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.intrastate, v => handleChange(setInterstateSupplies, interstateSupplies, i, "intrastate", v))}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {interstateSupplies.map((row, i) => (
-                          <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.interstate, v => handleChange(setInterstateSupplies, interstateSupplies, i, "interstate", v))}</td>
-                            <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.intrastate, v => handleChange(setInterstateSupplies, interstateSupplies, i, "intrastate", v))}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {tableActions}
-                  </div>
-                )}
-
-                {/* ───────────────────────────────────────────────
-                    SECTION 4: Eligible ITC (sabse lamba table)
-                ─────────────────────────────────────────────── */}
-                {selectedSection === gstr3bSections[3] && (
-                  <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-                      <thead>
-                        <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Details</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
-                          <th style={{ padding: "14px", textAlign: "right" }}>CESS</th>
+                      ))}
+                    </tbody>
+                  </table>
+                  {tableActions}
+                </div>
+              )}
+              {/* ───────────────────────────────────────────────
+                  SECTION 4: Eligible ITC (sabse lamba table)
+              ─────────────────────────────────────────────── */}
+              {selectedSection === gstr3bSections[3] && (
+                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                    <thead>
+                      <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Details</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
+                        <th style={{ padding: "14px", textAlign: "right" }}>CESS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ background: "#f0f9ff" }}>
+                        <td colSpan={5} style={{ padding: "12px", fontWeight: 600 }}>(A) ITC Available (whether in full or part)</td>
+                      </tr>
+                      {itcDetails.available.map((row, i) => (
+                        <tr key={`a${i}`}>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleItcAvailableChange(i, "igst", v))}</td>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleItcAvailableChange(i, "cgst", v))}</td>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleItcAvailableChange(i, "sgst", v))}</td>
+                          <td style={{ padding: "12px", textAlign: "right" }}>{renderInput(row.cess, v => handleItcAvailableChange(i, "cess", v))}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        <tr style={{ background: "#f0f9ff" }}>
-                          <td colSpan={5} style={{ padding: "12px", fontWeight: 600 }}>(A) ITC Available (whether in full or part)</td>
+                      ))}
+                      <tr style={{ background: "#f0f9ff" }}>
+                        <td colSpan={5} style={{ padding: "12px", fontWeight: 600 }}>(B) ITC Reversed</td>
+                      </tr>
+                      {itcDetails.reversed.map((row, i) => (
+                        <tr key={`r${i}`}>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleItcReversedChange(i, "igst", v))}</td>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleItcReversedChange(i, "cgst", v))}</td>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleItcReversedChange(i, "sgst", v))}</td>
+                          <td style={{ padding: "12px", textAlign: "right" }}>{renderInput(row.cess, v => handleItcReversedChange(i, "cess", v))}</td>
                         </tr>
-                        {itcDetails.available.map((row, i) => (
-                          <tr key={`a${i}`}>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleItcAvailableChange(i, "igst", v))}</td>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleItcAvailableChange(i, "cgst", v))}</td>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleItcAvailableChange(i, "sgst", v))}</td>
-                            <td style={{ padding: "12px", textAlign: "right" }}>{renderInput(row.cess, v => handleItcAvailableChange(i, "cess", v))}</td>
-                          </tr>
-                        ))}
-
-                        <tr style={{ background: "#f0f9ff" }}>
-                          <td colSpan={5} style={{ padding: "12px", fontWeight: 600 }}>(B) ITC Reversed</td>
+                      ))}
+                      <tr style={{ background: "#dbeafe", fontWeight: 600 }}>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>(C) Net ITC Available (A - B)</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(itcDetails.netItc.igst, v => handleNetItcChange("igst", v))}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(itcDetails.netItc.cgst, v => handleNetItcChange("cgst", v))}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(itcDetails.netItc.sgst, v => handleNetItcChange("sgst", v))}</td>
+                        <td style={{ padding: "12px", textAlign: "right" }}>{renderInput(itcDetails.netItc.cess, v => handleNetItcChange("cess", v))}</td>
+                      </tr>
+                      <tr style={{ background: "#f0f9ff" }}>
+                        <td colSpan={5} style={{ padding: "12px", fontWeight: 600 }}>(D) Other Details</td>
+                      </tr>
+                      {itcDetails.ineligible.map((row, i) => (
+                        <tr key={`in${i}`}>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleItcIneligibleChange(i, "igst", v))}</td>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleItcIneligibleChange(i, "cgst", v))}</td>
+                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleItcIneligibleChange(i, "sgst", v))}</td>
+                          <td style={{ padding: "12px", textAlign: "right" }}>{renderInput(row.cess, v => handleItcIneligibleChange(i, "cess", v))}</td>
                         </tr>
-                        {itcDetails.reversed.map((row, i) => (
-                          <tr key={`r${i}`}>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleItcReversedChange(i, "igst", v))}</td>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleItcReversedChange(i, "cgst", v))}</td>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleItcReversedChange(i, "sgst", v))}</td>
-                            <td style={{ padding: "12px", textAlign: "right" }}>{renderInput(row.cess, v => handleItcReversedChange(i, "cess", v))}</td>
-                          </tr>
-                        ))}
-
-                        <tr style={{ background: "#dbeafe", fontWeight: 600 }}>
-                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>(C) Net ITC Available (A - B)</td>
-                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(itcDetails.netItc.igst, v => handleNetItcChange("igst", v))}</td>
-                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(itcDetails.netItc.cgst, v => handleNetItcChange("cgst", v))}</td>
-                          <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(itcDetails.netItc.sgst, v => handleNetItcChange("sgst", v))}</td>
-                          <td style={{ padding: "12px", textAlign: "right" }}>{renderInput(itcDetails.netItc.cess, v => handleNetItcChange("cess", v))}</td>
+                      ))}
+                    </tbody>
+                  </table>
+                  {tableActions}
+                </div>
+              )}
+              {selectedSection === gstr3bSections[4] && (
+                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                    <thead>
+                      <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Inter-State Supplies</th>
+                        <th style={{ padding: "14px", textAlign: "right" }}>Intra-State Supplies</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {exemptNonGst.map((row, i) => (
+                        <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.interstate, v => handleChange(setExemptNonGst, exemptNonGst, i, "interstate", v))}</td>
+                          <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.intrastate, v => handleChange(setExemptNonGst, exemptNonGst, i, "intrastate", v))}</td>
                         </tr>
-
-                        <tr style={{ background: "#f0f9ff" }}>
-                          <td colSpan={5} style={{ padding: "12px", fontWeight: 600 }}>(D) Other Details</td>
+                      ))}
+                    </tbody>
+                  </table>
+                  {tableActions}
+                </div>
+              )}
+              {/* ───────────────────────────────────────────────
+                  SECTION 6: Interest & Late Fee
+              ─────────────────────────────────────────────── */}
+              {selectedSection === gstr3bSections[5] && (
+                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                    <thead>
+                      <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Description</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
+                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
+                        <th style={{ padding: "14px", textAlign: "right" }}>CESS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {interestLateFee.map((row, i) => (
+                        <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleChange(setInterestLateFee, interestLateFee, i, "igst", v))}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleChange(setInterestLateFee, interestLateFee, i, "cgst", v))}</td>
+                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleChange(setInterestLateFee, interestLateFee, i, "sgst", v))}</td>
+                          <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.cess, v => handleChange(setInterestLateFee, interestLateFee, i, "cess", v))}</td>
                         </tr>
-                        {itcDetails.ineligible.map((row, i) => (
-                          <tr key={`in${i}`}>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleItcIneligibleChange(i, "igst", v))}</td>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleItcIneligibleChange(i, "cgst", v))}</td>
-                            <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleItcIneligibleChange(i, "sgst", v))}</td>
-                            <td style={{ padding: "12px", textAlign: "right" }}>{renderInput(row.cess, v => handleItcIneligibleChange(i, "cess", v))}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {tableActions}
-                  </div>
-                )}
-{selectedSection === gstr3bSections[4] && (
-                  <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-                      <thead>
-                        <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Inter-State Supplies</th>
-                          <th style={{ padding: "14px", textAlign: "right" }}>Intra-State Supplies</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {exemptNonGst.map((row, i) => (
-                          <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.interstate, v => handleChange(setExemptNonGst, exemptNonGst, i, "interstate", v))}</td>
-                            <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.intrastate, v => handleChange(setExemptNonGst, exemptNonGst, i, "intrastate", v))}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {tableActions}
-                  </div>
-                )}
-
-                {/* ───────────────────────────────────────────────
-                    SECTION 6: Interest & Late Fee
-                ─────────────────────────────────────────────── */}
-                {selectedSection === gstr3bSections[5] && (
-                  <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-                      <thead>
-                        <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Description</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
-                          <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
-                          <th style={{ padding: "14px", textAlign: "right" }}>CESS</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {interestLateFee.map((row, i) => (
-                          <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.igst, v => handleChange(setInterestLateFee, interestLateFee, i, "igst", v))}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.cgst, v => handleChange(setInterestLateFee, interestLateFee, i, "cgst", v))}</td>
-                            <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.sgst, v => handleChange(setInterestLateFee, interestLateFee, i, "sgst", v))}</td>
-                            <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.cess, v => handleChange(setInterestLateFee, interestLateFee, i, "cess", v))}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {tableActions}
-                  </div>
-                )}
-                              </>
-            )}
-        );
+                      ))}
+                    </tbody>
+                  </table>
+                  {tableActions}
+                </div>
+              )}
+            </>
+          )}
+      
 
             {selectedSection && currentColumns.length > 0 && (
               <>
