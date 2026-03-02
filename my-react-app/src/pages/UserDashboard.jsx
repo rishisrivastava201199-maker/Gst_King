@@ -2711,7 +2711,9 @@ const handleClientSelect = () => {
     "3- Inter State Supplies",
     "4- Eligible ITC",
     "5- Exempt , Nil Rated and Non - Gst Supplies",
-    "6- Intrest and Late fee For Previous Tax Period"
+    "6- Intrest and Late fee For Previous Tax Period",
+    "7- Payment of tax "
+
   ];
   const GSTRLayout = ({ title = "GST Returns" }) => {
     const [activeSubTab, setActiveSubTab] = useState("Manually");
@@ -2948,8 +2950,22 @@ const [skipValidation, setSkipValidation] = useState(false);
       "3- Inter State Supplies",
       "4- Eligible ITC",
       "5- Exempt , Nil Rated and Non - Gst Supplies",
-      "6- Intrest and Late fee For Previous Tax Period"
+      "6- Intrest and Late fee For Previous Tax Period",
+      "7- Payment of tax "
     ];
+    const [cashLedger, setCashLedger] = useState([
+  { desc: "Tax", igst: "", cgst: "", sgst: "", cess: "" },
+  { desc: "Interest", igst: "", cgst: "", sgst: "", cess: "" },
+  { desc: "Late fees", igst: "", cgst: "", sgst: "", cess: "" },
+  // agar aur rows chahiye jaise Penalty ya Others to add kar sakte ho
+]);
+
+const [creditLedger, setCreditLedger] = useState({
+  igst: "",
+  cgst: "",
+  sgst: "",
+  cess: "",
+});
     // Yeh logic decide karega ki GSTR-3B ke 6 options dikhane hain ya GSTR-1 ke
     const currentSections = title.toUpperCase().includes("3B") ? gstr3bSections : gstr1Sections;
     const canSelect = selectedYear && selectedMonth;
@@ -4011,9 +4027,129 @@ const [skipValidation, setSkipValidation] = useState(false);
                   </table>
                   {tableActions}
                 </div>
+
+
+                
               )}
+
+              
+
+              {selectedSection === gstr3bSections[5] && (
+  <div style={{ padding: "0 0 32px 0" }}>
+    <h2 style={{ margin: "0 0 24px", fontSize: 24, color: "#1e293b" }}>
+      {selectedSection} (Payment of Tax)
+    </h2>
+
+    {/* Cash Ledger Balance - UPDATE (jaise portal mein cash side dikhta hai) */}
+    <div style={{ marginBottom: "40px" }}>
+      <div style={{
+        fontWeight: 600,
+        fontSize: 16,
+        marginBottom: 12,
+        color: "#1e293b",
+        display: "flex",
+        alignItems: "center",
+        gap: 8
+      }}>
+        Cash Ledger Balance
+        <span style={{ color: "#ef4444", fontSize: "0.9rem", fontWeight: 500 }}>(UPDATE)</span>
+      </div>
+
+      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <thead>
+            <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
+              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 180 }}>Description</th>
+              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
+              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
+              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CESS</th>
+              <th style={{ padding: "14px", textAlign: "right" }}>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cashLedger.map((row, i) => (
+              <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
+                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(row.igst || "", v => handleChange(setCashLedger, cashLedger, i, "igst", v))}
+                </td>
+                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(row.cgst || "", v => handleChange(setCashLedger, cashLedger, i, "cgst", v))}
+                </td>
+                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(row.sgst || "", v => handleChange(setCashLedger, cashLedger, i, "sgst", v))}
+                </td>
+                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(row.cess || "", v => handleChange(setCashLedger, cashLedger, i, "cess", v))}
+                </td>
+                <td style={{ padding: "14px", textAlign: "right", fontWeight: 600 }}>
+                  {(Number(row.igst || 0) + Number(row.cgst || 0) + Number(row.sgst || 0) + Number(row.cess || 0)).toFixed(2)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {tableActions}
+    </div>
+
+    {/* Credit Ledger Balance (jaise portal mein credit side single row) */}
+    <div>
+      <div style={{
+        fontWeight: 600,
+        fontSize: 16,
+        marginBottom: 12,
+        color: "#1e293b"
+      }}>
+        Credit Ledger Balance
+      </div>
+
+      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <thead>
+            <tr style={{ background: "#ecfdf5", fontWeight: 600 }}>
+              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>IGST</th>
+              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
+              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
+              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CESS</th>
+              <th style={{ padding: "14px", textAlign: "right" }}>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style={{ background: "#f9fafb" }}>
+              <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                {renderInput(creditLedger.igst || "", v => setCreditLedger(prev => ({ ...prev, igst: v })))}
+              </td>
+              <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                {renderInput(creditLedger.cgst || "", v => setCreditLedger(prev => ({ ...prev, cgst: v })))}
+              </td>
+              <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                {renderInput(creditLedger.sgst || "", v => setCreditLedger(prev => ({ ...prev, sgst: v })))}
+              </td>
+              <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                {renderInput(creditLedger.cess || "", v => setCreditLedger(prev => ({ ...prev, cess: v })))}
+              </td>
+              <td style={{ padding: "14px", textAlign: "right", fontWeight: 600 }}>
+                {(Number(creditLedger.igst || 0) + Number(creditLedger.cgst || 0) + Number(creditLedger.sgst || 0) + Number(creditLedger.cess || 0)).toFixed(2)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      {tableActions}
+    </div>
+  </div>
+)}
+              
             </>
+            
+            
           )}
+          
+
+          
+          
       
 
             {selectedSection && currentColumns.length > 0 && (
