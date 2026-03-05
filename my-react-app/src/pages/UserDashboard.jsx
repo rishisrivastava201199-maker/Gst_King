@@ -1380,7 +1380,18 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
     "12 - HSN-wise summary of outward supplies",
     "13 - Documents Issued",
     "14 - Supplies made through ECO",
-    "15 - Supplies U/s 9(5)"
+    "15 - Supplies U/s 9(5)",
+    "16 - B2B Amendment",
+    "17 - Export Amendment",
+    "18 - ECO B2B",
+    "19 - ECO URP B2B",
+    "20 - ECO B2C",
+    "21- ECO URP B2C",
+    "22- ECO Amendment B2B",
+    "23 - ECO Amendment B2C ", 
+    "24 - ECO Amendment URP B2B"
+    
+
   ];
 
   const sections = baseSections.map(title => ({
@@ -2706,13 +2717,13 @@ const handleClientSelect = () => {
   ];
   // GSTR-3B ke 6 options
   const gstr3bSections = [
-    "1- tax on outward supplies & reverse charge inward",
-    "2- Supplies notified u/s 9(5) of the CGST Act 2017",
-    "3- Inter State Supplies",
-    "4- Eligible ITC",
-    "5- Exempt , Nil Rated and Non - Gst Supplies",
-    "6- Intrest and Late fee For Previous Tax Period",
-    "7- Payment of tax "
+    "tax on outward supplies & reverse charge inward",
+    "Supplies notified u/s 9(5) of the CGST Act 2017",
+    "Inter State Supplies",
+    "Eligible ITC",
+    "Exempt , Nil Rated and Non - Gst Supplies",
+    "Intrest and Late fee For Previous Tax Period",
+    "Payment of tax "
 
   ];
   const GSTRLayout = ({ title = "GST Returns" }) => {
@@ -2741,6 +2752,17 @@ const handleClientSelect = () => {
       "E-com URP2B",
       "E-com URP2C"
     ];
+    // 7. Payment of Tax - Cash Ledger
+const [cashLedger, setCashLedger] = useState([
+  { desc: "Tax", igst: "", cgst: "", sgst: "", cess: "" },
+  { desc: "Interest", igst: "", cgst: "", sgst: "", cess: "" },
+  { desc: "Late Fees", igst: "", cgst: "", sgst: "", cess: "" }
+]);
+
+// 7. Payment of Tax - Credit Ledger
+const [creditLedger, setCreditLedger] = useState([
+  { igst: "", cgst: "", sgst: "", cess: "" }
+]);
     const handleSelectAllImport = () => {
       if (selectAllImport) {
         setSelectedOptions([]);
@@ -2801,6 +2823,161 @@ const handleClientSelect = () => {
       const saved = localStorage.getItem(STORAGE_KEYS.eco);
       return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Liable to Collect Tax u/s 52(TCS)", gstinEco: "", nameEco: "", netValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
     });
+    const [b2bAmendmentRows, setB2bAmendmentRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.b2bAmendment);
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      gstin: "",
+      invoiceNo: "",
+      invoiceDate: "",
+      invoiceValue: 0,
+      pos: "",
+      rate: 0,
+      taxableValue: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0
+    }
+  ];
+});
+const [exportAmendmentRows, setExportAmendmentRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.exportAmendment);
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      exportType: "",
+      invoiceNo: "",
+      invoiceDate: "",
+      invoiceValue: 0,
+      portCode: "",
+      shippingBillNo: "",
+      shippingBillDate: "",
+      rate: 0,
+      taxableValue: 0,
+      igst: 0,
+      cess: 0
+    }
+  ];
+});
+const [ecoB2bRows, setEcoB2bRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoB2b);
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      gstin: "",
+      invoiceNo: "",
+      invoiceDate: "",
+      invoiceValue: 0,
+      pos: "",
+      rate: 0,
+      taxableValue: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0
+    }
+  ];
+});
+const [ecoUrpB2bRows, setEcoUrpB2bRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoUrpB2b);
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      supplierGstin: "",
+      pos: "",
+      rate: 0,
+      taxableValue: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0
+    }
+  ];
+});
+const [ecoB2cRows, setEcoB2cRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoB2c);
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      pos: "",
+      rate: 0,
+      taxableValue: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0
+    }
+  ];
+});
+const [ecoUrpB2cRows, setEcoUrpB2cRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoUrpB2c);
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      pos: "",
+      rate: 0,
+      taxableValue: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0
+    }
+  ];
+});
+const [ecoAmendmentB2bRows, setEcoAmendmentB2bRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoAmendmentB2b);
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      gstin: "",
+      invoiceNo: "",
+      invoiceDate: "",
+      invoiceValue: 0,
+      pos: "",
+      rate: 0,
+      taxableValue: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0
+    }
+  ];
+});
+const [ecoAmendmentB2cRows, setEcoAmendmentB2cRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoAmendmentB2c);
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      pos: "",
+      rate: 0,
+      taxableValue: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0
+    }
+  ];
+});
+const [ecoAmendmentUrpB2bRows, setEcoAmendmentUrpB2bRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoAmendmentUrpB2b);
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      supplierGstin: "",
+      pos: "",
+      rate: 0,
+      taxableValue: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0
+    }
+  ];
+});
+
+    
     const [summaryTotals, setSummaryTotals] = useState(() => {
       const saved = localStorage.getItem(STORAGE_KEYS.summaryTotals);
       return saved ? JSON.parse(saved) : {
@@ -2941,31 +3118,28 @@ const [skipValidation, setSkipValidation] = useState(false);
       "12 - HSN-wise summary of outward supplies",
       "13 - Documents Issued",
       "14 - Supplies made through ECO",
-      "15 - Supplies U/s 9(5)"
+      "15 - Supplies U/s 9(5)",
+      "16 - B2B Amendment",
+      "17 - Export Amendment",
+      "18 - ECO B2B",
+      "19 - ECO URP B2B",
+      "20 - ECO B2C",
+      "21- ECO URP B2C",
+      "22- ECO Amendment B2B",
+      "23 - ECO Amendment B2C ", 
+      "24 - ECO Amendment URP B2B"
     ];
     // GSTR-3B ke 6 options
     const gstr3bSections = [
-      "1- tax on outward supplies & reverse charge inward",
-      "2- Supplies notified u/s 9(5) of the CGST Act 2017",
-      "3- Inter State Supplies",
-      "4- Eligible ITC",
-      "5- Exempt , Nil Rated and Non - Gst Supplies",
-      "6- Intrest and Late fee For Previous Tax Period",
-      "7- Payment of tax "
+      "tax on outward supplies & reverse charge inward",
+      "Supplies notified u/s 9(5) of the CGST Act 2017",
+      "Inter State Supplies",
+      "Eligible ITC",
+      "Exempt , Nil Rated and Non - Gst Supplies",
+      "Intrest and Late fee For Previous Tax Period",
+      "Payment of tax "
     ];
-    const [cashLedger, setCashLedger] = useState([
-  { desc: "Tax", igst: "", cgst: "", sgst: "", cess: "" },
-  { desc: "Interest", igst: "", cgst: "", sgst: "", cess: "" },
-  { desc: "Late fees", igst: "", cgst: "", sgst: "", cess: "" },
-  // agar aur rows chahiye jaise Penalty ya Others to add kar sakte ho
-]);
-
-const [creditLedger, setCreditLedger] = useState({
-  igst: "",
-  cgst: "",
-  sgst: "",
-  cess: "",
-});
+    
     // Yeh logic decide karega ki GSTR-3B ke 6 options dikhane hain ya GSTR-1 ke
     const currentSections = title.toUpperCase().includes("3B") ? gstr3bSections : gstr1Sections;
     const canSelect = selectedYear && selectedMonth;
@@ -3112,7 +3286,113 @@ const [creditLedger, setCreditLedger] = useState({
         { key: "sgst", label: "SGST", align: "right", type: "number" },
         { key: "cess", label: "Cess", align: "right", type: "number" },
         { key: "total", label: "Total", align: "right", type: "number" }
-      ]
+      ],
+      "16 - B2B Amendment": [
+        { key: "gstin", label: "GSTIN", align: "left" },
+        { key: "invoiceNo", label: "Invoice No", align: "left" },
+        { key: "invoiceDate", label: "Invoice Date", align: "left" },     // or "center" if you prefer
+        { key: "invoiceValue", label: "Invoice Value", align: "right", type: "number" },
+        { key: "pos", label: "POS", align: "center" },                    // Place of Supply - often shown centered
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+      "17 - Export Amendment": [
+        { key: "exportType", label: "Export Type", align: "left" },
+        { key: "invoiceNo", label: "Invoice No", align: "left" },
+        { key: "invoiceDate", label: "Invoice Date", align: "left" },
+        { key: "invoiceValue", label: "Invoice Value", align: "right", type: "number" },
+        { key: "portCode", label: "Port Code", align: "left" },
+        { key: "shippingBillNo", label: "Shipping Bill No", align: "left" },
+        { key: "shippingBillDate", label: "Shipping Bill Date", align: "left" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+
+      "18 - ECO B2B": [
+        { key: "gstin", label: "GSTIN", align: "left" },
+        { key: "invoiceNo", label: "Invoice No", align: "left" },
+        { key: "invoiceDate", label: "Invoice Date", align: "left" },
+        { key: "invoiceValue", label: "Invoice Value", align: "right", type: "number" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+
+      "19 - ECO URP B2B": [
+        { key: "supplierGstin", label: "Supplier GSTIN", align: "left" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+
+      "20 - ECO B2C": [
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+
+      "21 - ECO URP B2C": [
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+
+      "22 - ECO Amendment B2B": [
+        { key: "gstin", label: "GSTIN", align: "left" },
+        { key: "invoiceNo", label: "Invoice No", align: "left" },
+        { key: "invoiceDate", label: "Invoice Date", align: "left" },
+        { key: "invoiceValue", label: "Invoice Value", align: "right", type: "number" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+
+      "23 - ECO Amendment B2C": [
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ],
+
+      "24 - ECO Amendment URP B2B": [
+        { key: "supplierGstin", label: "Supplier GSTIN", align: "left" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type: "number" }
+      ]            
     };
     const currentColumns = tableColumns[selectedSection] || [];
     const getRowsAndSetter = () => {
@@ -3128,9 +3408,19 @@ const [creditLedger, setCreditLedger] = useState({
         case "12 - HSN-wise summary of outward supplies": return [hsnRows, setHsnRows];
         case "13 - Documents Issued": return [documentsRows, setDocumentsRows];
         case "14 - Supplies made through ECO": return [ecoRows, setEcoRows];
+        case "16 - B2B Amendment": return [b2bAmendmentRows, setB2bAmendmentRows];
+        case "17 - Export Amendment": return [exportAmendmentRows, setExportAmendmentRows];
+        case "18 - ECO B2B": return [ecoB2bRows, setEcoB2bRows];
+        case "19 - ECO URP B2B": return [ecoUrpB2bRows, setEcoUrpB2bRows];
+        case "20 - ECO B2C": return [ecoB2cRows, setEcoB2cRows];
+        case "21- ECO URP B2C": return [ecoUrpB2cRows, setEcoUrpB2cRows];
+        case "22- ECO Amendment B2B": return [ecoAmendmentB2bRows, setEcoAmendmentB2bRows];
+        case "23 - ECO Amendment B2C ": return [ecoAmendmentB2cRows, setEcoAmendmentB2cRows];
+        case "24 - ECO Amendment URP B2B": return [ecoAmendmentUrpB2bRows, setEcoAmendmentUrpB2bRows];
         default: return [[], () => {}];
       }
     };
+    const [rows, setRows] = getRowsAndSetter();
     
     const addRow = () => {
       const newSl = rows.length + 1;
@@ -4027,126 +4317,136 @@ const [creditLedger, setCreditLedger] = useState({
                   </table>
                   {tableActions}
                 </div>
-
-
-                
               )}
-
-              
-
-              {selectedSection === gstr3bSections[5] && (
-  <div style={{ padding: "0 0 32px 0" }}>
-    <h2 style={{ margin: "0 0 24px", fontSize: 24, color: "#1e293b" }}>
-      {selectedSection} (Payment of Tax)
-    </h2>
-
-    {/* Cash Ledger Balance - UPDATE (jaise portal mein cash side dikhta hai) */}
-    <div style={{ marginBottom: "40px" }}>
-      <div style={{
-        fontWeight: 600,
-        fontSize: 16,
-        marginBottom: 12,
-        color: "#1e293b",
-        display: "flex",
-        alignItems: "center",
-        gap: 8
-      }}>
-        Cash Ledger Balance
-        <span style={{ color: "#ef4444", fontSize: "0.9rem", fontWeight: 500 }}>(UPDATE)</span>
-      </div>
-
-      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-          <thead>
-            <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
-              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 180 }}>Description</th>
-              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
-              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
-              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
-              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CESS</th>
-              <th style={{ padding: "14px", textAlign: "right" }}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cashLedger.map((row, i) => (
-              <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.desc}</td>
-                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                  {renderInput(row.igst || "", v => handleChange(setCashLedger, cashLedger, i, "igst", v))}
-                </td>
-                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                  {renderInput(row.cgst || "", v => handleChange(setCashLedger, cashLedger, i, "cgst", v))}
-                </td>
-                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                  {renderInput(row.sgst || "", v => handleChange(setCashLedger, cashLedger, i, "sgst", v))}
-                </td>
-                <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                  {renderInput(row.cess || "", v => handleChange(setCashLedger, cashLedger, i, "cess", v))}
-                </td>
-                <td style={{ padding: "14px", textAlign: "right", fontWeight: 600 }}>
-                  {(Number(row.igst || 0) + Number(row.cgst || 0) + Number(row.sgst || 0) + Number(row.cess || 0)).toFixed(2)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {tableActions}
-    </div>
-
-    {/* Credit Ledger Balance (jaise portal mein credit side single row) */}
-    <div>
-      <div style={{
-        fontWeight: 600,
-        fontSize: 16,
-        marginBottom: 12,
-        color: "#1e293b"
-      }}>
-        Credit Ledger Balance
-      </div>
-
-      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-          <thead>
-            <tr style={{ background: "#ecfdf5", fontWeight: 600 }}>
-              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>IGST</th>
-              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CGST</th>
-              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>SGST</th>
-              <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>CESS</th>
-              <th style={{ padding: "14px", textAlign: "right" }}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style={{ background: "#f9fafb" }}>
-              <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                {renderInput(creditLedger.igst || "", v => setCreditLedger(prev => ({ ...prev, igst: v })))}
-              </td>
-              <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                {renderInput(creditLedger.cgst || "", v => setCreditLedger(prev => ({ ...prev, cgst: v })))}
-              </td>
-              <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                {renderInput(creditLedger.sgst || "", v => setCreditLedger(prev => ({ ...prev, sgst: v })))}
-              </td>
-              <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
-                {renderInput(creditLedger.cess || "", v => setCreditLedger(prev => ({ ...prev, cess: v })))}
-              </td>
-              <td style={{ padding: "14px", textAlign: "right", fontWeight: 600 }}>
-                {(Number(creditLedger.igst || 0) + Number(creditLedger.cgst || 0) + Number(creditLedger.sgst || 0) + Number(creditLedger.cess || 0)).toFixed(2)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      {tableActions}
-    </div>
-  </div>
-)}
               
             </>
             
             
           )}
-          
+          {/* ───────────────────────────────────────────────
+    SECTION 7: Payment of Tax
+────────────────────────────────────────────── */}
+{selectedSection === gstr3bSections[6] && (
+  <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+
+    {/* CASH LEDGER BALANCE */}
+    <div style={{ border: "1px solid #d1d5db", borderRadius: 8, overflow: "hidden" }}>
+      
+      <div style={{
+        background: "#dbeafe",
+        padding: "12px",
+        fontWeight: 700,
+        fontSize: "16px",
+        textAlign: "center"
+      }}>
+        Cash Ledger Balance
+      </div>
+
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+        <thead>
+          <tr style={{ background: "#e0f2fe" }}>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>Description</th>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>IGST</th>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>CGST</th>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>SGST</th>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>CESS</th>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cashLedger.map((row, i) => {
+            const total =
+              Number(row.igst || 0) +
+              Number(row.cgst || 0) +
+              Number(row.sgst || 0) +
+              Number(row.cess || 0);
+
+            return (
+              <tr key={i}>
+                <td style={{ padding: 12, border: "1px solid #d1d5db" }}>{row.desc}</td>
+                {["igst","cgst","sgst","cess"].map((field) => (
+                  <td key={field} style={{ padding: 12, border: "1px solid #d1d5db" }}>
+                    <input
+                      type="number"
+                      value={row[field]}
+                      onChange={(e) => {
+                        const newData = [...cashLedger];
+                        newData[i][field] = e.target.value;
+                        setCashLedger(newData);
+                      }}
+                      style={{ width: "100%", padding: 6 }}
+                    />
+                  </td>
+                ))}
+                <td style={{ padding: 12, border: "1px solid #d1d5db", fontWeight: 600 }}>
+                  {total}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    {/* CREDIT LEDGER BALANCE */}
+    <div style={{ border: "1px solid #d1d5db", borderRadius: 8, overflow: "hidden" }}>
+      
+      <div style={{
+        background: "#bbf7d0",
+        padding: "12px",
+        fontWeight: 700,
+        fontSize: "16px",
+        textAlign: "center"
+      }}>
+        Credit Ledger Balance
+      </div>
+
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+        <thead>
+          <tr style={{ background: "#dcfce7" }}>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>IGST</th>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>CGST</th>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>SGST</th>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>CESS</th>
+            <th style={{ padding: 12, border: "1px solid #d1d5db" }}>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {creditLedger.map((row, i) => {
+            const total =
+              Number(row.igst || 0) +
+              Number(row.cgst || 0) +
+              Number(row.sgst || 0) +
+              Number(row.cess || 0);
+
+            return (
+              <tr key={i}>
+                {["igst","cgst","sgst","cess"].map((field) => (
+                  <td key={field} style={{ padding: 12, border: "1px solid #d1d5db" }}>
+                    <input
+                      type="number"
+                      value={row[field]}
+                      onChange={(e) => {
+                        const newData = [...creditLedger];
+                        newData[i][field] = e.target.value;
+                        setCreditLedger(newData);
+                      }}
+                      style={{ width: "100%", padding: 6 }}
+                    />
+                  </td>
+                ))}
+                <td style={{ padding: 12, border: "1px solid #d1d5db", fontWeight: 600 }}>
+                  {total}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+)}
 
           
           
