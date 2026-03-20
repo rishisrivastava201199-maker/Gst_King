@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -515,6 +515,7 @@ function UserDashboard() {
   const [showGSTReturnPeriodSelection, setShowGSTReturnPeriodSelection] = useState(false);
   const [showReturnsSummary, setShowReturnsSummary] = useState(false);
   const [selectedFY, setSelectedFY] = useState("2025-26");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedQuarter, setSelectedQuarter] = useState("Quarter 4 (Jan - Mar)");
   const [selectedPeriod, setSelectedPeriod] = useState("January");
   const [step, setStep] = useState('selection');           // 'selection' | 'summary' | 'detail'
@@ -1277,6 +1278,9 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
   const [records, setRecords] = useState({});
   const [showAddForm, setShowAddForm] = useState(false);
 
+
+  
+
   const [form, setForm] = useState({
     deemedExports: false,
     sezWithPayment: false,
@@ -1368,31 +1372,35 @@ const DetailedGSTView = ({ formType, fy, period, onBack }) => {
   };
 
   const baseSections = [
-    "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
-    "5 - B2C (Large) Invoices",
-    "6A - Exports Invoices",
-    "7 - B2C (Others)",
-    "8A, 8B, 8C, 8D - Nil Rated Supplies",
-    "9B - Credit / Debit Notes (Registered)",
-    "9B - Credit / Debit Notes (Unregistered)",
-    "11A(1), 11A(2) - Tax Liability (Advances Received)",
-    "11B - Adjustment of Advances",
-    "12 - HSN-wise summary of outward supplies",
-    "13 - Documents Issued",
-    "14 - Supplies made through ECO",
-    "15 - Supplies U/s 9(5)",
-    "16 - B2B Amendment",
-    "17 - Export Amendment",
-    "18 - ECO B2B",
-    "19 - ECO URP B2B",
-    "20 - ECO B2C",
-    "21- ECO URP B2C",
-    "22- ECO Amendment B2B",
-    "23 - ECO Amendment B2C ", 
-    "24 - ECO Amendment URP B2B"
-    
-
-  ];
+      "1 - 4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
+      "2 - B2C (Large) Invoices",
+      "3 - Exports Invoices",
+      "4 - B2C (Others)",
+      "5 - 8B, 8C, 8D - Nil Rated Supplies",
+      "6 - 9B  Credit / Debit Notes (Registered)",
+      "7 - 9B  Credit / Debit Notes (Unregistered)",
+      "8 - 11A(1), 11A(2) - Tax Liability (Advances Received)",
+      "9 - 11B Adjustment of Advances",
+      "12 - HSN-wise summary of outward supplies",
+      "13 - Documents Issued",
+      "14 - Supplies made through ECO",
+      "15 - Supplies U/s 9(5)",
+      "16 - B2B Amendment",
+      "17 - Export Amendment",
+      "18 - ECO B2B",
+      "19 - ECO URP B2B",
+      "20 - ECO B2C",
+      "21 - ECO URP B2C",
+      "22 - ECO Amendment B2B",
+      "23 - ECO Amendment B2C ", 
+      "24 - ECO Amendment URP B2B",
+      "25 - B2BA",
+      "26 - B2CLA",
+      "27 - CDNRA",
+      "28 - CDNURA",
+      "29 - ECO URP2C Amendment",
+      "30 - Amended Tax Liability"
+    ];
 
   const sections = baseSections.map(title => ({
     title,
@@ -2354,6 +2362,8 @@ const handleClientSelect = () => {
   const [selectedDemand, setSelectedDemand] = useState(null);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const [dynamicClient, setDynamicClient] = useState({
     gstin: client?.gstin || "09ABMCS5888A1ZU",
     company: client?.company || "SALVIA GRAFIX PRIVATE LIMITED",
@@ -2409,9 +2419,11 @@ const handleClientSelect = () => {
     "gstr-1",
     "gstr-1A",
     "gstr 3b",
-    "IMS",
-    "Annual Return",
+    "itc-04",
+    "tds/tcs",
     "Reports",
+    "download center",
+    
   ];
   const dashboardTabs = [
     { id: "returns-status", label: "Returns Status" },
@@ -2687,8 +2699,28 @@ const handleClientSelect = () => {
     "Deemed Export",
     "Intra-State Supply Attracting IGST"
   ];
+
+  const RateOptions = ["0%", "0.10%", "0.25%", "1%", "1.50%", "3%", "5%", "6%"];
+
+  const appTaxRate = ["0%, 65%"];
   // Note Type options (Debit / Credit)
   const noteTypeOptions = ["Debit", "Credit"];
+
+  const TypeofDocumenstOptions = ["OE","E"];
+
+
+  const rcmOptions = ["Y", "N"];
+
+  const ucqOptions = [
+  "TGM - TEN GROSS",
+  "THD - THOUSANDS",
+  "TON - TONNES",
+  "TUB - TUBES",
+  "UGS - US GALLONS",
+  "UNT - UNITS",
+  "YDS - YARDS",
+  "OTH - OTHERS"
+];
   // Nature of Supply options for ECO
   const natureOptions = [
     "1 - Liable to Collect Tax u/s 52(TCS)",
@@ -2731,6 +2763,80 @@ const handleClientSelect = () => {
     const [selectedYear, setSelectedYear] = useState("2025-26");
     const [selectedMonth, setSelectedMonth] = useState("");
     const [selectedSection, setSelectedSection] = useState("");
+    const [selectedState, setSelectedState] = useState("");
+    const [selectedItcTable, setSelectedItcTable] = useState("");
+        const [selectedTdsTcsSection, setSelectedTdsTcsSection] = useState("");
+
+
+
+  
+
+    const [tdsTcsDownloadRows, setTdsTcsDownloadRows] = useState([
+      { id: 1, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 2, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 3, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 4, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 5, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 6, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" }
+    ]);
+
+    const [tdsTcsUploadRows, setTdsTcsUploadRows] = useState([
+      { id: 1, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 2, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 3, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 4, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 5, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 6, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Rejected" }
+    ]);
+
+    const [tdsTcsFilingRows] = useState([
+      { sl: 1, category: "TDS", status: "Accepted", records: 3, taxableValue: 3750.90, igst: 675.15, cgst: "-", sgst: "-" },
+      { sl: 2, category: "TCS", status: "Accepted", records: 3, taxableValue: 3750.90, igst: 675.15, cgst: "-", sgst: "-" }
+    ]);
+
+
+    const [downloadCenterYear, setDownloadCenterYear] = useState("");
+const [downloadCenterMonthDropdownOpen, setDownloadCenterMonthDropdownOpen] = useState(false);
+const [selectedDownloadMonths, setSelectedDownloadMonths] = useState([]);
+const [downloadCenterSelectAll, setDownloadCenterSelectAll] = useState(false);
+const [selectedDownloadOptions, setSelectedDownloadOptions] = useState([]);
+
+const downloadCenterYears = [
+  "2017-18",
+  "2018-19",
+  "2019-20",
+  "2020-21",
+  "2021-22",
+  "2022-23",
+  "2023-24",
+  "2024-25",
+  "2025-26"
+];
+
+const downloadCenterMonths = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+
+const downloadCenterOptions = [
+  "GSTR-1",
+  "GSTR-2A",
+  "GSTR-2B",
+  "GSTR-3B",
+  "Electronic Cash/Credit Ledger",
+  "Notice/Order"
+];
+    
     const importOptions = [
       "B2B",
       "B2CL",
@@ -2750,8 +2856,13 @@ const handleClientSelect = () => {
       "E-com B2B",
       "E-com B2C",
       "E-com URP2B",
-      "E-com URP2C"
-    ];
+      "E-com URP2C",
+      "B2BA",
+      "B2CLA",
+      "CDNRA",
+      "CDNURA",
+      "ECO URP2C Amendment"
+    ]
     // 7. Payment of Tax - Cash Ledger
 const [cashLedger, setCashLedger] = useState([
   { desc: "Tax", igst: "", cgst: "", sgst: "", cess: "" },
@@ -2778,6 +2889,123 @@ const [creditLedger, setCreditLedger] = useState([
         setSelectedOptions([...selectedOptions, option]);
       }
     };
+
+    const [itc04Table4Rows, setItc04Table4Rows] = useState(() => {
+  return [{
+    sl: 1,
+    gstinJobWorker: "",
+    state: "",
+    jobWorkerType: "",
+    challanNumber: "",
+    challanDate: "",
+    goodsType: "",
+    description: "",
+    uqc: "",
+    quantity: "",
+    taxableValue: "",
+    rate: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  }];
+});
+
+const [itc04Table5ARows, setItc04Table5ARows] = useState(() => {
+  return [{
+    sl: 1,
+    gstinJobWorker: "",
+    state: "",
+    jobWorkerType: "",
+    challanNumber: "",
+    challanDate: "",
+    goodsType: "",
+    description: "",
+    uqc: "",
+    quantity: "",
+    taxableValue: "",
+    rate: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  }];
+});
+
+const [itc04Table5BRows, setItc04Table5BRows] = useState(() => {
+  return [{
+    sl: 1,
+    gstinJobWorker: "",
+    state: "",
+    jobWorkerType: "",
+    challanNumber: "",
+    challanDate: "",
+    goodsType: "",
+    description: "",
+    uqc: "",
+    quantity: "",
+    taxableValue: "",
+    rate: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  }];
+});
+
+const [itc04Table5CRows, setItc04Table5CRows] = useState(() => {
+  return [{
+    sl: 1,
+    gstinJobWorker: "",
+    state: "",
+    jobWorkerType: "",
+    challanNumber: "",
+    challanDate: "",
+    goodsType: "",
+    description: "",
+    uqc: "",
+    quantity: "",
+    taxableValue: "",
+    rate: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  }];
+});
+
+
+    const toggleTdsTcsRow = (setter, id) => {
+      setter(prev => prev.map(row => row.id === id ? { ...row, selected: !row.selected } : row));
+    };
+
+    const handleTdsTcsAllAccept = () => {
+      setTdsTcsDownloadRows(prev =>
+        prev.map(row => row.selected ? { ...row, status: "Accepted" } : row)
+      );
+    };
+
+    const handleTdsTcsReject = () => {
+      setTdsTcsDownloadRows(prev =>
+        prev.map(row => row.selected ? { ...row, status: "Rejected" } : row)
+      );
+    };
+
+    const handleTdsTcsDelete = () => {
+      setTdsTcsDownloadRows(prev => prev.filter(row => !row.selected));
+    };
+
+    const handleTdsTcsDownload = () => {
+      toast.success("TDS/TCS records downloaded successfully!");
+    };
+
+    const handleTdsTcsUploadPortal = () => {
+      toast.success("TDS/TCS upload initiated on portal!");
+    };
+
+    const handleTdsTcsSubmit = () => {
+      toast.success("TDS/TCS file submitted successfully!");
+    };
     // Row states with localStorage persistence
     const [b2bRows, setB2bRows] = useState(() => {
       const saved = localStorage.getItem(STORAGE_KEYS.b2b);
@@ -2789,7 +3017,20 @@ const [creditLedger, setCreditLedger] = useState([
     });
     const [b2cOthersRows, setB2cOthersRows] = useState(() => {
       const saved = localStorage.getItem(STORAGE_KEYS.b2cOthers);
-      return saved ? JSON.parse(saved) : [{ sl: 1, type: "E/OF", pos: "", applicableTaxRate: "", rate: 0, taxableValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
+      return saved ? JSON.parse(saved) : [{   sl: 1,
+          exportType: "",
+          invoiceNumber: "",
+          invoiceDate: "",
+          invoiceValue: "",
+          portCode: "",
+          shippingBillNumber: "",
+          shippingBillDate: "",
+          rate: "",
+          taxableValue: "",
+          cgst: "",
+          igst: "",
+          sgst: "",
+          cessAmount: "", }];
     });
     const [nilExemptRows, setNilExemptRows] = useState(() => {
       const saved = localStorage.getItem(STORAGE_KEYS.nilExempt);
@@ -2945,11 +3186,14 @@ const [ecoAmendmentB2bRows, setEcoAmendmentB2bRows] = useState(() => {
     }
   ];
 });
+
 const [ecoAmendmentB2cRows, setEcoAmendmentB2cRows] = useState(() => {
   const saved = localStorage.getItem(STORAGE_KEYS.ecoAmendmentB2c);
   return saved ? JSON.parse(saved) : [
     {
       sl: 1,
+      supplierGstin: "",
+      supplierName: "",
       pos: "",
       rate: 0,
       taxableValue: 0,
@@ -2960,6 +3204,7 @@ const [ecoAmendmentB2cRows, setEcoAmendmentB2cRows] = useState(() => {
     }
   ];
 });
+
 const [ecoAmendmentUrpB2bRows, setEcoAmendmentUrpB2bRows] = useState(() => {
   const saved = localStorage.getItem(STORAGE_KEYS.ecoAmendmentUrpB2b);
   return saved ? JSON.parse(saved) : [
@@ -2975,8 +3220,184 @@ const [ecoAmendmentUrpB2bRows, setEcoAmendmentUrpB2bRows] = useState(() => {
       cess: 0
     }
   ];
+
+  });
+
+
+const [b2baRows, setB2baRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.b2ba);
+
+  return saved
+    ? JSON.parse(saved)
+    : [
+        {
+          sl: 1,
+          gstin: "",
+          receiverName: "",
+          origInvNum: "",
+          origInvDate: "",
+          revInvNum: "",
+          revInvDate: "",
+          invoiceValue: 0,
+          pos: "",
+          rcm: "",
+          applicableTaxRate: "",
+          invoiceType: "",
+          ecomGstin: "",
+          rate: 0,
+          taxableValue: 0,
+          igst: 0,
+          cgst: 0,
+          sgst: 0,
+          cess: 0
+        }
+      ];
 });
 
+const [b2claRows, setB2claRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.b2cla);
+
+  return saved ? JSON.parse(saved) : [
+    {
+      sl: 1,
+      origInvNo: "",
+      origInvDate: "",
+      origPos: "",
+      revInvNo: "",
+      revInvDate: "",
+      invoiceValueB2CLA: "",
+      applicableTaxRateB2CLA: "",
+      rateB2CLA: "",
+      taxableValueB2CLA: "",
+      cgst: 0,
+      igst: 0,
+      sgst: 0,
+      cessAmount: 0,
+      ecoGstin: ""
+    }
+  ];
+});
+
+const [cdnraRows, setCdnraRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.cdnra);
+
+  return saved
+    ? JSON.parse(saved)
+    : [
+        {
+          sl: 1,
+          gstin: "",
+          receiverName: "",
+
+          origNoteNo: "",
+          origNoteDate: "",
+
+          revNoteNo: "",
+          revNoteDate: "",
+
+          noteType: "",
+          pos: "",
+
+          rcm: "",
+
+          noteSupplyType: "",
+
+          noteValue: "",
+
+          applicableTaxRate: "",
+
+          rate: "",
+
+          taxableValue: "",
+
+          cgst: "",
+          igst: "",
+          sgst: "",
+
+          cessAmount: "",
+        },
+      ];
+});
+      
+
+const [cdnuraRows, setCdnuraRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.cdnura);
+
+  return saved
+    ? JSON.parse(saved)
+    : [
+        {
+          sl: 1,
+
+          urType: "",
+
+          origNoteNo: "",
+          origNoteDate: "",
+
+          revNoteNo: "",
+          revNoteDate: "",
+
+          noteType: "",
+
+          pos: "",
+
+          noteValue: "",
+
+          applicableTaxRate: "",
+
+          rate: "",
+
+          taxableValue: "",
+
+          cgst: "",
+          igst: "",
+          sgst: "",
+
+          cessAmount: "",
+        },
+      ];
+});
+
+
+const [ecoUrp2cAmendmentRows, setEcoUrp2cAmendmentRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoUrp2cAmendment);
+
+  return saved
+    ? JSON.parse(saved)
+    : [
+        {
+          sl: 1,
+
+          financialYear: "",
+          originalMonth: "",
+
+          pos: "",
+
+          rate: "",
+
+          taxableValue: "",
+
+          cessAmount: "",
+        },
+      ];
+});
+
+const [amendedTaxLiabilityRows, setAmendedTaxLiabilityRows] = useState(() => {
+  const saved = localStorage.getItem("amendedTaxLiability");
+  return saved ? JSON.parse(saved) : [{
+    sl: 1,
+    financialYear: "",
+    originalMonth: "",
+    originalPlaceOfSupply: "",
+    applicableTaxRate: "",
+    rate: 0,
+    grossAdvanceReceived: 0,
+    igst: 0,
+    cgst: 0,
+    sgst: 0,
+    cessAmount: 0
+  }];
+});
     
     const [summaryTotals, setSummaryTotals] = useState(() => {
       const saved = localStorage.getItem(STORAGE_KEYS.summaryTotals);
@@ -3067,10 +3488,42 @@ const [skipValidation, setSkipValidation] = useState(false);
     // Dropdown controls
     const [openPosDropdownRow, setOpenPosDropdownRow] = useState(null);
     const [openSupplyTypeDropdownRow, setOpenSupplyTypeDropdownRow] = useState(null);
-    const [openNoteTypeDropdownRow, setOpenNoteTypeDropdownRow] = useState(null);
     const [openNatureDropdownRow, setOpenNatureDropdownRow] = useState(null);
     const [openDocumentNatureDropdownRow, setOpenDocumentNatureDropdownRow] = useState(null);
     const [openUrTypeDropdownRow, setOpenUrTypeDropdownRow] = useState(null);
+
+    const [openApplicableTaxDropdownRow, setOpenApplicableTaxDropdownRow] = useState(null);
+    const [openInvoiceTypeDropdownRow, setOpenInvoiceTypeDropdownRow] = useState(null);
+    const [openRateDropdownRow, setOpenRateDropdownRow] = useState(null);
+    const [openTypeDropdownRow, setOpenTypeDropdownRow] = useState(null);
+    const [openRcmDropdownRow, setOpenRcmDropdownRow] = useState(null);
+    const [openUcqDropdownRow, setOpenUcqDropdownRow] = useState(null);
+    const [openNoteTypeDropdownRow, setOpenNoteTypeDropdownRow] = useState(null);
+    const [openDropdown, setOpenDropdown] = useState(null);
+    const monthDropdownRef = useRef(null);
+
+
+
+useEffect(() => {
+
+  const handleClickOutside = (event) => {
+    if (
+      openDropdown &&
+      !event.target.closest(".custom-dropdown-container")
+    ) {
+      setOpenDropdown(null);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+
+}, [openDropdown]);
+    
+
     // Save to localStorage
     useEffect(() => localStorage.setItem(STORAGE_KEYS.b2b, JSON.stringify(b2bRows)), [b2bRows]);
     useEffect(() => localStorage.setItem(STORAGE_KEYS.b2cLarge, JSON.stringify(b2cLargeRows)), [b2cLargeRows]);
@@ -3106,15 +3559,15 @@ const [skipValidation, setSkipValidation] = useState(false);
     const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
     // GSTR-1 sections (normal case)
     const gstr1Sections = [
-      "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
-      "5 - B2C (Large) Invoices",
-      "6A - Exports Invoices",
-      "7 - B2C (Others)",
-      "8A, 8B, 8C, 8D - Nil Rated Supplies",
-      "9B - Credit / Debit Notes (Registered)",
-      "9B - Credit / Debit Notes (Unregistered)",
-      "11A(1), 11A(2) - Tax Liability (Advances Received)",
-      "11B - Adjustment of Advances",
+      "1 - 4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices",
+      "2 - B2C (Large) Invoices",
+      "3 - Exports Invoices",
+      "4 - B2C (Others)",
+      "5 - 8B, 8C, 8D - Nil Rated Supplies",
+      "6 - 9B  Credit / Debit Notes (Registered)",
+      "7 - 9B  Credit / Debit Notes (Unregistered)",
+      "8 - 11A(1), 11A(2) - Tax Liability (Advances Received)",
+      "9 - 11B Adjustment of Advances",
       "12 - HSN-wise summary of outward supplies",
       "13 - Documents Issued",
       "14 - Supplies made through ECO",
@@ -3124,10 +3577,16 @@ const [skipValidation, setSkipValidation] = useState(false);
       "18 - ECO B2B",
       "19 - ECO URP B2B",
       "20 - ECO B2C",
-      "21- ECO URP B2C",
-      "22- ECO Amendment B2B",
-      "23 - ECO Amendment B2C ", 
-      "24 - ECO Amendment URP B2B"
+      "21 - ECO URP B2C",
+      "22 - ECO Amendment B2B",
+      "23 - ECO Amendment B2C", 
+      "24 - ECO Amendment URP B2B",
+      "25 - B2BA",
+      "26 - B2CLA",
+      "27 - CDNRA",
+      "28 - CDNURA",
+      "29 - ECO URP2C Amendment",
+      "30 - Amended Tax Liability"
     ];
     // GSTR-3B ke 6 options
     const gstr3bSections = [
@@ -3140,13 +3599,112 @@ const [skipValidation, setSkipValidation] = useState(false);
       "Payment of tax "
     ];
     
-    // Yeh logic decide karega ki GSTR-3B ke 6 options dikhane hain ya GSTR-1 ke
-    const currentSections = title.toUpperCase().includes("3B") ? gstr3bSections : gstr1Sections;
-    const canSelect = selectedYear && selectedMonth;
-    const isGSTR3B = title.toUpperCase().includes("3B");
+  const isGSTR3B = title.toUpperCase().includes("3B");
+const isTDSTCS = title.toUpperCase().includes("TDS/TCS");
+const isITC04 = title.toUpperCase().includes("ITC-04");
+const isDownloadCenter = title.toUpperCase().includes("DOWNLOAD CENTER");
+
+const tdsTcsSections = ["Download", "Upload", "TDS/TCS Filing"];
+
+
+
+
+const itc04Sections = ["Table 4", "Table 5(A)", "Table 5(B)", "Table 5(C)"];
+
+const stateOptions = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Delhi",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Tamil Nadu",
+  "Telangana",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal"
+];
+
+const currentSections = isGSTR3B
+  ? gstr3bSections
+  : isITC04
+    ? itc04Sections
+    : gstr1Sections;
+
+const canSelect = isITC04
+  ? selectedYear && selectedMonth && selectedState
+  : selectedYear && selectedMonth;
+
+
+const toggleDownloadMonth = (month) => {
+  setSelectedDownloadMonths((prev) =>
+    prev.includes(month)
+      ? prev.filter((m) => m !== month)
+      : [...prev, month]
+  );
+};
+
+const toggleDownloadOption = (option) => {
+  setSelectedDownloadOptions((prev) =>
+    prev.includes(option)
+      ? prev.filter((item) => item !== option)
+      : [...prev, option]
+  );
+};
+
+const handleDownloadCenterSelectAll = () => {
+  if (downloadCenterSelectAll) {
+    setSelectedDownloadOptions([]);
+  } else {
+    setSelectedDownloadOptions(downloadCenterOptions);
+  }
+  setDownloadCenterSelectAll(!downloadCenterSelectAll);
+};
+
+const handleDownloadCenterCancel = () => {
+  setDownloadCenterYear("");
+  setSelectedDownloadMonths([]);
+  setSelectedDownloadOptions([]);
+  setDownloadCenterSelectAll(false);
+  setDownloadCenterMonthDropdownOpen(false);
+};
+
+const handleDownloadCenterDownload = () => {
+  toast.success("Download Center request submitted successfully!");
+};
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      monthDropdownRef.current &&
+      !monthDropdownRef.current.contains(event.target)
+    ) {
+      setDownloadCenterMonthDropdownOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
+
 
     const tableColumns = {
-      "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": [
+      "1 - 4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": [
         { key: "gstin", label: "GSTIN", align: "left" },
         { key: "recipientName", label: "Recipient Name", align: "left" },
         { key: "invNo", label: "Inv. No.", align: "left" },
@@ -3164,7 +3722,57 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "sgst", label: "SGST", align: "right", type: "number" },
         { key: "cess", label: "CESS", align: "right", type: "number" }
       ],
-      "5 - B2C (Large) Invoices": [
+
+      
+      "2 - B2C (Large) Invoices": [
+        { key: "invNo", label: "Inv. No.", align: "left" },
+        { key: "invValue", label: "Inv. Value", align: "right", type: "number" },
+        { key: "pos", label: "POS", align: "center" },
+        { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
+        { key: "gstRate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "CESS", align: "right", type:   "number"}
+      ],
+
+
+      "3 - Exports Invoices": [
+
+  { key: "exportType", label: "Export Type", align: "center" },
+
+  { key: "invoiceNumber", label: "Invoice Number", align: "left" },
+
+  { key: "invoiceDate", label: "Invoice Date", align: "center" },
+
+  { key: "invoiceValue", label: "Invoice Value", align: "right", type: "number" },
+
+  { key: "portCode", label: "Port Code", align: "center" },
+
+  { key: "shippingBillNumber", label: "Shipping Bill Number", align: "left" },
+
+  { key: "shippingBillDate", label: "Shipping Bill Date", align: "center" },
+
+  { key: "rate", label: "Rate", align: "right" },
+
+  { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+
+  { key: "cessAmount", label: "Cess Amount", align: "right", type: "number" }
+
+],
+
+                  
+  
+  
+
+      "5 - 8B, 8C, 8D - Nil Rated Supplies": [
         { key: "invNo", label: "Inv. No.", align: "left" },
         { key: "invDate", label: "Inv. Date", align: "center" },
         { key: "invValue", label: "Inv. Value", align: "right", type: "number" },
@@ -3177,7 +3785,8 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "sgst", label: "SGST", align: "right", type: "number" },
         { key: "cess", label: "CESS", align: "right", type: "number" }
       ],
-      "7 - B2C (Others)": [
+     
+      "4 - B2C (Others)": [
         { key: "type", label: "Type", align: "center" },
         { key: "pos", label: "POS", align: "center" },
         { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
@@ -3189,13 +3798,16 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "cess", label: "Cess", align: "right", type: "number" },
         { key: "total", label: "Total", align: "right", type: "number" }
       ],
-      "8A, 8B, 8C, 8D - Nil Rated Supplies": [
+       
+      "5 - 8B, 8C, 8D - Nil Rated Supplies":[
         { key: "description", label: "Description", align: "left" },
         { key: "nilRated", label: "Nil Rated", align: "right", type: "number" },
         { key: "exempted", label: "Exempted", align: "right", type: "number" },
         { key: "nonGst", label: "Non-GST", align: "right", type: "number" }
       ],
-      "9B - Credit / Debit Notes (Registered)": [
+
+       
+      "6 - 9B  Credit / Debit Notes (Registered)": [
         { key: "gstin", label: "GSTIN of Recipient", align: "left" },
         { key: "recipientName", label: "Recipient Name", align: "left" },
         { key: "noteNo", label: "Note No", align: "left" },
@@ -3205,7 +3817,7 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "rcm", label: "RCM", align: "center" },
         { key: "noteSupplyType", label: "Note Supply Type", align: "left" },
         { key: "noteValue", label: "Note Value", align: "right", type: "number" },
-        { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+        { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
         { key: "rate", label: "Rate", align: "right", type: "number" },
         { key: "taxable", label: "Taxable", align: "right", type: "number" },
         { key: "igst", label: "IGST", align: "right", type: "number" },
@@ -3214,7 +3826,9 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "cess", label: "Cess", align: "right", type: "number" },
         { key: "total", label: "Total", align: "right", type: "number" }
       ],
-      "9B - Credit / Debit Notes (Unregistered)": [
+
+       
+      "7 - 9B  Credit / Debit Notes (Unregistered)": [
         { key: "urType", label: "UR Type", align: "center" },
         { key: "noteNo", label: "Note No", align: "left" },
         { key: "noteDate", label: "Note Date", align: "center" },
@@ -3223,7 +3837,7 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "rcm", label: "RCM", align: "center" },
         { key: "noteSupplyType", label: "Note Supply Type", align: "left" },
         { key: "noteValue", label: "Note Value", align: "right", type: "number" },
-        { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+        { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
         { key: "rate", label: "Rate", align: "right", type: "number" },
         { key: "taxable", label: "Taxable", align: "right", type: "number" },
         { key: "igst", label: "IGST", align: "right", type: "number" },
@@ -3232,9 +3846,10 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "cess", label: "Cess", align: "right", type: "number" },
         { key: "total", label: "Total", align: "right", type: "number" }
       ],
-      "11A(1), 11A(2) - Tax Liability (Advances Received)": [
+      
+      "8 - 11A(1), 11A(2) - Tax Liability (Advances Received)": [
         { key: "pos", label: "POS", align: "center" },
-        { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+        { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
         { key: "rate", label: "Rate", align: "right", type: "number" },
         { key: "grossAdvance", label: "Gross Advance Received", align: "right", type: "number" },
         { key: "taxable", label: "Taxable", align: "right", type: "number" },
@@ -3244,9 +3859,10 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "cess", label: "Cess", align: "right", type: "number" },
         { key: "total", label: "Total", align: "right", type: "number" }
       ],
-      "11B - Adjustment of Advances": [
+      
+      "9 - 11B Adjustment of Advances": [
         { key: "pos", label: "POS", align: "center" },
-        { key: "diffRatePercent", label: "% Diff. Rate", align: "center" },
+        { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
         { key: "rate", label: "Rate", align: "right", type: "number" },
         { key: "grossAdvance", label: "Gross Advance Received", align: "right", type: "number" },
         { key: "taxable", label: "Taxable", align: "right", type: "number" },
@@ -3277,7 +3893,7 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "cancelled", label: "Cancelled", align: "right", type: "number" }
       ],
       "14 - Supplies made through ECO": [
-        { key: "nature", label: "Nature of Supply", align: "left" },
+        { key: "nature", label: "Supply", align: "left" },
         { key: "gstinEco", label: "GSTIN of ECO", align: "left" },
         { key: "nameEco", label: "Name of ECO", align: "left" },
         { key: "netValue", label: "Net Value of Supply", align: "right", type: "number" },
@@ -3287,6 +3903,19 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "cess", label: "Cess", align: "right", type: "number" },
         { key: "total", label: "Total", align: "right", type: "number" }
       ],
+
+      "15 - Supplies U/s 9(5)": [
+          { key: "nature", label: "Nature of Supply", align: "left" },      
+          { key: "gstinEco", label: "GSTIN of ECO", align: "left" },
+          { key: "nameEco", label: "Name of ECO", align: "left" },
+          { key: "netValue", label: "Net Value of Supply", align: "right", type: "number" },
+          { key: "igst", label: "IGST", align: "right", type: "number" },
+          { key: "cgst", label: "CGST", align: "right", type: "number" },
+          { key: "sgst", label: "SGST", align: "right", type: "number" },       
+          { key: "cess", label: "Cess", align: "right", type: "number" },
+          { key: "total", label: "Total", align: "right", type:"number" }    
+      ],
+
       "16 - B2B Amendment": [
         { key: "gstin", label: "GSTIN", align: "left" },
         { key: "invoiceNo", label: "Invoice No", align: "left" },
@@ -3360,11 +3989,18 @@ const [skipValidation, setSkipValidation] = useState(false);
       ],
 
       "22 - ECO Amendment B2B": [
-        { key: "gstin", label: "GSTIN", align: "left" },
-        { key: "invoiceNo", label: "Invoice No", align: "left" },
-        { key: "invoiceDate", label: "Invoice Date", align: "left" },
-        { key: "invoiceValue", label: "Invoice Value", align: "right", type: "number" },
+        { key: "Supplier gstin", label: "GSTIN", align: "left" },
+        {key: "supplierName", label: "Supplier Name", align: "left" },
+        {key: "recipientGstin", label: "Recipient GSTIN", align: "left" },
+        {key: "recipientName", label: "Recipient Name", align: "left" },
+        {key: "Document number", label: "Document Number", align: "center" },
+        {key:"Document date", label: "Document Date", align: "center" },
+        // { key: "invoiceNo", label: "Invoice No", align: "left" },
+        // { key: "invoiceDate", label: "Invoice Date", align: "left" },
+        { key: "SuppliesValue Made", label: "Supplies Made", align: "right", type: "number" },
+
         { key: "pos", label: "POS", align: "center" },
+        {key:"Invoice type", label: "Invoice Type", align: "center" },
         { key: "rate", label: "Rate", align: "right", type: "number" },
         { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
         { key: "igst", label: "IGST", align: "right", type: "number" },
@@ -3374,13 +4010,16 @@ const [skipValidation, setSkipValidation] = useState(false);
       ],
 
       "23 - ECO Amendment B2C": [
+        { key: "suppliesGstin", label: "Supplies GSTIN", align: "right" },
+        { key: "suppliesName", label: "Supplies Name", align: "left" },
         { key: "pos", label: "POS", align: "center" },
         { key: "rate", label: "Rate", align: "right", type: "number" },
         { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
         { key: "igst", label: "IGST", align: "right", type: "number" },
         { key: "cgst", label: "CGST", align: "right", type: "number" },
         { key: "sgst", label: "SGST", align: "right", type: "number" },
-        { key: "cess", label: "CESS", align: "right", type: "number" }
+        { key: "cess", label: "CESS", align: "right", type: "number" },
+        {key: "total", label: "Total", align: "right", type: "number" }
       ],
 
       "24 - ECO Amendment URP B2B": [
@@ -3392,31 +4031,273 @@ const [skipValidation, setSkipValidation] = useState(false);
         { key: "cgst", label: "CGST", align: "right", type: "number" },
         { key: "sgst", label: "SGST", align: "right", type: "number" },
         { key: "cess", label: "CESS", align: "right", type: "number" }
-      ]            
-    };
-    const currentColumns = tableColumns[selectedSection] || [];
-    const getRowsAndSetter = () => {
+      ],
+      
+      "25 - B2BA": [
+        { key: "gstin", label: "GSTIN/UIN of Recipient", align: "left" },
+        { key: "receiverName", label: "Receiver Name", align: "left" },
+        { key: "original number", label: "Original Number", align: "center" },
+        { key: "origInvDate", label: "Original  date", align: "center" },
+        { key: "revInvNum", label: "Revised  Number", align: "center" },
+        { key: "revInvDate", label: "Revised  date", align: "center" },
+        { key: "Value", label: "values", align: "right", type: "number" },
+
+        { key: "pos", label: "POS", align: "center" },
+        { key: "rcm", label: "RCM", align: "center" },
+        { key: "applicableTaxRate", label: "App. % of Tax Rate", align: "center" },
+
+        // ← Yeh dono ab bilkul baki sections jaisa hai (dropdown kaam karega)
+        { key: "invType", label: "Inv. Type", align: "center" },
+        { key: "ecoGstin", label: "ECO GSTIN", align: "center" },
+
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+        { key: "cess", label: "Cess", align: "right", type: "number" }
+      ],
+
+      "26 - B2CLA": [
+
+        { key: "origInvNo", label: "Original Invoice Number", align: "left" },
+        { key: "origInvDate", label: "Original Invoice Date", align: "center" },
+
+        { key: "origPos", label: "POS", align: "center" },
+
+        { key: "revInvNo", label: "Revised Invoice Number", align: "left" },
+        { key: "revInvDate", label: "Revised Invoice Date", align: "center" },
+
+        { key: "invoiceValueB2CLA", label: "Invoice Value", align: "right", type: "number" },
+
+        { key: "applicableTaxRateB2CLA", label: "Applicable % of Tax Rate", align: "center" },
+
+        { key: "rateB2CLA", label: "Rate", align: "right", type: "number" },
+
+        { key: "taxableValueB2CLA", label: "Taxable Value", align: "right", type: "number" },
+
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+
+        { key: "cessAmount", label: "Cess Amount", align: "right", type: "number" },
+
+        { key: "ecoGstin", label: "E-Commerce GSTIN", align: "left" }
+
+      ],
+
+      "27 - CDNRA": [
+
+        { key: "gstin", label: "GSTIN/UIN of Recipient", align: "left" },
+        { key: "receiverName", label: "Receiver Name", align: "left" },
+
+        { key: "origNoteNo", label: "Original Note Number", align: "left" },
+        { key: "origNoteDate", label: "Original Note Date", align: "center" },
+
+        { key: "revNoteNo", label: "Revised Note Number", align: "left" },
+        { key: "revNoteDate", label: "Revised Note Date", align: "center" },
+
+        { key: "noteType", label: "Note Type", align: "center" },
+        { key: "pos", label: "Place Of Supply", align: "center" },
+
+        { key: "rcm", label: "Reverse Charge", align: "center" },
+
+        { key: "noteSupplyType", label: "Note Supply Type", align: "center" },
+
+        { key: "noteValue", label: "Note Value", align: "right", type: "number" },
+
+        { key: "applicableTaxRate", label: "Applicable % of Tax Rate", align: "center" },
+
+        { key: "rate", label: "Rate", align: "right", type: "number" },
+
+        { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+
+        { key: "cgst", label: "CGST", align: "right", type: "number" },
+        { key: "igst", label: "IGST", align: "right", type: "number" },
+        { key: "sgst", label: "SGST", align: "right", type: "number" },
+
+        { key: "cessAmount", label: "Cess Amount", align: "right", type: "number" }
+
+],
+
+        "28 - CDNURA": [
+
+          { key: "urType", label: "UR Type", align: "center" },
+
+          { key: "origNoteNo", label: "Original Note Number", align: "left" },
+          { key: "origNoteDate", label: "Original Note Date", align: "center" },
+
+          { key: "revNoteNo", label: "Revised Note Number", align: "left" },
+          { key: "revNoteDate", label: "Revised Note Date", align: "center" },
+
+          { key: "noteType", label: "Note Type", align: "center" },
+
+          { key: "pos", label: "Place Of Supply", align: "center" },
+
+          { key: "noteValue", label: "Note Value", align: "right", type: "number" },
+
+          { key: "applicableTaxRate", label: "Applicable % of Tax Rate", align: "center" },
+
+          { key: "rate", label: "Rate", align: "right", type: "number" },
+
+          { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+
+          { key: "cgst", label: "CGST", align: "right", type: "number" },
+          { key: "igst", label: "IGST", align: "right", type: "number" },
+          { key: "sgst", label: "SGST", align: "right", type: "number" },
+
+          { key: "cessAmount", label: "Cess Amount", align: "right", type: "number" }
+
+        ],
+
+        "29 - ECO URP2C Amendment": [
+
+          { key: "financialYear", label: "Financial Year", align: "center" },
+
+          { key: "originalMonth", label: "Original Month", align: "center" },
+
+          { key: "pos", label: "Place Of Supply", align: "center" },
+
+          { key: "rate", label: "Rate", align: "right", type: "number" },
+
+          { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+
+          { key: "cessAmount", label: "Cess Amount", align: "right", type: "number" }
+
+], 
+
+"30 - Amended Tax Liability": [
+  { key: "financialYear", label: "Financial Year", align: "center" },
+  { key: "originalMonth", label: "Original Month", align: "center" },
+  { key: "originalPlaceOfSupply", label: "Original Place Of Supply", align: "center" },
+  { key: "applicableTaxRate", label: "Applicable % of Tax Rate", align: "right" },
+  { key: "rate", label: "Rate", align: "right" },
+  { key: "grossAdvanceReceived", label: "Gross Advance Received", align: "right", type: "number" },
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+  { key: "cessAmount", label: "Cess Amount", align: "right", type: "number" }
+],
+"Table 4": [
+  { key: "gstinJobWorker", label: "GSTIN of Job Worker", align: "left" },
+  { key: "state", label: "State (in case of Unregistered)", align: "left" },
+  { key: "jobWorkerType", label: "Job Worker's Type", align: "center" },
+  { key: "challanNumber", label: "Challan Number", align: "left" },
+  { key: "challanDate", label: "Challan Date", align: "center" },
+  { key: "goodsType", label: "Type of Goods", align: "center" },
+  { key: "description", label: "Description of Goods", align: "left" },
+  { key: "uqc", label: "Unique Quantity Code (UQC)", align: "center" },
+  { key: "quantity", label: "Quantity", align: "right", type: "number" },
+  { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+  { key: "rate", label: "Rate", align: "right", type: "number" },
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+  { key: "cess", label: "CESS", align: "right", type: "number" }
+],
+
+"Table 5(A)": [
+  { key: "gstinJobWorker", label: "GSTIN of Job Worker", align: "left" },
+  { key: "state", label: "State (in case of Unregistered)", align: "left" },
+  { key: "jobWorkerType", label: "Job Worker's Type", align: "center" },
+  { key: "challanNumber", label: "Challan Number", align: "left" },
+  { key: "challanDate", label: "Challan Date", align: "center" },
+  { key: "goodsType", label: "Type of Goods", align: "center" },
+  { key: "description", label: "Description of Goods", align: "left" },
+  { key: "uqc", label: "Unique Quantity Code (UQC)", align: "center" },
+  { key: "quantity", label: "Quantity", align: "right", type: "number" },
+  { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+  { key: "rate", label: "Rate", align: "right", type: "number" },
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+  { key: "cess", label: "CESS", align: "right", type: "number" }
+],
+
+"Table 5(B)": [
+  { key: "gstinJobWorker", label: "GSTIN of Job Worker", align: "left" },
+  { key: "state", label: "State (in case of Unregistered)", align: "left" },
+  { key: "jobWorkerType", label: "Job Worker's Type", align: "center" },
+  { key: "challanNumber", label: "Challan Number", align: "left" },
+  { key: "challanDate", label: "Challan Date", align: "center" },
+  { key: "goodsType", label: "Type of Goods", align: "center" },
+  { key: "description", label: "Description of Goods", align: "left" },
+  { key: "uqc", label: "Unique Quantity Code (UQC)", align: "center" },
+  { key: "quantity", label: "Quantity", align: "right", type: "number" },
+  { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+  { key: "rate", label: "Rate", align: "right", type: "number" },
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+  { key: "cess", label: "CESS", align: "right", type: "number" }
+],
+
+"Table 5(C)": [
+  { key: "gstinJobWorker", label: "GSTIN of Job Worker", align: "left" },
+  { key: "state", label: "State (in case of Unregistered)", align: "left" },
+  { key: "jobWorkerType", label: "Job Worker's Type", align: "center" },
+  { key: "challanNumber", label: "Challan Number", align: "left" },
+  { key: "challanDate", label: "Challan Date", align: "center" },
+  { key: "goodsType", label: "Type of Goods", align: "center" },
+  { key: "description", label: "Description of Goods", align: "left" },
+  { key: "uqc", label: "Unique Quantity Code (UQC)", align: "center" },
+  { key: "quantity", label: "Quantity", align: "right", type: "number" },
+  { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+  { key: "rate", label: "Rate", align: "right", type: "number" },
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+  { key: "cess", label: "CESS", align: "right", type: "number" }
+],
+
+};
+
+
+   const currentColumns = tableColumns[isITC04 ? selectedItcTable : selectedSection] || [];
+   const getRowsAndSetter = () => {
+  if (isITC04) {
+    switch (selectedItcTable) {
+      case "Table 4":
+        return [itc04Table4Rows, setItc04Table4Rows];
+      case "Table 5(A)":
+        return [itc04Table5ARows, setItc04Table5ARows];
+      case "Table 5(B)":
+        return [itc04Table5BRows, setItc04Table5BRows];
+      case "Table 5(C)":
+        return [itc04Table5CRows, setItc04Table5CRows];
+      default:
+        return [[], () => {}];
+    }
+  } 
       switch (selectedSection) {
-        case "4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": return [b2bRows, setB2bRows];
-        case "5 - B2C (Large) Invoices": return [b2cLargeRows, setB2cLargeRows];
-        case "7 - B2C (Others)": return [b2cOthersRows, setB2cOthersRows];
-        case "8A, 8B, 8C, 8D - Nil Rated Supplies": return [nilExemptRows, setNilExemptRows];
-        case "9B - Credit / Debit Notes (Registered)": return [creditDebitRegisteredRows, setCreditDebitRegisteredRows];
-        case "9B - Credit / Debit Notes (Unregistered)": return [creditDebitUnregisteredRows, setCreditDebitUnregisteredRows];
-        case "11A(1), 11A(2) - Tax Liability (Advances Received)": return [advanceLiabilityRows, setAdvanceLiabilityRows];
-        case "11B - Adjustment of Advances": return [advanceAdjustmentRows, setAdvanceAdjustmentRows];
+        case "1 - 4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": return [b2bRows, setB2bRows];
+        case "2 - B2C (Large) Invoices": return [b2cLargeRows, setB2cLargeRows];
+        case "3 - Exports Invoices": return [b2cOthersRows, setB2cOthersRows];
+        case "4 - B2C (Others)": return [nilExemptRows, setNilExemptRows];
+        case "5 - 8B, 8C, 8D - Nil Rated Supplies": return [nilExemptRows, setNilExemptRows];
+        case "6 - 9B  Credit / Debit Notes (Registered)": return [creditDebitRegisteredRows, setCreditDebitRegisteredRows];
+        case "7 - 9B  Credit / Debit Notes (Unregistered)": return [creditDebitUnregisteredRows, setCreditDebitUnregisteredRows];
+        case "8 - 11A(1), 11A(2) - Tax Liability (Advances Received)": return [advanceLiabilityRows, setAdvanceLiabilityRows];
+        case "9 - 11B Adjustment of Advances": return [advanceAdjustmentRows, setAdvanceAdjustmentRows];
         case "12 - HSN-wise summary of outward supplies": return [hsnRows, setHsnRows];
         case "13 - Documents Issued": return [documentsRows, setDocumentsRows];
         case "14 - Supplies made through ECO": return [ecoRows, setEcoRows];
+        case "15 - Supplies U/s 9(5)": return [outwardSupplies, setOutwardSupplies];
         case "16 - B2B Amendment": return [b2bAmendmentRows, setB2bAmendmentRows];
         case "17 - Export Amendment": return [exportAmendmentRows, setExportAmendmentRows];
         case "18 - ECO B2B": return [ecoB2bRows, setEcoB2bRows];
         case "19 - ECO URP B2B": return [ecoUrpB2bRows, setEcoUrpB2bRows];
         case "20 - ECO B2C": return [ecoB2cRows, setEcoB2cRows];
-        case "21- ECO URP B2C": return [ecoUrpB2cRows, setEcoUrpB2cRows];
-        case "22- ECO Amendment B2B": return [ecoAmendmentB2bRows, setEcoAmendmentB2bRows];
-        case "23 - ECO Amendment B2C ": return [ecoAmendmentB2cRows, setEcoAmendmentB2cRows];
+        case "21 - ECO URP B2C": return [ecoUrpB2cRows, setEcoUrpB2cRows];
+        case "22 - ECO Amendment B2B": return [ecoAmendmentB2bRows, setEcoAmendmentB2bRows];
+        case "23 - ECO Amendment B2C": return [ecoAmendmentB2cRows, setEcoAmendmentB2cRows];
         case "24 - ECO Amendment URP B2B": return [ecoAmendmentUrpB2bRows, setEcoAmendmentUrpB2bRows];
+        case "25 - B2BA": return [b2baRows, setB2baRows];
+        case "26 - B2CLA": return [b2claRows, setB2claRows];
+        case "27 - CDNRA": return [cdnraRows, setCdnraRows];
+        case "28 - CDNURA": return [cdnuraRows, setCdnuraRows];
+        case "29 - ECO URP2C Amendment":return [ecoUrp2cAmendmentRows, setEcoUrp2cAmendmentRows];
+        case "30 - Amended Tax Liability": return [amendedTaxLiabilityRows, setAmendedTaxLiabilityRows];
         default: return [[], () => {}];
       }
     };
@@ -3583,10 +4464,10 @@ const [skipValidation, setSkipValidation] = useState(false);
       setActiveSubTab("Manually");
     };
     return (
-      <div style={{ padding: "20px", background: "#f8fafc", minHeight: "100vh" }}>
-        <div style={{ background: "white", borderRadius: "16px", boxShadow: "0 10px 40px rgba(0,0,0,0.06)", overflow: "hidden" }}>
+      <div style={{ padding: "12px", background: "#f8fafc", minHeight: "100vh" }}>
+        <div style={{ background: "white", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)", overflow: "hidden" }}>
           {/* Header */}
-          <div style={{ padding: "28px 36px", borderBottom: "1px solid #e2e8f0" }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0" }}>
             <div style={{
               display: "flex",
               justifyContent: "space-between",
@@ -3594,45 +4475,103 @@ const [skipValidation, setSkipValidation] = useState(false);
               flexWrap: "wrap",
               gap: "24px"
             }}>
-              <h1 style={{ margin: 0, fontSize: "2.2rem", fontWeight: 800, color: "#7c3aed" }}>
+              <h1 style={{ margin: 0, 
+    fontSize: "1.5rem",           // ← yahan title chhota kiya
+    fontWeight: 700, 
+    color: "#7c3aed",
+    textShadow: "0 1px 2px rgba(124, 58, 237, 0.1)" }}>
                 {title}
               </h1>
               {/* Financial Year + Month → title ke right side pe sabke liye */}
-              {activeSubTab === "Manually" && (
-                <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-                  <div style={{ width: 160 }}>
-                    <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Financial Year</label>
-                    <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
-                      {years.map(y => <option key={y}>{y}</option>)}
-                    </select>
-                  </div>
-                  <div style={{ width: 160 }}>
-                    <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Month</label>
-                    <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
-                      <option value="">Select</option>
-                      {months.map(m => <option key={m}>{m}</option>)}
-                    </select>
-                  </div>
-                </div>
+              {activeSubTab === "Manually" && !isDownloadCenter && (
+  <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+    <div style={{ width: 120 }}>
+      <label style={{ display: "block", marginBottom: 4, fontWeight: 600, fontSize: "0.85rem" }}>
+        Financial Year
+      </label>
+      <select
+        value={selectedYear}
+        onChange={e => {
+          setSelectedYear(e.target.value);
+          setSelectedSection("");
+          setSelectedItcTable("");
+          setSelectedTdsTcsSection("");
+        }}
+        style={{
+          width: "100%",
+          padding: "6px",
+          borderRadius: 4,
+          border: "1px solid #c7d2fe",
+          fontSize: "0.85rem"
+        }}
+      >
+        {years.map(y => <option key={y}>{y}</option>)}
+      </select>
+    </div>
+
+    {!isTDSTCS && (
+      <div style={{ width: 120 }}>
+        <label style={{ display: "block", marginBottom: 4, fontWeight: 600, fontSize: "0.85rem" }}>
+          Month
+        </label>
+        <select
+          value={selectedMonth}
+          onChange={e => {
+            setSelectedMonth(e.target.value);
+            setSelectedSection("");
+            setSelectedItcTable("");
+          }}
+          style={{
+            width: "100%",
+            padding: "6px",
+            borderRadius: 4,
+            border: "1px solid #c7d2fe",
+            fontSize: "0.85rem"
+          }}
+        >
+          <option value="">Select</option>
+          {months.map(m => <option key={m}>{m}</option>)}
+        </select>
+      </div>
+    )}
+ 
+    {isITC04 && (
+      <div style={{ width: 180 }}>
+        <label style={{ display: "block", marginBottom: 4, fontWeight: 600 , fontSize: "0.85rem" }}>State</label>
+        <select
+          value={selectedState}
+          onChange={e => {
+            setSelectedState(e.target.value);
+            setSelectedItcTable("");
+          }}
+          style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #c7d2fe" , fontSize: "0.85rem" }}
+        >
+          <option value="">Select</option>
+          {stateOptions.map(state => <option key={state} value={state}>{state}</option>)}
+        </select>
+      </div>
+    )}
+  </div>
+
               )}
             </div>
           </div>
           {/* Tabs */}
           <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#fafbff" }}>
-            {["Manually", "Import", "Summary"].map(tab => (
+  {!isTDSTCS && ["Manually", "Import", "Summary"].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveSubTab(tab)}
                 style={{
                   flex: 1,
-                  padding: "16px",
-                  background: activeSubTab === tab ? "white" : "transparent",
-                  color: activeSubTab === tab ? "#4f46e5" : "#64748b",
-                  border: "none",
-                  fontSize: "1.08rem",
-                  fontWeight: activeSubTab === tab ? 700 : 500,
-                  cursor: "pointer",
-                  borderBottom: activeSubTab === tab ? "4px solid #7c3aed" : "none"
+  padding: "10px",                    // ← padding kam
+  background: activeSubTab === tab ? "white" : "transparent",
+  color: "#64748b",
+  border: "none",
+  fontSize: "0.95rem",                // ← font chhota
+  fontWeight: activeSubTab === tab ? 600 : 400,
+  cursor: "pointer",
+  borderBottom: activeSubTab === tab ? "2px solid #7c3aed" : "none"
                 }}
               >
                 {tab}
@@ -4063,15 +5002,15 @@ const [skipValidation, setSkipValidation] = useState(false);
                     key={section}
                     onClick={() => setSelectedSection(section)}
                     style={{
-                      padding: "10px 20px",
+                      padding: "6px 12px",
                       background: selectedSection === section ? "#7c3aed" : "white",
                       color: selectedSection === section ? "white" : "#4f46e5",
                       border: selectedSection === section ? "none" : "1px solid #c7d2fe",
                       borderRadius: "8px",
-                      fontSize: "0.95rem",
+                      fontSize: "0.8  5rem",
                       fontWeight: selectedSection === section ? 600 : 500,
                       cursor: "pointer",
-                      boxShadow: selectedSection === section ? "0 2px 8px rgba(124,58,237,0.2)" : "none",
+                      boxShadow: selectedSection === section ? "0 1px 4px rgba(124,58,237,0.2)" : "none",
                       transition: "all 0.2s"
                     }}
                   >
@@ -4080,15 +5019,46 @@ const [skipValidation, setSkipValidation] = useState(false);
                 ))}
               </div>
             </div>
+            
           )}
+          {isITC04 && canSelect && (
+  <div style={{
+    padding: "16px 0 24px 0",
+    background: "#f8fafc",
+    overflowX: "auto",
+    whiteSpace: "nowrap",
+    marginBottom: "20px"
+  }}>
+    <div style={{ display: "inline-flex", gap: "12px" }}>
+      {itc04Sections.map((section) => (
+        <button
+          key={section}
+          onClick={() => setSelectedItcTable(section)}
+          style={{
+            padding: "6px 14px",
+            background: selectedItcTable === section ? "#e0f2fe" : "white",
+            color: selectedItcTable === section ? "#0f172a" : "#166534",
+            border: selectedItcTable === section ? "1px solid #38bdf8" : "1px solid #86efac",
+            borderRadius: "8px",
+            fontSize: "0.85rem",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          {section}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
 
           {/* GSTR-3B ke alawa sabke liye purana dropdown */}
-          {!isGSTR3B && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginBottom: "40px" }}>
+         {!isGSTR3B && !isTDSTCS && !isDownloadCenter && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "8px" }}>
            
-              <div style={{ flex: 1, minWidth: 400 }}>
-                <label style={{ display: "block", marginBottom: 6, fontWeight: 600 }}>Select sheet</label>
-                <select value={selectedSection} onChange={e => setSelectedSection(e.target.value)} disabled={!canSelect} style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #c7d2fe" }}>
+              <div style={{ flex: 1, minWidth: 300 }}>
+                <label style={{ display: "block", marginBottom: 4, fontWeight: 600 , fontSize: "0.85rem" }}>Select sheet</label>
+                <select value={selectedSection} onChange={e => setSelectedSection(e.target.value)} disabled={!canSelect} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #c7d2fe" , fontSize: "0.85rem"}}>
                   <option value="">{canSelect ? "Choose section..." : "Select period first"}</option>
                   {currentSections.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -4096,15 +5066,54 @@ const [skipValidation, setSkipValidation] = useState(false);
             </div>
           )}
 
+                    {isTDSTCS && selectedYear && (
+            <div style={{
+              padding: "16px 0 24px 0",
+              background: "#f8fafc",
+              overflowX: "auto",
+              whiteSpace: "nowrap",
+              marginBottom: "20px"
+            }}>
+              <div style={{ display: "inline-flex", gap: "12px" }}>
+                {tdsTcsSections.map((section) => (
+                  <button
+                    key={section}
+                    onClick={() => setSelectedTdsTcsSection(section)}
+                    style={{
+                      padding: "8px 18px",
+                      background: selectedTdsTcsSection === section ? "#fef3c7" : "white",
+                      color: "#92400e",
+                      border: selectedTdsTcsSection === section ? "1px solid #f59e0b" : "1px solid #fed7aa",
+                      borderRadius: "8px",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      boxShadow: selectedTdsTcsSection === section ? "0 1px 4px rgba(245,158,11,0.25)" : "none",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    {section}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {selectedSection && isGSTR3B && (
             <>
-              <h2 style={{ margin: "0 0 24px", fontSize: 24, color: "#1e293b" }}>{selectedSection}</h2>
+              <h2 style={{ margin: "8px 0 8px 0", fontSize: "1.25rem", color: "#1e293b" }}>{selectedSection}</h2>
+
               {/* ───────────────────────────────────────────────
                   SECTION 1: Outward Supplies + RCM
               ─────────────────────────────────────────────── */}
               {selectedSection === gstr3bSections[0] && (
-                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 , marginTop:"0px"}}>
+                  <table style={{ 
+  width: "100%", 
+  borderCollapse: "collapse", 
+  fontSize: "13px",           // thoda chhota text
+  border: "1px solid #d1d5db" // outer border
+}}>
                     <thead>
                       <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
                         <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
@@ -4146,7 +5155,12 @@ const [skipValidation, setSkipValidation] = useState(false);
               ─────────────────────────────────────────────── */}
               {selectedSection === gstr3bSections[1] && (
                 <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                  <table style={{ 
+  width: "100%", 
+  borderCollapse: "collapse", 
+  fontSize: "13px",           // thoda chhota text
+  border: "1px solid #d1d5db" // outer border
+}}>
                     <thead>
                       <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
                         <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 380 }}>Nature of Supplies (ECO)</th>
@@ -4180,7 +5194,12 @@ const [skipValidation, setSkipValidation] = useState(false);
               ─────────────────────────────────────────────── */}
               {selectedSection === gstr3bSections[2] && (
                 <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                 <table style={{ 
+  width: "100%", 
+  borderCollapse: "collapse", 
+  fontSize: "13px",           // thoda chhota text
+  border: "1px solid #d1d5db" // outer border
+}}>
                     <thead>
                       <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
                         <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
@@ -4206,7 +5225,12 @@ const [skipValidation, setSkipValidation] = useState(false);
               ─────────────────────────────────────────────── */}
               {selectedSection === gstr3bSections[3] && (
                 <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                  <table style={{ 
+  width: "100%", 
+  borderCollapse: "collapse", 
+  fontSize: "13px",           // thoda chhota text
+  border: "1px solid #d1d5db" // outer border
+}}>
                     <thead>
                       <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
                         <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Details</th>
@@ -4267,7 +5291,12 @@ const [skipValidation, setSkipValidation] = useState(false);
               )}
               {selectedSection === gstr3bSections[4] && (
                 <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                  <table style={{ 
+  width: "100%", 
+  borderCollapse: "collapse", 
+  fontSize: "13px",           // thoda chhota text
+  border: "1px solid #d1d5db" // outer border
+}}>
                     <thead>
                       <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
                         <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
@@ -4293,7 +5322,12 @@ const [skipValidation, setSkipValidation] = useState(false);
               ─────────────────────────────────────────────── */}
               {selectedSection === gstr3bSections[5] && (
                 <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                  <table style={{ 
+  width: "100%", 
+  borderCollapse: "collapse", 
+  fontSize: "13px",           // thoda chhota text
+  border: "1px solid #d1d5db" // outer border
+}}>
                     <thead>
                       <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
                         <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Description</th>
@@ -4342,7 +5376,12 @@ const [skipValidation, setSkipValidation] = useState(false);
         Cash Ledger Balance
       </div>
 
-      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+     <table style={{ 
+  width: "100%", 
+  borderCollapse: "collapse", 
+  fontSize: "13px",           // thoda chhota text
+  border: "1px solid #d1d5db" // outer border
+}}>
         <thead>
           <tr style={{ background: "#e0f2fe" }}>
             <th style={{ padding: 12, border: "1px solid #d1d5db" }}>Description</th>
@@ -4401,7 +5440,12 @@ const [skipValidation, setSkipValidation] = useState(false);
         Credit Ledger Balance
       </div>
 
-      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+      <table style={{ 
+  width: "100%", 
+  borderCollapse: "collapse", 
+  fontSize: "13px",           // thoda chhota text
+  border: "1px solid #d1d5db" // outer border
+}}>
         <thead>
           <tr style={{ background: "#dcfce7" }}>
             <th style={{ padding: 12, border: "1px solid #d1d5db" }}>IGST</th>
@@ -4448,463 +5492,986 @@ const [skipValidation, setSkipValidation] = useState(false);
   </div>
 )}
 
+{isDownloadCenter && (
+  <div style={{ padding: "8px 0 24px 0" }}>
+    <div
+      style={{
+        maxWidth: "900px",
+        margin: "0 auto",
+        background: "#ffffff",
+        border: "1px solid #dbe2ea",
+        borderRadius: "16px",
+        padding: "28px",
+        boxShadow: "0 6px 20px rgba(15, 23, 42, 0.06)"
+      }}
+    >
+      <div style={{ marginBottom: "22px" }}>
+        <h2 style={{ margin: 0, fontSize: "1.9rem", fontWeight: 800, color: "#5b3df5" }}>
+          Download Center
+        </h2>
+      </div>
+
+      <div
+  style={{
+    display: "flex",
+    gap: "18px",
+    flexWrap: "wrap",
+    alignItems: "flex-end",
+    overflow: "visible"
+  }}
+>
+        <div style={{ minWidth: "220px", flex: 1 }}>
+          <label style={{ display: "block", marginBottom: "8px", fontWeight: 700, color: "#1f2937" }}>
+            Year
+          </label>
+          <select
+            value={downloadCenterYear}
+            onChange={(e) => {
+              setDownloadCenterYear(e.target.value);
+              setSelectedDownloadMonths([]);
+              setSelectedDownloadOptions([]);
+              setDownloadCenterSelectAll(false);
+            }}
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "10px",
+              fontSize: "1rem",
+              background: "#fff"
+            }}
+          >
+            <option value="">Select</option>
+            {downloadCenterYears.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+
+     <div
+  ref={monthDropdownRef}
+  style={{
+    minWidth: "280px",
+    flex: 1,
+    position: "relative",
+    zIndex: 20
+  }}
+>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "8px",
+      fontWeight: 700,
+      color: "#1f2937"
+    }}
+  >
+    Month
+  </label>
+
+  <button
+    type="button"
+    onClick={() => setDownloadCenterMonthDropdownOpen(prev => !prev)}
+    style={{
+      width: "100%",
+      minHeight: "48px",
+      padding: "12px 14px",
+      border: "1px solid #cbd5e1",
+      borderRadius: "10px",
+      fontSize: "1rem",
+      background: "#fff",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      textAlign: "left",
+      boxSizing: "border-box"
+    }}
+  >
+    <span
+      style={{
+        color: selectedDownloadMonths.length ? "#111827" : "#9ca3af",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        paddingRight: "10px"
+      }}
+    >
+      {selectedDownloadMonths.length
+        ? selectedDownloadMonths.join(", ")
+        : "Select Month"}
+    </span>
+    <span
+      style={{
+        fontSize: "12px",
+        flexShrink: 0,
+        transform: downloadCenterMonthDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 0.2s ease"
+      }}
+    >
+      ▼
+    </span>
+  </button>
+
+  {downloadCenterMonthDropdownOpen && (
+    <div
+      style={{
+        position: "absolute",
+        top: "calc(100% + 8px)",
+        left: 0,
+        right: 0,
+        width: "100%",
+        maxHeight: "260px",
+        overflowY: "auto",
+        border: "1px solid #cbd5e1",
+        borderRadius: "12px",
+        background: "#ffffff",
+        zIndex: 9999,
+        boxShadow: "0 12px 30px rgba(15, 23, 42, 0.16)",
+        boxSizing: "border-box"
+      }}
+    >
+      <div
+        style={{
+          padding: "10px 14px",
+          fontWeight: 700,
+          fontSize: "0.95rem",
+          color: "#334155",
+          borderBottom: "1px solid #e2e8f0",
+          background: "#f8fafc",
+          position: "sticky",
+          top: 0
+        }}
+      >
+        Select Month
+      </div>
+
+      {downloadCenterMonths.map((month, index) => (
+        <label
+          key={month}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+            padding: "11px 14px",
+            borderBottom: index !== downloadCenterMonths.length - 1 ? "1px solid #f1f5f9" : "none",
+            cursor: "pointer",
+            background: selectedDownloadMonths.includes(month) ? "#f8fafc" : "#fff"
+          }}
+        >
+          <span style={{ color: "#1f2937", fontSize: "0.96rem" }}>{month}</span>
+          <input
+            type="checkbox"
+            checked={selectedDownloadMonths.includes(month)}
+            onChange={() => toggleDownloadMonth(month)}
+            style={{ width: 16, height: 16, cursor: "pointer", flexShrink: 0 }}
+          />
+        </label>
+      ))}
+    </div>
+  )}
+</div>
+      </div>
+
+      {downloadCenterYear && selectedDownloadMonths.length > 0 && (
+        <>
+          <div style={{ marginTop: "28px", marginBottom: "14px", display: "flex", alignItems: "center", gap: "12px" }}>
+            <span
+              onClick={handleDownloadCenterSelectAll}
+              style={{
+                fontWeight: 800,
+                textDecoration: "underline",
+                cursor: "pointer",
+                color: "#111827",
+                fontSize: "1rem"
+              }}
+            >
+              Select all
+            </span>
+
+            <input
+              type="checkbox"
+              checked={downloadCenterSelectAll}
+              onChange={handleDownloadCenterSelectAll}
+              style={{ width: 18, height: 18, cursor: "pointer" }}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: "12px"
+            }}
+          >
+            {downloadCenterOptions.map((option, index) => (
+              <label
+                key={option}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "12px 14px",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "10px",
+                  background: "#fafafa"
+                }}
+              >
+                <span style={{ fontSize: "0.98rem", color: "#334155" }}>
+                  {index + 1}- {option}
+                </span>
+
+                <input
+                  type="checkbox"
+                  checked={selectedDownloadOptions.includes(option)}
+                  onChange={() => toggleDownloadOption(option)}
+                  style={{ width: 18, height: 18, cursor: "pointer" }}
+                />
+              </label>
+            ))}
+          </div>
+        </>
+      )}
+
+      <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "30px", flexWrap: "wrap" }}>
+        <button
+          onClick={handleDownloadCenterCancel}
+          style={{
+            padding: "11px 30px",
+            background: "#fff7ed",
+            color: "#ea580c",
+            border: "1px solid #fdba74",
+            borderRadius: "10px",
+            fontWeight: 800,
+            cursor: "pointer",
+            minWidth: "130px"
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleDownloadCenterDownload}
+          style={{
+            padding: "11px 30px",
+            background: "#d9f99d",
+            color: "#365314",
+            border: "1px solid #84cc16",
+            borderRadius: "10px",
+            fontWeight: 800,
+            cursor: "pointer",
+            minWidth: "150px"
+          }}
+        >
+          Download
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+          {isTDSTCS && selectedTdsTcsSection === "Download" && (
+            <>
+              <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8, background: "white" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", border: "1px solid #d1d5db" }}>
+                  <thead>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Taxation Type</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>GSTIN of Deductor</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Tax Period of GSTR-7</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Trade Name / Legal Name of Deductor</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Taxable Value</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>CGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>SGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Status</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>Select</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tdsTcsDownloadRows.map((row) => (
+                      <tr key={row.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.taxationType}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.gstin}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.taxPeriod}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.tradeName}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.taxableValue).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.igst).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.cgst}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.sgst}</td>
+                        <td style={{
+                          padding: "12px",
+                          borderRight: "1px solid #d1d5db",
+                          textAlign: "center",
+                          color: row.status === "Accepted" ? "#16a34a" : row.status === "Rejected" ? "#ea580c" : "#7c3aed",
+                          fontWeight: 600
+                        }}>
+                          {row.status}
+                        </td>
+                        <td style={{ padding: "12px", textAlign: "center" }}>
+                          <input
+                            type="checkbox"
+                            checked={row.selected}
+                            onChange={() => toggleTdsTcsRow(setTdsTcsDownloadRows, row.id)}
+                            style={{ width: 18, height: 18, cursor: "pointer" }}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "18px", flexWrap: "wrap" }}>
+                <button onClick={handleTdsTcsDownload} style={{ padding: "8px 16px", background: "#dbeafe", color: "#1d4ed8", border: "1px solid #93c5fd", borderRadius: 8, fontWeight: 600, cursor: "pointer" }}>
+                  Download
+                </button>
+                <button onClick={handleTdsTcsAllAccept} style={{ padding: "8px 16px", background: "#ecfccb", color: "#3f6212", border: "1px solid #a3e635", borderRadius: 8, fontWeight: 600, cursor: "pointer" }}>
+                  All Accept
+                </button>
+                <button onClick={handleTdsTcsReject} style={{ padding: "8px 16px", background: "#ffedd5", color: "#c2410c", border: "1px solid #fdba74", borderRadius: 8, fontWeight: 600, cursor: "pointer" }}>
+                  Reject
+                </button>
+                <button onClick={handleTdsTcsDelete} style={{ padding: "8px 16px", background: "#fee2e2", color: "#b91c1c", border: "1px solid #fca5a5", borderRadius: 8, fontWeight: 600, cursor: "pointer" }}>
+                  Delete
+                </button>
+              </div>
+            </>
+          )}
+
+          {isTDSTCS && selectedTdsTcsSection === "Upload" && (
+            <>
+              <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8, background: "white" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", border: "1px solid #d1d5db" }}>
+                  <thead>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Taxation Type</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>GSTIN of Deductor</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Tax Period of GSTR-7</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Trade Name / Legal Name of Deductor</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Taxable Value</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>CGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>SGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Status</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>Select</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tdsTcsUploadRows.map((row) => (
+                      <tr key={row.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.taxationType}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.gstin}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.taxPeriod}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.tradeName}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.taxableValue).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.igst).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.cgst}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.sgst}</td>
+                        <td style={{
+                          padding: "12px",
+                          borderRight: "1px solid #d1d5db",
+                          textAlign: "center",
+                          color: row.status === "Accepted" ? "#16a34a" : "#ea580c",
+                          fontWeight: 600
+                        }}>
+                          {row.status}
+                        </td>
+                        <td style={{ padding: "12px", textAlign: "center" }}>
+                          <input
+                            type="checkbox"
+                            checked={row.selected}
+                            onChange={() => toggleTdsTcsRow(setTdsTcsUploadRows, row.id)}
+                            style={{ width: 18, height: 18, cursor: "pointer" }}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "18px" }}>
+                <button
+                  onClick={handleTdsTcsUploadPortal}
+                  style={{
+                    padding: "10px 18px",
+                    background: "#dbeafe",
+                    color: "#1d4ed8",
+                    border: "1px solid #93c5fd",
+                    borderRadius: 8,
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  Upload on Portal
+                </button>
+              </div>
+            </>
+          )}
+
+          {isTDSTCS && selectedTdsTcsSection === "TDS/TCS Filing" && (
+            <>
+              <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8, background: "white" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", border: "1px solid #d1d5db" }}>
+                  <thead>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>SL</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Category</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Status</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>No of Records</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Taxable Value</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>CGST</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>SGST</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tdsTcsFilingRows.map((row) => (
+                      <tr key={row.sl} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.sl}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.category}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center", color: "#16a34a", fontWeight: 600 }}>{row.status}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.records}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.taxableValue).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.igst).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.cgst}</td>
+                        <td style={{ padding: "12px", textAlign: "center" }}>{row.sgst}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "18px" }}>
+                <button
+                  onClick={handleTdsTcsSubmit}
+                  style={{
+                    padding: "10px 20px",
+                    background: "#ecfccb",
+                    color: "#365314",
+                    border: "1px solid #a3e635",
+                    borderRadius: 8,
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  Submit File
+                </button>
+              </div>
+            </>
+          )}
           
           
       
 
-            {selectedSection && currentColumns.length > 0 && (
-              <>
-                <h2 style={{ margin: "0 0 24px", fontSize: 24, color: "#1e293b" }}>{selectedSection}</h2>
-                <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10, background: "white", position: "relative" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-                    <thead>
-                      <tr style={{ background: "#f8fafc", borderBottom: "2px solid #cbd5e1" }}>
-                        <th style={{ padding: "14px 10px", textAlign: "center", minWidth: 50 }}>SL</th>
-                        {currentColumns.map((col, i) => (
-                          <th key={i} style={{ padding: "14px 10px", textAlign: col.align, minWidth: 100, whiteSpace: "nowrap" }}>
-                            {col.label}
-                          </th>
-                        ))}
-                        <th style={{ padding: "14px 10px", textAlign: "center", minWidth: 100 }}>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((row, rowIndex) => (
-                        <tr key={rowIndex} style={{ background: rowIndex % 2 === 0 ? "#fafcff" : "white" }}>
-                          <td style={{ padding: "12px 10px", textAlign: "center" }}>{row.sl}</td>
-                          {currentColumns.map((col, colIndex) => (
-                            <td key={colIndex} style={{ padding: "8px 10px", position: "relative" }}>
-                              {/* POS Dropdown */}
-                              {col.key === "pos" ? (
-                                <>
-                                  <input
-                                    type="text"
-                                    readOnly
-                                    value={row[col.key] || ""}
-                                    placeholder="Select State"
-                                    onClick={() => setOpenPosDropdownRow(rowIndex)}
-                                    style={{
-                                      width: "100%",
-                                      padding: "8px",
-                                      border: "1px solid #d1d5db",
-                                      borderRadius: 6,
-                                      textAlign: "center",
-                                      cursor: "pointer",
-                                      background: "#f9fafb"
-                                    }}
-                                  />
-                                  {openPosDropdownRow === rowIndex && (
-                                    <div
-                                      style={{
-                                        position: "absolute",
-                                        top: "100%",
-                                        left: 0,
-                                        width: "280px",
-                                        maxHeight: "320px",
-                                        overflowY: "auto",
-                                        background: "white",
-                                        border: "1px solid #cbd5e1",
-                                        borderRadius: 6,
-                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-                                        zIndex: 100,
-                                        marginTop: "4px"
-                                      }}
-                                    >
-                                      {stateList.map((state, idx) => (
-                                        <div
-                                          key={idx}
-                                          onClick={() => {
-                                            updateCell(rowIndex, col.key, state.code);
-                                            setOpenPosDropdownRow(null);
-                                          }}
-                                          style={{
-                                            padding: "8px 12px",
-                                            cursor: "pointer",
-                                            borderBottom: "1px solid #f0f0f0",
-                                            fontSize: "0.9rem"
-                                          }}
-                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
-                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
-                                        >
-                                          {state.name} ({state.code}) - {state.stateCode}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </>
-                              ) : col.key === "noteSupplyType" &&
-                                (selectedSection === "9B - Credit / Debit Notes (Registered)" ||
-                                 selectedSection === "9B - Credit / Debit Notes (Unregistered)") ? (
-                                <>
-                                  <input
-                                    type="text"
-                                    readOnly
-                                    value={row[col.key] || ""}
-                                    placeholder="Select Supply Type"
-                                    onClick={() => setOpenSupplyTypeDropdownRow(rowIndex)}
-                                    style={{
-                                      width: "100%",
-                                      padding: "8px",
-                                      border: "1px solid #d1d5db",
-                                      borderRadius: 6,
-                                      textAlign: "left",
-                                      cursor: "pointer",
-                                      background: "#f9fafb"
-                                    }}
-                                  />
-                                  {openSupplyTypeDropdownRow === rowIndex && (
-                                    <div
-                                      style={{
-                                        position: "absolute",
-                                        top: "100%",
-                                        left: 0,
-                                        width: "260px",
-                                        maxHeight: "220px",
-                                        overflowY: "auto",
-                                        background: "white",
-                                        border: "1px solid #cbd5e1",
-                                        borderRadius: 6,
-                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-                                        zIndex: 100,
-                                        marginTop: "4px"
-                                      }}
-                                    >
-                                      {supplyTypeOptions.map((option, idx) => (
-                                        <div
-                                          key={idx}
-                                          onClick={() => {
-                                            updateCell(rowIndex, col.key, option);
-                                            setOpenSupplyTypeDropdownRow(null);
-                                          }}
-                                          style={{
-                                            padding: "8px 12px",
-                                            cursor: "pointer",
-                                            borderBottom: "1px solid #f0f0f0",
-                                            fontSize: "0.9rem"
-                                          }}
-                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
-                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
-                                        >
-                                          {option}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </>
-                              ) : col.key === "noteType" &&
-                                (selectedSection === "9B - Credit / Debit Notes (Registered)" ||
-                                 selectedSection === "9B - Credit / Debit Notes (Unregistered)") ? (
-                                <>
-                                  <input
-                                    type="text"
-                                    readOnly
-                                    value={row[col.key] || ""}
-                                    placeholder="Select Note Type"
-                                    onClick={() => setOpenNoteTypeDropdownRow(rowIndex)}
-                                    style={{
-                                      width: "100%",
-                                      padding: "8px",
-                                      border: "1px solid #d1d5db",
-                                      borderRadius: 6,
-                                      textAlign: "center",
-                                      cursor: "pointer",
-                                      background: "#f9fafb"
-                                    }}
-                                  />
-                                  {openNoteTypeDropdownRow === rowIndex && (
-                                    <div
-                                      style={{
-                                        position: "absolute",
-                                        top: "100%",
-                                        left: 0,
-                                        width: "180px",
-                                        maxHeight: "140px",
-                                        overflowY: "auto",
-                                        background: "white",
-                                        border: "1px solid #cbd5e1",
-                                        borderRadius: 6,
-                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-                                        zIndex: 100,
-                                        marginTop: "4px"
-                                      }}
-                                    >
-                                      {noteTypeOptions.map((option, idx) => (
-                                        <div
-                                          key={idx}
-                                          onClick={() => {
-                                            updateCell(rowIndex, col.key, option);
-                                            setOpenNoteTypeDropdownRow(null);
-                                          }}
-                                          style={{
-                                            padding: "8px 12px",
-                                            cursor: "pointer",
-                                            borderBottom: "1px solid #f0f0f0",
-                                            fontSize: "0.95rem"
-                                          }}
-                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
-                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
-                                        >
-                                          {option}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </>
-                              ) : col.key === "nature" && selectedSection === "14 - Supplies made through ECO" ? (
-                                <>
-                                  <input
-                                    type="text"
-                                    readOnly
-                                    value={row[col.key] || ""}
-                                    placeholder="Select Nature"
-                                    onClick={() => setOpenNatureDropdownRow(rowIndex)}
-                                    style={{
-                                      width: "100%",
-                                      padding: "8px",
-                                      border: "1px solid #d1d5db",
-                                      borderRadius: 6,
-                                      textAlign: "left",
-                                      cursor: "pointer",
-                                      background: "#f9fafb"
-                                    }}
-                                  />
-                                  {openNatureDropdownRow === rowIndex && (
-                                    <div
-                                      style={{
-                                        position: "absolute",
-                                        top: "100%",
-                                        left: 0,
-                                        width: "300px",
-                                        maxHeight: "200px",
-                                        overflowY: "auto",
-                                        background: "white",
-                                        border: "1px solid #cbd5e1",
-                                        borderRadius: 6,
-                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-                                        zIndex: 100,
-                                        marginTop: "4px"
-                                      }}
-                                    >
-                                      {natureOptions.map((option, idx) => (
-                                        <div
-                                          key={idx}
-                                          onClick={() => {
-                                            updateCell(rowIndex, col.key, option);
-                                            setOpenNatureDropdownRow(null);
-                                          }}
-                                          style={{
-                                            padding: "8px 12px",
-                                            cursor: "pointer",
-                                            borderBottom: "1px solid #f0f0f0",
-                                            fontSize: "0.9rem"
-                                          }}
-                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
-                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
-                                        >
-                                          {option}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </>
-                              ) : col.key === "nature" && selectedSection === "13 - Documents Issued" ? (
-                                <>
-                                  <input
-                                    type="text"
-                                    readOnly
-                                    value={row[col.key] || ""}
-                                    placeholder="Select Nature"
-                                    onClick={() => setOpenDocumentNatureDropdownRow(rowIndex)}
-                                    style={{
-                                      width: "100%",
-                                      padding: "8px",
-                                      border: "1px solid #d1d5db",
-                                      borderRadius: 6,
-                                      textAlign: "left",
-                                      cursor: "pointer",
-                                      background: "#f9fafb"
-                                    }}
-                                  />
-                                  {openDocumentNatureDropdownRow === rowIndex && (
-                                    <div
-                                      style={{
-                                        position: "absolute",
-                                        top: "100%",
-                                        left: 0,
-                                        width: "400px",
-                                        maxHeight: "300px",
-                                        overflowY: "auto",
-                                        background: "white",
-                                        border: "1px solid #cbd5e1",
-                                        borderRadius: 6,
-                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-                                        zIndex: 100,
-                                        marginTop: "4px"
-                                      }}
-                                    >
-                                      {documentNatureOptions.map((option, idx) => (
-                                        <div
-                                          key={idx}
-                                          onClick={() => {
-                                            updateCell(rowIndex, col.key, option);
-                                            setOpenDocumentNatureDropdownRow(null);
-                                          }}
-                                          style={{
-                                            padding: "8px 12px",
-                                            cursor: "pointer",
-                                            borderBottom: "1px solid #f0f0f0",
-                                            fontSize: "0.9rem"
-                                          }}
-                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
-                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
-                                        >
-                                          {option}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </>
-                              ) : col.key === "urType" && selectedSection === "9B - Credit / Debit Notes (Unregistered)" ? (
-                                <>
-                                  <input
-                                    type="text"
-                                    readOnly
-                                    value={row[col.key] || ""}
-                                    placeholder="Select UR Type"
-                                    onClick={() => setOpenUrTypeDropdownRow(rowIndex)}
-                                    style={{
-                                      width: "100%",
-                                      padding: "8px",
-                                      border: "1px solid #d1d5db",
-                                      borderRadius: 6,
-                                      textAlign: "center",
-                                      cursor: "pointer",
-                                      background: "#f9fafb"
-                                    }}
-                                  />
-                                  {openUrTypeDropdownRow === rowIndex && (
-                                    <div
-                                      style={{
-                                        position: "absolute",
-                                        top: "100%",
-                                        left: 0,
-                                        width: "240px",
-                                        maxHeight: "180px",
-                                        overflowY: "auto",
-                                        background: "white",
-                                        border: "1px solid #cbd5e1",
-                                        borderRadius: 6,
-                                        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-                                        zIndex: 100,
-                                        marginTop: "4px"
-                                      }}
-                                    >
-                                      {urTypeOptions.map((option, idx) => (
-                                        <div
-                                          key={idx}
-                                          onClick={() => {
-                                            updateCell(rowIndex, col.key, option);
-                                            setOpenUrTypeDropdownRow(null);
-                                          }}
-                                          style={{
-                                            padding: "8px 12px",
-                                            cursor: "pointer",
-                                            borderBottom: "1px solid #f0f0f0",
-                                            fontSize: "0.95rem"
-                                          }}
-                                          onMouseEnter={e => (e.currentTarget.style.background = "#eff6ff")}
-                                          onMouseLeave={e => (e.currentTarget.style.background = "white")}
-                                        >
-                                          {option}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </>
-                              ) : (
-                                <input
-                                  type={col.type === "number" ? "number" : "text"}
-                                  value={row[col.key] ?? ""}
-                                  onChange={e => updateCell(rowIndex, col.key, e.target.value)}
-                                  style={{
-                                    width: "100%",
-                                    padding: "8px",
-                                    border: "1px solid #d1d5db",
-                                    borderRadius: 6,
-                                    textAlign: col.align === "right" ? "right" : col.align === "center" ? "center" : "left"
-                                  }}
-                                />
-                              )}
-                            </td>
-                          ))}
-                          <td style={{ padding: "12px 10px", textAlign: "center" }}>
-                            <span onClick={() => deleteRow(rowIndex)} style={{ color: "#ef4444", cursor: "pointer" }}>Delete</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr style={{ background: "#f1f5f9", fontWeight: 600 }}>
-                        <td colSpan={currentColumns.length + 1} style={{ padding: "14px 10px", textAlign: "right" }}>Total</td>
-                        <td style={{ padding: "14px 10px", textAlign: "right" }}>0.00</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-                <div style={{ marginTop: 28, display: "flex", justifyContent: "space-between" }}>
-                  <button
-                    onClick={addRow}
-                    style={{
-                      padding: "12px 32px",
-                      background: "linear-gradient(135deg, #3b82f6, #2563eb)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: 10,
-                      fontWeight: 600,
-                      cursor: "pointer"
-                    }}
-                  >
-                    + Add Row
-                  </button>
-                  <div style={{ display: "flex", gap: 16 }}>
-                    <button
-                      onClick={handleSave}
-                      style={{
-                        padding: "12px 40px",
-                        background: "#10b981",
-                        color: "white",
-                        border: "none",
-                        borderRadius: 10,
-                        fontWeight: 600,
-                        cursor: "pointer"
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button
-                      style={{
-                        padding: "12px 40px",
-                        background: "#ef4444",
-                        color: "white",
-                        border: "none",
-                        borderRadius: 10,
-                        fontWeight: 600,
-                        cursor: "pointer"
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
+          {!isDownloadCenter && !isTDSTCS && ((isITC04 && selectedItcTable) || (!isITC04 && selectedSection)) && currentColumns.length > 0 && (
+  <>
+    <h2 style={{ margin: "8px 0 8px 0", fontSize: "1.2rem", color: "#1e293b" }}>
+  {isITC04 ? selectedItcTable : selectedSection}
+</h2>
+    <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 8, background: "white", marginTop: "0px",     // ← yahan 0 ya -4px daal sakte ho agar bhi space dikhe
+  padding: "0" }}>
+      <table style={{ 
+  width: "100%", 
+  borderCollapse: "collapse", 
+  fontSize: "13px",           // thoda chhota text
+  border: "1px solid #d1d5db" // outer border
+}}>
+        <thead>
+          <tr style={{ background: "#f1f3f5" }}>   {/* halka gray header */}
+  <th style={{
+    padding: "6px 8px",                   // padding kam rakha
+    textAlign: "center",
+    minWidth: 45,
+    border: "1px solid #d0d7e0",          // sab jagah same border color
+    background: "#e9ecef",                 // Excel jaisa header
+    whiteSpace: "nowrap",
+    fontWeight: 600
+  }}>SL</th>
+
+  {currentColumns.map((col, i) => (
+    <th key={i} style={{
+      padding: "6px 8px",                 // ← yahan padding 14px se ghataya
+      textAlign: col.align || "left",
+      minWidth: 100,
+      border: "1px solid #d0d7e0",        // ← yeh line add ya replace karo
+      whiteSpace: "nowrap",
+      background: "#e9ecef",              // consistent header bg
+      fontWeight: 600
+    }}>
+      {col.label}
+    </th>
+  ))}
+
+  <th style={{
+    padding: "6px 8px",                   // ← padding kam
+    textAlign: "center",
+    minWidth: 100,
+    border: "1px solid #d0d7e0",          // ← add karo
+    background: "#e9ecef",
+    fontWeight: 600
+  }}>Action</th>
+</tr>
+        </thead>
+        <tbody>
+          {rows.map((row, rowIndex) => (
+            <tr key={rowIndex} style={{
+  background: rowIndex % 2 === 0 ? "#ffffff" : "#f9f9f9"   // halka zebra, ya dono white bhi rakh sakte ho
+}}>
+  <td
+  style={{
+    padding: "5px 8px",
+    border: "1px solid #d0d7e0",
+    textAlign: "center",
+  }}
+>
+  {row.sl || (rowIndex + 1)}
+</td>
+
+{currentColumns.map((col, colIndex) => (
+  <td
+    key={colIndex}
+    style={{
+      padding: "5px 8px",
+      border: "1px solid #d0d7e0",
+      position: "relative",
+    }}
+  >
+{(() => {
+
+
+  
+  // ──────────────────────────────
+  // is this column a dropdown?
+  // ──────────────────────────────
+  const isDropdownField =
+    col.key === "pos" ||
+    ["invoice", "invtype", "invoicetype"].some((term) =>
+      (col.key || "").toLowerCase().includes(term) ||
+      (col.label || "").toLowerCase().includes(term)
+    ) ||
+    col.key === "exportType" ||
+    col.key === "financialYear" ||
+    col.key === "originalMonth" ||
+    col.key === "noteType" ||
+    col.key === "nature" ||
+    col.key === "urType" ||
+    ["applicableTaxRate", "applicablePercent", "applicable %"].includes(col.key) ||
+    ["rate", "gstRate", "taxRate"].includes(col.key) ||
+    (col.key || "").toLowerCase() === "type" ||
+    (col.key || "").toLowerCase() === "notetype" ||
+    (col.key || "").toLowerCase() === "rcm" ||
+    (col.key || "").toLowerCase() === "uqc" ||
+    (col.key || "").toLowerCase().replace(/\s/g, "") === "natureofsupply";
+
+  // ──────────────────────────────
+  // Normal input (text / number)
+  // ──────────────────────────────
+  if (!isDropdownField) {
+    return (
+      <input
+        type={col.type === "number" ? "number" : "text"}
+        value={row[col.key] ?? ""}
+        onChange={(e) => updateCell(rowIndex, col.key, e.target.value)}
+        style={{
+          width: "100%",
+          padding: "4px",
+          border: "none",
+          outline: "none",
+          background: "transparent",
+          textAlign:
+            col.align === "right" ? "right" :
+            col.align === "center" ? "center" : "left",
+        }}
+      />
+    );
+  }
+
+  // ──────────────────────────────
+  // Dropdown config (your original logic, unchanged)
+  // ──────────────────────────────
+  let dropdownType = "";
+  let placeholderText = "";
+  let dropdownWidth = "220px";
+  let optionsArray = [];
+  let textAlign = "center";
+
+  if (col.key === "pos") {
+    dropdownType = "pos";
+    placeholderText = "Select State";
+    dropdownWidth = "280px";
+    optionsArray = stateList.map((s) => ({
+      label: `${s.name} (${s.code}) - ${s.stateCode}`,
+      value: s.code,
+    }));
+  }
+  else if (col.key === "exportType") {
+  dropdownType = "exportType";
+  placeholderText = "Select Export Type";
+  dropdownWidth = "160px";
+
+  optionsArray = [
+    { label: "WOPAY", value: "WOPAY" },
+    { label: "WPAY", value: "WPAY" }
+  ];
+}
+ else if (
+    ["invoice", "invtype", "invoicetype"].some((term) =>
+      (col.key || "").toLowerCase().includes(term) ||
+      (col.label || "").toLowerCase().includes(term)
+    )
+  ) {
+    dropdownType = "invoiceType";
+    placeholderText = "Select Invoice Type";
+    dropdownWidth = "340px";
+    optionsArray = [
+      "Regular B2B", "SEZ Supply WPAY", "SEZ Supply WOPAY",
+      "Deemed Export", "Intra-State Supply Attracting IGST"
+    ].map(opt => ({ label: opt, value: opt }));
+    textAlign = "left";
+  }
+  else if (col.key === "financialYear") {
+  dropdownType = "financialYear";
+  placeholderText = "Select Financial Year";
+  dropdownWidth = "180px";
+  optionsArray = [
+    "2017-18","2018-19","2019-20","2020-21","2021-22",
+    "2022-23","2023-24","2024-25","2025-26"
+  ].map(opt => ({ label: opt, value: opt }));
+} else if (col.key === "originalMonth") {
+  dropdownType = "originalMonth";
+  placeholderText = "Select Original Month";
+  dropdownWidth = "180px";
+  optionsArray = [
+    "April", "May", "June", "July", "August", "September",
+    "October", "November", "December", "January", "February", "March"
+  ].map(opt => ({ label: opt, value: opt }));
+} else if (col.key === "noteType") {
+    dropdownType = "noteType";
+    placeholderText = "Select Note Type";
+    dropdownWidth = "180px";
+    optionsArray = noteTypeOptions.map(opt => ({ label: opt, value: opt }));
+  } else if (col.key === "nature") {
+    if (selectedSection === "14 - Supplies made through ECO") {
+      dropdownType = "nature-eco";
+      placeholderText = "Select Nature";
+      dropdownWidth = "300px";
+      optionsArray = natureOptions.map(opt => ({ label: opt, value: opt }));
+    } else if (selectedSection === "13 - Documents Issued") {
+      dropdownType = "nature-doc";
+      placeholderText = "Select Nature";
+      dropdownWidth = "420px";
+      optionsArray = documentNatureOptions.map(opt => ({ label: opt, value: opt }));
+    }
+    textAlign = "left";
+  } else if (col.key === "urType") {
+    dropdownType = "urType";
+    placeholderText = "Select UR Type";
+    dropdownWidth = "240px";
+    optionsArray = urTypeOptions.map(opt => ({ label: opt, value: opt }));
+  } else if (["applicableTaxRate", "applicablePercent", "applicable %"].includes(col.key)) {
+    dropdownType = "applicableTaxRate";
+    placeholderText = "Select %";
+    dropdownWidth = "140px";
+    optionsArray = ["0%", "65%"].map(opt => ({ label: opt, value: opt }));
+  } else if (["rate", "gstRate", "taxRate"].includes(col.key)) {
+    dropdownType = "rate";
+    placeholderText = "Select Rate";
+    dropdownWidth = "220px";
+    optionsArray = ["0%", "0.10%", "0.25%", "1%", "1.50%", "3%", "5%", "6%"].map(opt => ({ label: opt, value: opt }));
+  } else if ((col.key || "").toLowerCase() === "type") {
+    dropdownType = "type";
+    placeholderText = "Select Type";
+    dropdownWidth = "140px";
+    optionsArray = TypeofDocumenstOptions.map(opt => ({ label: opt, value: opt }));
+  } else if ((col.key || "").toLowerCase() === "notetype") {
+    dropdownType = "notetype";
+    placeholderText = "Select Note Type";
+    dropdownWidth = "160px";
+    optionsArray = noteTypeOptions.map(opt => ({ label: opt, value: opt }));
+  } else if ((col.key || "").toLowerCase() === "rcm") {
+    dropdownType = "rcm";
+    placeholderText = "Select RCM";
+    dropdownWidth = "120px";
+    optionsArray = rcmOptions.map(opt => ({ label: opt, value: opt }));
+  } else if ((col.key || "").toLowerCase() === "uqc") {
+    dropdownType = "uqc";
+    placeholderText = "Select UQC";
+    dropdownWidth = "240px";
+    optionsArray = ucqOptions.map(opt => ({ label: opt, value: opt }));
+    textAlign = "left";
+  } else if ((col.key || "").toLowerCase().replace(/\s/g, "") === "natureofsupply") {
+    dropdownType = "natureofsupply";
+    placeholderText = "Select Nature of Supply";
+    dropdownWidth = "320px";
+    optionsArray = natureOptions.map(opt => ({ label: opt, value: opt }));
+    textAlign = "left";
+  }else if (col.key === "jobWorkerType") {
+  dropdownType = "jobWorkerType";
+  placeholderText = "Select Type";
+  dropdownWidth = "140px";
+  optionsArray = [
+    { label: "SEZ", value: "SEZ" },
+    { label: "Non SEZ", value: "Non SEZ" }
+  ];
+}
+else if (col.key === "goodsType") {
+  dropdownType = "goodsType";
+  placeholderText = "Select Goods Type";
+  dropdownWidth = "160px";
+  optionsArray = [
+    { label: "Capital Goods", value: "Capital Goods" },
+    { label: "Inputs", value: "Inputs" }
+  ];
+}
+else if (col.key === "uqc") {
+  dropdownType = "uqc";
+  placeholderText = "Select UQC";
+  dropdownWidth = "120px";
+  optionsArray = [
+    { label: "KGS", value: "KGS" },
+    { label: "MTR", value: "MTR" },
+    { label: "SQF", value: "SQF" }
+  ];
+}
+
+  const isOpen = openDropdown?.row === rowIndex && openDropdown?.type === dropdownType;
+
+  // ──────────────────────────────
+  // Position calculation when opening
+  // ──────────────────────────────
+  let posStyles = {
+    top: "100%",
+    left: "0px",
+    marginTop: "4px",
+  };
+
+  if (isOpen && openDropdown?.rect) {
+    const r = openDropdown.rect;
+    const dropdownEstHeight = Math.min(optionsArray.length * 36 + 20, 340);
+
+    // Flip up if not enough space below
+    if (window.innerHeight - r.bottom < dropdownEstHeight + 30) {
+      posStyles = {
+        bottom: "100%",
+        top: "auto",
+        marginBottom: "4px",
+        marginTop: "0px",
+      };
+    }
+
+    // Shift left if going off right side
+    const rightSpace = window.innerWidth - r.right;
+    if (rightSpace < Number.parseInt(dropdownWidth) + 20) {
+      posStyles.left = `-${Number.parseInt(dropdownWidth) - r.width - 8}px`;
+    }
+  }
+return (
+    <>
+      <input
+  type="text"
+  readOnly
+  value={row[col.key] || ""}
+  placeholder={placeholderText}
+  onClick={(e) => {
+    e.stopPropagation();
+
+    setOpenDropdown({
+      row: rowIndex,
+      type: dropdownType
+    });
+  }}
+  style={{
+    width: "100%",
+    padding: "6px 8px",
+    border: "none",
+    outline: "none",
+    background: "transparent",
+    textAlign,
+    cursor: "pointer",
+    color: row[col.key] ? "#1e293b" : "#94a3b8",
+  }}
+/>
+
+   {isOpen && (
+  <div
+  className="custom-dropdown-container"
+  onClick={(e) => {
+    // agar overlay pe click hua
+    if (e.target === e.currentTarget) {
+      setOpenDropdown(null);
+    }
+  }}
+  style={{
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    background: "rgba(0,0,0,0.25)",
+    zIndex: 2000,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  }}
+>
+    <div
+      style={{
+        width: "420px",
+        maxHeight: "70vh",
+        background: "white",
+        borderRadius: "10px",
+        boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column"
+      }}
+    >
+
+      {/* Header */}
+      <div
+        style={{
+          padding: "12px 16px",
+          borderBottom: "1px solid #e5e7eb",
+          fontWeight: 600,
+          fontSize: "15px"
+        }}
+      >
+        {placeholderText}
+      </div>
+
+      {/* Options */}
+      <div
+        style={{
+          overflowY: "auto",
+          maxHeight: "60vh"
+        }}
+      >
+        {optionsArray.map((item, idx) => (
+          <div
+            key={idx}
+            onClick={() => {
+              updateCell(rowIndex, col.key, item.value);
+              setOpenDropdown(null);
+            }}
+            style={{
+              padding: "10px 16px",
+              cursor: "pointer",
+              fontSize: "14px",
+              borderBottom:
+                idx < optionsArray.length - 1
+                  ? "1px solid #f1f5f9"
+                  : "none",
+              background:
+                row[col.key] === item.value
+                  ? "#eff6ff"
+                  : "transparent",
+              color:
+                row[col.key] === item.value
+                  ? "#2563eb"
+                  : "#1e293b"
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.background = "#f8fafc")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background =
+                row[col.key] === item.value
+                  ? "#eff6ff"
+                  : "transparent")
+            }
+          >
+            {item.label}
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </div>
+)}
+    </>
+  );
+})()}
+  </td>
+))}
+
+<td style={{ padding: "12px 10px", textAlign: "center" }}>
+  <span onClick={() => deleteRow(rowIndex)} style={{ color: "#ef4444", cursor: "pointer" }}>
+    Delete
+  </span>
+</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr style={{ background: "#f1f5f9", fontWeight: 600 }}>
+            <td colSpan={currentColumns.length + 1} style={{ padding: "6px 8px", textAlign: "right" ,border: "1px solid #d0d7e0",}}>Total</td>
+            <td style={{
+      padding: "4px 6px",
+      textAlign: "right",
+      border: "1px solid #d0d7e0",          // ← add
+    }}>0.00</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div style={{ marginTop: 28, display: "flex", justifyContent: "space-between" }}>
+      <button
+        onClick={addRow}
+        style={{
+          padding: "8px 20px",          // ← padding kam: 12px 32px → 8px 20px
+      background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+      color: "white",
+      border: "none",
+      borderRadius: 6,              // radius bhi thoda chhota
+      fontWeight: 500,              // fontWeight kam (600 → 500)
+      fontSize: "0.9rem",           // optional: text chhota
+      cursor: "pointer"
+        }}
+      >
+        + Add Row
+      </button>
+      <div style={{ display: "flex", gap: 10 }}>
+        <button
+          onClick={handleSave}
+          style={{
+            padding: "8px 20px",
+            background: "#10b981",
+            color: "white",
+            border: "none",
+            borderRadius: 6 ,
+            fontWeight: 500,
+            fontSize: "0.9rem",
+            cursor: "pointer"
+          }}
+        >
+          Save
+        </button>
+        <button
+          style={{
+            padding: "8px 28px",
+            background: "#ef4444",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            fontWeight: 500,
+            fontSize: "0.9rem",
+            cursor: "pointer"
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </>
+)}
           </div>
         )}
         
 
         {/* Summary Tab */}
         {activeSubTab === "Summary" && (
-          <div style={{ padding: "32px" }}>
+          <div style={{ padding: "20px" }}>
             <h2 style={{ textAlign: "center", marginBottom: "32px", fontSize: "2rem", color: "#1e293b" }}>GSTR-1 Summary</h2>
             <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10 }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
@@ -5191,11 +6758,19 @@ const [skipValidation, setSkipValidation] = useState(false);
           </div>
         );
       }
-      const regularGstrTabs = ["gstr-1", "gstr-1A", "gstr 3b", "IMS"];
-      if (regularGstrTabs.includes(activeMenu)) {
-        const displayTitle = activeMenu.toUpperCase().replace("GSTR ", "GSTR-").replace(" 3B", " 3B");
-        return <GSTRLayout title={displayTitle} />;
-      }
+      const regularGstrTabs = ["gstr-1", "gstr-1A", "gstr 3b", "itc-04","tds/tcs","download center"];
+    if (regularGstrTabs.includes(activeMenu)) {
+  const displayTitle =
+    activeMenu === "tds/tcs"
+      ? "TDS/TCS"
+      : activeMenu === "download center"
+      ? "Download Center"
+      : activeMenu.toUpperCase().replace("GSTR ", "GSTR-").replace(" 3B", " 3B");
+
+  return <GSTRLayout title={displayTitle} />;
+}
+
+ 
       if (activeMenu === "Annual Return") {
         return (
           <div style={{ padding: "20px", background: "#f8fafc" }}>
@@ -5648,7 +7223,19 @@ const [skipValidation, setSkipValidation] = useState(false);
               </div>
               {selectedDemand && (
                 <div onClick={() => setSelectedDemand(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 2000 }}>
-                  <div onClick={(e) => e.stopPropagation()} style={{ width: "420px", background: "#ffffff", borderRadius: "18px", boxShadow: "0 20px 50px rgba(0,0,0,0.2)", overflow: "hidden" }}>
+                  <div
+  onClick={(e) => e.stopPropagation()}
+  style={{
+    width: "420px",
+    maxHeight: "70vh",
+    background: "white",
+    borderRadius: "10px",
+    boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column"
+  }}
+>
                     <div style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#ffffff", padding: "14px", textAlign: "center", fontSize: "1rem", fontWeight: "600" }}>
                       Payment towards Demand
                     </div>
@@ -7043,7 +8630,7 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
               width: "90%",
               maxWidth: "900px",
               maxHeight: "92vh",
-              overflowY: "auto",
+              overflowY: "visible",
               boxShadow: "0 20px 60px rgba(0,0,0,0.35)"
             }}
             onClick={(e) => e.stopPropagation()}
@@ -7170,12 +8757,12 @@ const DashboardHome = ({ allClients, addClient, navigate }) => {
                 <button
                   onClick={() => setShowAddClientModal(false)}
                   style={{
-                    padding: "12px 32px",
+                    padding: "8px 16px",
                     background: "#e5e7eb",
                     border: "none",
                     borderRadius: "8px",
                     cursor: "pointer",
-                    fontWeight: "600"
+                    fontWeight: "500"
                   }}
                 >
                   Cancel
@@ -8674,6 +10261,20 @@ case "/user/gst-return":
       />
     );
 }
+
+useEffect(() => {
+    if (step === 'detail') {
+      setIsModalOpen(true);
+      document.body.style.overflow = 'hidden';
+    } else {
+      setIsModalOpen(false);
+      document.body.style.overflow = 'auto';
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [step]);
 
 
   return (

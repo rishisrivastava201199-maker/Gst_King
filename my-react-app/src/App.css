@@ -314,6 +314,7 @@ td:last-child { text-align: right; font-weight: 600; }
   max-width: 900px;
   width: 90%;
   max-height: 85vh;
+  
   overflow-y: auto;
   box-shadow: var(--shadow);
   animation: scaleIn 0.3s ease;
