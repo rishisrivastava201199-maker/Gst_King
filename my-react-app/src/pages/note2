@@ -1,24 +1,27 @@
- // LocalStorage keys
-  const STORAGE_KEYS = {
-    b2b: "gstr_b2bRows",
-    b2cLarge: "gstr_b2cLargeRows",
-    b2cOthers: "gstr_b2cOthersRows",
-    nilExempt: "gstr_nilExemptRows",
-    creditDebitRegistered: "gstr_creditDebitRegisteredRows",
-    creditDebitUnregistered: "gstr_creditDebitUnregisteredRows",
-    advanceLiability: "gstr_advanceLiabilityRows",
-    advanceAdjustment: "gstr_advanceAdjustmentRows",
-    hsn: "gstr_hsnRows",
-    documents: "gstr_documentsRows",
-    eco: "gstr_ecoRows",
-    summaryTotals: "gstr_summaryTotals",
-    outward: "gstr3b_outwardSupplies",
-    eco: "gstr3b_ecoSupplies",
-    interstate: "gstr3b_interstateSupplies",
-    itc: "gstr3b_itcDetails",
-    exempt: "gstr3b_exemptNonGst",
-    interestLateFee: "gstr3b_interestLateFee"
-  };
+
+const STORAGE_KEYS = {
+  b2b: "gstr_b2bRows",
+  b2cLarge: "gstr_b2cLargeRows",
+  b2cOthers: "gstr_b2cOthersRows",
+  nilExempt: "gstr_nilExemptRows",
+  creditDebitRegistered: "gstr_creditDebitRegisteredRows",
+  creditDebitUnregistered: "gstr_creditDebitUnregisteredRows",
+  advanceLiability: "gstr_advanceLiabilityRows",
+  advanceAdjustment: "gstr_advanceAdjustmentRows",
+  hsn: "gstr_hsnRows",
+  documents: "gstr_documentsRows",
+  ecoRows: "gstr_ecoRows",
+  summaryTotals: "gstr_summaryTotals",
+  outward: "gstr3b_outwardSupplies",
+  ecoSupplies: "gstr3b_ecoSupplies",
+  interstateUnregistered: "gstr3b_interstateUnregistered",
+interstateComposition: "gstr3b_interstateComposition",
+interstateUin: "gstr3b_interstateUin",
+  itc: "gstr3b_itcDetails",
+  exempt: "gstr3b_exemptNonGst",
+ interestLateFee: "gstr3b_interestLateFee",
+gstr3bSavedSummary: "gstr3b_saved_summary"
+};
   // Full State list for POS dropdown
   const stateList = [
     { name: "ANDAMAN AND NICOBAR ISLANDS", code: "35", stateCode: "AN" },
@@ -129,6 +132,85 @@
     const [selectedYear, setSelectedYear] = useState("2025-26");
     const [selectedMonth, setSelectedMonth] = useState("");
     const [selectedSection, setSelectedSection] = useState("");
+    const [selectedState, setSelectedState] = useState("");
+    const [selectedItcTable, setSelectedItcTable] = useState("");
+        const [selectedTdsTcsSection, setSelectedTdsTcsSection] = useState("");
+        const [reportFromDate, setReportFromDate] = useState("");
+const [reportToDate, setReportToDate] = useState("");
+const [activeReportTab, setActiveReportTab] = useState("Summary");
+
+
+
+
+
+  
+
+    const [tdsTcsDownloadRows, setTdsTcsDownloadRows] = useState([
+      { id: 1, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 2, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 3, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 4, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 5, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" },
+      { id: 6, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Not Accept" }
+    ]);
+
+    const [tdsTcsUploadRows, setTdsTcsUploadRows] = useState([
+      { id: 1, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 2, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 3, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 4, selected: false, taxationType: "TDS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 5, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Accepted" },
+      { id: 6, selected: false, taxationType: "TCS", gstin: "09AACCF6368D1CV", taxPeriod: "April-2025", tradeName: "MEESHO LTD", taxableValue: 1250.30, igst: 225.05, cgst: "-", sgst: "-", status: "Rejected" }
+    ]);
+
+    const [tdsTcsFilingRows] = useState([
+      { sl: 1, category: "TDS", status: "Accepted", records: 3, taxableValue: 3750.90, igst: 675.15, cgst: "-", sgst: "-" },
+      { sl: 2, category: "TCS", status: "Accepted", records: 3, taxableValue: 3750.90, igst: 675.15, cgst: "-", sgst: "-" }
+    ]);
+
+
+    const [downloadCenterYear, setDownloadCenterYear] = useState("");
+const [downloadCenterMonthDropdownOpen, setDownloadCenterMonthDropdownOpen] = useState(false);
+const [selectedDownloadMonths, setSelectedDownloadMonths] = useState([]);
+const [downloadCenterSelectAll, setDownloadCenterSelectAll] = useState(false);
+const [selectedDownloadOptions, setSelectedDownloadOptions] = useState([]);
+
+const downloadCenterYears = [
+  "2017-18",
+  "2018-19",
+  "2019-20",
+  "2020-21",
+  "2021-22",
+  "2022-23",
+  "2023-24",
+  "2024-25",
+  "2025-26"
+];
+
+const downloadCenterMonths = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+
+const downloadCenterOptions = [
+  "GSTR-1",
+  "GSTR-2A",
+  "GSTR-2B",
+  "GSTR-3B",
+  "Electronic Cash/Credit Ledger",
+  "Notice/Order"
+];
+    
     const importOptions = [
       "B2B",
       "B2CL",
@@ -180,6 +262,123 @@ const [creditLedger, setCreditLedger] = useState([
       } else {
         setSelectedOptions([...selectedOptions, option]);
       }
+    };
+
+    const [itc04Table4Rows, setItc04Table4Rows] = useState(() => {
+  return [{
+    sl: 1,
+    gstinJobWorker: "",
+    state: "",
+    jobWorkerType: "",
+    challanNumber: "",
+    challanDate: "",
+    goodsType: "",
+    description: "",
+    uqc: "",
+    quantity: "",
+    taxableValue: "",
+    rate: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  }];
+});
+
+const [itc04Table5ARows, setItc04Table5ARows] = useState(() => {
+  return [{
+    sl: 1,
+    gstinJobWorker: "",
+    state: "",
+    jobWorkerType: "",
+    challanNumber: "",
+    challanDate: "",
+    goodsType: "",
+    description: "",
+    uqc: "",
+    quantity: "",
+    taxableValue: "",
+    rate: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  }];
+});
+
+const [itc04Table5BRows, setItc04Table5BRows] = useState(() => {
+  return [{
+    sl: 1,
+    gstinJobWorker: "",
+    state: "",
+    jobWorkerType: "",
+    challanNumber: "",
+    challanDate: "",
+    goodsType: "",
+    description: "",
+    uqc: "",
+    quantity: "",
+    taxableValue: "",
+    rate: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  }];
+});
+
+const [itc04Table5CRows, setItc04Table5CRows] = useState(() => {
+  return [{
+    sl: 1,
+    gstinJobWorker: "",
+    state: "",
+    jobWorkerType: "",
+    challanNumber: "",
+    challanDate: "",
+    goodsType: "",
+    description: "",
+    uqc: "",
+    quantity: "",
+    taxableValue: "",
+    rate: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  }];
+});
+
+
+    const toggleTdsTcsRow = (setter, id) => {
+      setter(prev => prev.map(row => row.id === id ? { ...row, selected: !row.selected } : row));
+    };
+
+    const handleTdsTcsAllAccept = () => {
+      setTdsTcsDownloadRows(prev =>
+        prev.map(row => row.selected ? { ...row, status: "Accepted" } : row)
+      );
+    };
+
+    const handleTdsTcsReject = () => {
+      setTdsTcsDownloadRows(prev =>
+        prev.map(row => row.selected ? { ...row, status: "Rejected" } : row)
+      );
+    };
+
+    const handleTdsTcsDelete = () => {
+      setTdsTcsDownloadRows(prev => prev.filter(row => !row.selected));
+    };
+
+    const handleTdsTcsDownload = () => {
+      toast.success("TDS/TCS records downloaded successfully!");
+    };
+
+    const handleTdsTcsUploadPortal = () => {
+      toast.success("TDS/TCS upload initiated on portal!");
+    };
+
+    const handleTdsTcsSubmit = () => {
+      toast.success("TDS/TCS file submitted successfully!");
     };
     // Row states with localStorage persistence
     const [b2bRows, setB2bRows] = useState(() => {
@@ -235,10 +434,12 @@ const [creditLedger, setCreditLedger] = useState([
       const saved = localStorage.getItem(STORAGE_KEYS.documents);
       return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Invoice for Outward Supply", srFrom: "", srTo: "", totalNumber: 0, cancelled: 0 }];
     });
-    const [ecoRows, setEcoRows] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.eco);
-      return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Liable to Collect Tax u/s 52(TCS)", gstinEco: "", nameEco: "", netValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
-    });
+   const [ecoRows, setEcoRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoRows);
+  return saved ? JSON.parse(saved) : [
+    { sl: 1, nature: "1 - Liable to Collect Tax u/s 52(TCS)", gstinEco: "", nameEco: "", netValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+  ];
+});
     const [b2bAmendmentRows, setB2bAmendmentRows] = useState(() => {
   const saved = localStorage.getItem(STORAGE_KEYS.b2bAmendment);
   return saved ? JSON.parse(saved) : [
@@ -574,41 +775,381 @@ const [amendedTaxLiabilityRows, setAmendedTaxLiabilityRows] = useState(() => {
   }];
 });
     
-    const [summaryTotals, setSummaryTotals] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.summaryTotals);
-      return saved ? JSON.parse(saved) : {
-        b2b: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
-        b2cLarge: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
-        b2cOthers: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
-        hsn: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
-      };
+  const [summaryTotals, setSummaryTotals] = useState(() => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.summaryTotals);
+    return saved ? JSON.parse(saved) : {
+      b2b: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cLarge: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cOthers: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      hsn: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+    };
+  } catch {
+    return {
+      b2b: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cLarge: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cOthers: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      hsn: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+    };
+  }
+});
+    const defaultOutwardSupplies = [
+  {
+    nature: "(a) Total Taxable Supplies (Other than Zero Rated, Nil Rated and Exempted supplies)",
+    taxable: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  },
+  {
+    nature: "(b) Total Taxable Supplies (Zero Rated)",
+    taxable: "",
+    igst: "",
+    cgst: "Hide",
+    sgst: "Hide",
+    cess: ""
+  },
+  {
+    nature: "(c) Total Exempt Supplies (Nil Rated and Exempted)",
+    taxable: "",
+    igst: "Hide",
+    cgst: "Hide",
+    sgst: "Hide",
+    cess: "Hide"
+  },
+  {
+    nature: "(d) Inward Supplies (Liable to Reverse Charge)",
+    taxable: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  },
+  {
+    nature: "(e) Non-GST Outward Supplies)",
+    taxable: "",
+    igst: "Hide",
+    cgst: "Hide",
+    sgst: "Hide",
+    cess: "Hide"
+  }
+];
+const normalizeText = (value = "") =>
+  String(value)
+    .toLowerCase()
+    .replace(/[\s_\-./()]+/g, "")
+    .trim();
+
+const toNumber = (value) => {
+  if (value === null || value === undefined || value === "") return 0;
+  const cleaned = String(value).replace(/,/g, "").trim();
+  const num = Number(cleaned);
+  return Number.isFinite(num) ? num : 0;
+};
+
+const getHeaderRowIndex = (sheetData) => {
+  for (let i = 0; i < Math.min(sheetData.length, 12); i++) {
+    const row = (sheetData[i] || []).map(cell => normalizeText(cell));
+    const rowText = row.join("|");
+    if (
+      rowText.includes("taxablevalue") ||
+      rowText.includes("integratedtaxamount") ||
+      rowText.includes("integratedtax") ||
+      rowText.includes("centraltaxamount") ||
+      rowText.includes("stateuttaxamount") ||
+      rowText.includes("invoicevalue")
+    ) {
+      return i;
+    }
+  }
+  return 3;
+};
+
+const sheetToObjects = (worksheet) => {
+  const raw = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+  if (!raw || raw.length === 0) return [];
+
+  const headerRowIndex = getHeaderRowIndex(raw);
+  const headers = (raw[headerRowIndex] || []).map(h => String(h || "").trim());
+
+  return raw.slice(headerRowIndex + 1).map((row) => {
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[header] = row[index];
     });
-     const [outwardSupplies, setOutwardSupplies] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.outward);
-      return saved ? JSON.parse(saved) : [
-        { nature: "(a) Total Taxable Supplies (Other than Zero Rated, Nil Rated and Exempted supplies)", taxable: "", igst: "", cgst: "", sgst: "", cess: "" },
-        { nature: "(b) Total Taxable Supplies (Zero Rated)", taxable: "", igst: "", cgst: "Hide", sgst: "Hide", cess: "" },
-        { nature: "(c) Total Exempt Supplies (Nil Rated and Exempted)", taxable: "", igst: "Hide", cgst: "Hide", sgst: "Hide", cess: "Hide" },
-        { nature: "(d) Inward Supplies (Liable to Reverse Charge)", taxable: "", igst: "", cgst: "", sgst: "", cess: "" },
-        { nature: "(e) Non-GST Outward Supplies", taxable: "", igst: "Hide", cgst: "Hide", sgst: "Hide", cess: "Hide" }
-      ];
+    return obj;
+  });
+};
+
+const getValueByPossibleHeaders = (row, possibleHeaders) => {
+  const entries = Object.entries(row || {});
+  for (const [key, value] of entries) {
+    const normalizedKey = normalizeText(key);
+    if (possibleHeaders.some(h => normalizedKey === normalizeText(h))) {
+      return value;
+    }
+  }
+  return "";
+};
+
+const getImportSummaryKey = (option) => {
+  const v = normalizeText(option);
+
+  if (v.includes("b2b")) return "b2b";
+  if (v.includes("b2cl")) return "b2cLarge";
+  if (v === "b2c" || v.includes("b2cothers")) return "b2cOthers";
+  if (v.includes("14a")) return "eco";
+  if (v.includes("hsn")) return "hsn";
+
+  return null;
+};
+
+const getPossibleSheetNames = (option) => {
+  const v = normalizeText(option);
+
+  if (v.includes("b2b")) return ["b2b,sez,de", "b2b", "sez", "de"];
+  if (v.includes("b2cl")) return ["b2cl"];
+  if (v === "b2c" || v.includes("b2cothers")) return ["b2cs", "b2c"];
+  if (v.includes("14a")) return ["ecoa", "14a", "ecoa14a"];
+  if (v.includes("hsn")) return ["hsn(b2b)", "hsn(b2c)", "hsn"];
+
+  return [];
+};
+
+const pickMatchingSheet = (workbook, option) => {
+  const wanted = getPossibleSheetNames(option).map(normalizeText);
+  if (!wanted.length) return null;
+
+  for (const sheetName of workbook.SheetNames) {
+    const normalizedSheet = normalizeText(sheetName);
+    if (wanted.some(name => normalizedSheet.includes(name) || name.includes(normalizedSheet))) {
+      return workbook.Sheets[sheetName];
+    }
+  }
+  return null;
+};
+
+const calculateSummaryFromRows = (rows) => {
+  let taxable = 0;
+  let igst = 0;
+  let cgst = 0;
+  let sgst = 0;
+  let cess = 0;
+
+  rows.forEach((row) => {
+    taxable += toNumber(
+      getValueByPossibleHeaders(row, [
+        "Taxable Value",
+        "Total Taxable Value",
+        "Revised Taxable Value",
+        "Net value of supplies",
+        "Taxable value"
+      ])
+    );
+
+    igst += toNumber(
+      getValueByPossibleHeaders(row, [
+        "Integrated Tax Amount",
+        "Integrated tax",
+        "IGST",
+        "Total Integrated Tax"
+      ])
+    );
+
+    cgst += toNumber(
+      getValueByPossibleHeaders(row, [
+        "Central Tax Amount",
+        "Central tax",
+        "CGST",
+        "Total Central Tax"
+      ])
+    );
+
+    sgst += toNumber(
+      getValueByPossibleHeaders(row, [
+        "State/UT Tax Amount",
+        "State/UT tax",
+        "SGST",
+        "UTGST",
+        "Total State/UT Tax"
+      ])
+    );
+
+    cess += toNumber(
+      getValueByPossibleHeaders(row, [
+        "Cess Amount",
+        "Cess",
+        "Total Cess"
+      ])
+    );
+  });
+
+  return {
+    taxable,
+    igst,
+    cgst,
+    sgst,
+    cess,
+    total: taxable + igst + cgst + sgst + cess
+  };
+};
+
+const applyImportedSummary = (option, totals) => {
+  const key = getImportSummaryKey(option);
+  if (!key) return;
+
+  setSummaryTotals(prev => ({
+    ...prev,
+    [key]: {
+      taxable: totals.taxable || 0,
+      igst: totals.igst || 0,
+      cgst: totals.cgst || 0,
+      sgst: totals.sgst || 0,
+      cess: totals.cess || 0,
+      total: totals.total || 0
+    }
+  }));
+};
+
+const handleImportFile = async () => {
+  if (!uploadedFile) {
+    alert("Please select a file first.");
+    return;
+  }
+
+  if (!selectedOptions.length) {
+    alert("Please select at least one import section.");
+    return;
+  }
+
+  try {
+    setIsUploading(true);
+
+    const buffer = await uploadedFile.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array" });
+
+    selectedOptions.forEach((option) => {
+      const sheet = pickMatchingSheet(workbook, option);
+
+      if (!sheet) {
+        applyImportedSummary(option, {
+          taxable: 0,
+          igst: 0,
+          cgst: 0,
+          sgst: 0,
+          cess: 0,
+          total: 0
+        });
+        return;
+      }
+
+      const rows = sheetToObjects(sheet);
+
+      const filteredRows = rows.filter((row) =>
+        Object.values(row || {}).some(value => String(value || "").trim() !== "")
+      );
+
+      if (!filteredRows.length) {
+        applyImportedSummary(option, {
+          taxable: 0,
+          igst: 0,
+          cgst: 0,
+          sgst: 0,
+          cess: 0,
+          total: 0
+        });
+        return;
+      }
+
+      const totals = calculateSummaryFromRows(filteredRows);
+      applyImportedSummary(option, totals);
     });
+
+    setActiveSubTab("Summary");
+    setImportStep("sources");
+    setUploadedFile(null);
+    alert("Excel imported successfully.");
+  } catch (error) {
+    console.error("Import failed:", error);
+    alert("File read failed. Summary set to zero for invalid sections.");
+  } finally {
+    setIsUploading(false);
+  }
+};
+
+const [outwardSupplies, setOutwardSupplies] = useState(() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.outward));
+
+    if (
+      Array.isArray(saved) &&
+      saved.length === 5
+    ) {
+      return saved;
+    }
+
+    return defaultOutwardSupplies;
+  } catch {
+    return defaultOutwardSupplies;
+  }
+});
     // 2. ECO u/s 9(5)
-    const [ecoSupplies, setEcoSupplies] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.eco);
-      return saved ? JSON.parse(saved) : [
-        { nature: "1- Taxable Supplies on which ECO pays tax u/s 9(5) [To be furnished by ECO]", taxable: "", igst: "", cgst: "", sgst: "", cess: "", total: "" },
-        { nature: "2- Taxable Supplies made by registered person through ECO, on which ECO is required to pay tax u/s 9(5) [To be furnished by Registered person making Supplies through ECO]", taxable: "", igst: "", cgst: "", sgst: "", cess: "", total: "" }
-      ];
-    });
+    const defaultEcoSupplies = [
+  {
+    nature: "1- Taxable Supplies on which ECO pays tax u/s 9(5) [To be furnished by ECO]",
+    taxable: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: "",
+    total: ""
+  },
+  {
+    nature: "2- Taxable Supplies made by registered person through ECO, on which ECO is required to pay tax u/s 9(5) [To be furnished by Registered person making Supplies through ECO]",
+    taxable: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: "",
+    total: ""
+  }
+];
+
+const [ecoSupplies, setEcoSupplies] = useState(() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.ecoSupplies));
+
+    if (Array.isArray(saved) && saved.length === 2) {
+      return saved;
+    }
+
+    return defaultEcoSupplies;
+  } catch {
+    return defaultEcoSupplies;
+  }
+});
     // 3. Inter-State Supplies (composition, exempt, nil, non-GST)
-    const [interstateSupplies, setInterstateSupplies] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.interstate);
-      return saved ? JSON.parse(saved) : [
-        { nature: "From a supplier under composition scheme, Exempt and NIL Rated Supply", interstate: "", intrastate: "" },
-        { nature: "Non GST Supply", interstate: "", intrastate: "" }
-      ];
-    });
+  const [unregisteredSupplies, setUnregisteredSupplies] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.interstateUnregistered);
+  return saved
+    ? JSON.parse(saved)
+    : [{ placeOfSupply: "", taxableValue: "", igst: "" }];
+});
+
+const [compositionSupplies, setCompositionSupplies] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.interstateComposition);
+  return saved
+    ? JSON.parse(saved)
+    : [{ placeOfSupply: "", taxableValue: "", igst: "" }];
+});
+
+const [uinSupplies, setUinSupplies] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.interstateUin);
+  return saved
+    ? JSON.parse(saved)
+    : [{ placeOfSupply: "", taxableValue: "", igst: "" }];
+});
     // 4. Eligible ITC (sabse bada table)
     const [itcDetails, setItcDetails] = useState(() => {
       const saved = localStorage.getItem(STORAGE_KEYS.itc);
@@ -660,6 +1201,15 @@ const [skipValidation, setSkipValidation] = useState(false);
 
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
+
+    const [gstr3bSavedSummary, setGstr3bSavedSummary] = useState(() => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.gstr3bSavedSummary);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+});
     // Dropdown controls
     const [openPosDropdownRow, setOpenPosDropdownRow] = useState(null);
     const [openSupplyTypeDropdownRow, setOpenSupplyTypeDropdownRow] = useState(null);
@@ -675,6 +1225,7 @@ const [skipValidation, setSkipValidation] = useState(false);
     const [openUcqDropdownRow, setOpenUcqDropdownRow] = useState(null);
     const [openNoteTypeDropdownRow, setOpenNoteTypeDropdownRow] = useState(null);
     const [openDropdown, setOpenDropdown] = useState(null);
+    const monthDropdownRef = useRef(null);
 
 
 
@@ -709,17 +1260,41 @@ useEffect(() => {
     useEffect(() => localStorage.setItem(STORAGE_KEYS.advanceAdjustment, JSON.stringify(advanceAdjustmentRows)), [advanceAdjustmentRows]);
     useEffect(() => localStorage.setItem(STORAGE_KEYS.hsn, JSON.stringify(hsnRows)), [hsnRows]);
     useEffect(() => localStorage.setItem(STORAGE_KEYS.documents, JSON.stringify(documentsRows)), [documentsRows]);
-    useEffect(() => localStorage.setItem(STORAGE_KEYS.eco, JSON.stringify(ecoRows)), [ecoRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.ecoRows, JSON.stringify(ecoRows)), [ecoRows]);
+  
     useEffect(() => localStorage.setItem(STORAGE_KEYS.summaryTotals, JSON.stringify(summaryTotals)), [summaryTotals]);
+    useEffect(() => {
+  localStorage.setItem(
+    STORAGE_KEYS.gstr3bSavedSummary,
+    JSON.stringify(gstr3bSavedSummary)
+  );
+}, [gstr3bSavedSummary]);
     useEffect(() => {
       localStorage.setItem(STORAGE_KEYS.outward, JSON.stringify(outwardSupplies));
     }, [outwardSupplies]);
     useEffect(() => {
-      localStorage.setItem(STORAGE_KEYS.eco, JSON.stringify(ecoSupplies));
-    }, [ecoSupplies]);
+  localStorage.setItem(STORAGE_KEYS.ecoSupplies, JSON.stringify(ecoSupplies));
+}, [ecoSupplies]);
     useEffect(() => {
-      localStorage.setItem(STORAGE_KEYS.interstate, JSON.stringify(interstateSupplies));
-    }, [interstateSupplies]);
+  localStorage.setItem(
+    STORAGE_KEYS.interstateUnregistered,
+    JSON.stringify(unregisteredSupplies)
+  );
+}, [unregisteredSupplies]);
+
+useEffect(() => {
+  localStorage.setItem(
+    STORAGE_KEYS.interstateComposition,
+    JSON.stringify(compositionSupplies)
+  );
+}, [compositionSupplies]);
+
+useEffect(() => {
+  localStorage.setItem(
+    STORAGE_KEYS.interstateUin,
+    JSON.stringify(uinSupplies)
+  );
+}, [uinSupplies]);
     useEffect(() => {
       localStorage.setItem(STORAGE_KEYS.itc, JSON.stringify(itcDetails));
     }, [itcDetails]);
@@ -773,10 +1348,181 @@ useEffect(() => {
       "Payment of tax "
     ];
     
-    // Yeh logic decide karega ki GSTR-3B ke 6 options dikhane hain ya GSTR-1 ke
-    const currentSections = title.toUpperCase().includes("3B") ? gstr3bSections : gstr1Sections;
-    const canSelect = selectedYear && selectedMonth;
-    const isGSTR3B = title.toUpperCase().includes("3B");
+  const isGSTR3B = title.toUpperCase().includes("3B");
+  const isITC04 = title.toUpperCase().includes("ITC-04");
+const isTDSTCS = title.toUpperCase().includes("TDS/TCS");
+const tdsTcsSections = ["Download", "Upload", "TDS/TCS Filing"];
+const isReports = title.toUpperCase().includes("REPORTS");
+
+const itc04Sections = ["Table 4", "Table 5(A)", "Table 5(B)", "Table 5(C)"];
+const isDownloadCenter = title.toUpperCase().includes("DOWNLOAD CENTER");
+
+const stateOptions = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Delhi",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Tamil Nadu",
+  "Telangana",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal"
+];
+
+const currentSections = isGSTR3B
+  ? gstr3bSections
+  : isITC04
+    ? itc04Sections
+    : gstr1Sections;
+
+const canSelect = isITC04
+  ? selectedYear && selectedMonth && selectedState
+  : selectedYear && selectedMonth;
+
+
+const toggleDownloadMonth = (month) => {
+  setSelectedDownloadMonths((prev) =>
+    prev.includes(month)
+      ? prev.filter((m) => m !== month)
+      : [...prev, month]
+  );
+};
+
+const toggleDownloadOption = (option) => {
+  setSelectedDownloadOptions((prev) =>
+    prev.includes(option)
+      ? prev.filter((item) => item !== option)
+      : [...prev, option]
+  );
+};
+
+const handleDownloadCenterSelectAll = () => {
+  if (downloadCenterSelectAll) {
+    setSelectedDownloadOptions([]);
+  } else {
+    setSelectedDownloadOptions(downloadCenterOptions);
+  }
+  setDownloadCenterSelectAll(!downloadCenterSelectAll);
+};
+
+const handleDownloadCenterCancel = () => {
+  setDownloadCenterYear("");
+  setSelectedDownloadMonths([]);
+  setSelectedDownloadOptions([]);
+  setDownloadCenterSelectAll(false);
+  setDownloadCenterMonthDropdownOpen(false);
+};
+
+const handleDownloadCenterDownload = () => {
+  toast.success("Download Center request submitted successfully!");
+};
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      monthDropdownRef.current &&
+      !monthDropdownRef.current.contains(event.target)
+    ) {
+      setDownloadCenterMonthDropdownOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
+
+const reportTabs = ["Summary", "Month Wise", "Compare", "Annual"];
+
+const summaryReports = [
+  "GSTR-3B Summary",
+  "GSTR-1 Summary",
+  "GSTR-1A Summary",
+  "GSTR-2A Summary",
+  "GSTR-2B Summary",
+  "GSTR Consolidated Reports",
+  "GSTR-3B All Table Details",
+  "GSTR-1 Financial Year Invoice Dates",
+  "GSTR-2B Download Invoice Date in Next FY"
+];
+
+const monthWiseReports = [
+  "GSTR-3B Monthly / Yearly Report",
+  "GSTR-2B ITC Reclaim Reports",
+  "GSTR-1 Return Filed PDF Download",
+  "GSTR-3B Return Filed PDF Download",
+  "RCM Report in GSTR-3B",
+  "Electronic Credit / Cash Ledger Report"
+];
+
+const compareReports = [
+  "GSTR-2 vs GSTR-2A",
+  "GSTR-2 vs GSTR-2A (Party Wise)",
+  "GSTR-2 vs GSTR-2B",
+  "GSTR-2 vs GSTR-2B (Party Wise)",
+  "GSTR-2A vs GSTR-3B (ITC)",
+  "GSTR-2B vs GSTR-3B (ITC)",
+  "GSTR-3B vs GSTR-1",
+  "Tax Compare Report",
+  "GSTR-9 Compare Report",
+  "GSTR-3B vs TDS/TCS"
+];
+
+const annualReports = [
+  "GSTR-2 Annual Report",
+  "GSTR-2A Annual Report",
+  "GSTR-2B Annual Reports",
+  "GSTR-1 Annual Report",
+  "GSTR-1A Annual Report",
+  "GSTR-3B vs GSTR-2A",
+  "GSTR-3B vs GSTR-2B",
+  "GSTR-3B vs GSTR-1",
+  "GSTR-2A vs GSTR-2B",
+  "Rate Wise Reports",
+  "GSTR-9 Report",
+  "GSTR-9C Report",
+  "Interest and Late Fee Report",
+  "Trading Report",
+  "TDS/TCS Annual Report",
+  "Tax Liability and ITC Summary"
+];
+
+const getCurrentReportList = () => {
+  switch (activeReportTab) {
+    case "Summary":
+      return summaryReports;
+    case "Month Wise":
+      return monthWiseReports;
+    case "Compare":
+      return compareReports;
+    case "Annual":
+      return annualReports;
+    default:
+      return [];
+  }
+};
+
+const handleReportDownload = (reportName) => {
+  toast.success(`${reportName} download started`);
+};
+
+
 
     const tableColumns = {
       "1 - 4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": [
@@ -1252,13 +1998,100 @@ useEffect(() => {
   { key: "cgst", label: "CGST", align: "right", type: "number" },
   { key: "sgst", label: "SGST", align: "right", type: "number" },
   { key: "cessAmount", label: "Cess Amount", align: "right", type: "number" }
-]
+],
+"Table 4": [
+  { key: "gstinJobWorker", label: "GSTIN of Job Worker", align: "left" },
+  { key: "state", label: "State (in case of Unregistered)", align: "left" },
+  { key: "jobWorkerType", label: "Job Worker's Type", align: "center" },
+  { key: "challanNumber", label: "Challan Number", align: "left" },
+  { key: "challanDate", label: "Challan Date", align: "center" },
+  { key: "goodsType", label: "Type of Goods", align: "center" },
+  { key: "description", label: "Description of Goods", align: "left" },
+  { key: "uqc", label: "Unique Quantity Code (UQC)", align: "center" },
+  { key: "quantity", label: "Quantity", align: "right", type: "number" },
+  { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+  { key: "rate", label: "Rate", align: "right", type: "number" },
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+  { key: "cess", label: "CESS", align: "right", type: "number" }
+],
+
+"Table 5(A)": [
+  { key: "gstinJobWorker", label: "GSTIN of Job Worker", align: "left" },
+  { key: "state", label: "State (in case of Unregistered)", align: "left" },
+  { key: "jobWorkerType", label: "Job Worker's Type", align: "center" },
+  { key: "challanNumber", label: "Challan Number", align: "left" },
+  { key: "challanDate", label: "Challan Date", align: "center" },
+  { key: "goodsType", label: "Type of Goods", align: "center" },
+  { key: "description", label: "Description of Goods", align: "left" },
+  { key: "uqc", label: "Unique Quantity Code (UQC)", align: "center" },
+  { key: "quantity", label: "Quantity", align: "right", type: "number" },
+  { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+  { key: "rate", label: "Rate", align: "right", type: "number" },
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+  { key: "cess", label: "CESS", align: "right", type: "number" }
+],
+
+"Table 5(B)": [
+  { key: "gstinJobWorker", label: "GSTIN of Job Worker", align: "left" },
+  { key: "state", label: "State (in case of Unregistered)", align: "left" },
+  { key: "jobWorkerType", label: "Job Worker's Type", align: "center" },
+  { key: "challanNumber", label: "Challan Number", align: "left" },
+  { key: "challanDate", label: "Challan Date", align: "center" },
+  { key: "goodsType", label: "Type of Goods", align: "center" },
+  { key: "description", label: "Description of Goods", align: "left" },
+  { key: "uqc", label: "Unique Quantity Code (UQC)", align: "center" },
+  { key: "quantity", label: "Quantity", align: "right", type: "number" },
+  { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+  { key: "rate", label: "Rate", align: "right", type: "number" },
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+  { key: "cess", label: "CESS", align: "right", type: "number" }
+],
+
+"Table 5(C)": [
+  { key: "gstinJobWorker", label: "GSTIN of Job Worker", align: "left" },
+  { key: "state", label: "State (in case of Unregistered)", align: "left" },
+  { key: "jobWorkerType", label: "Job Worker's Type", align: "center" },
+  { key: "challanNumber", label: "Challan Number", align: "left" },
+  { key: "challanDate", label: "Challan Date", align: "center" },
+  { key: "goodsType", label: "Type of Goods", align: "center" },
+  { key: "description", label: "Description of Goods", align: "left" },
+  { key: "uqc", label: "Unique Quantity Code (UQC)", align: "center" },
+  { key: "quantity", label: "Quantity", align: "right", type: "number" },
+  { key: "taxableValue", label: "Taxable Value", align: "right", type: "number" },
+  { key: "rate", label: "Rate", align: "right", type: "number" },
+  { key: "igst", label: "IGST", align: "right", type: "number" },
+  { key: "cgst", label: "CGST", align: "right", type: "number" },
+  { key: "sgst", label: "SGST", align: "right", type: "number" },
+  { key: "cess", label: "CESS", align: "right", type: "number" }
+],
 
 };
 
 
-    const currentColumns = tableColumns[selectedSection] || [];
-    const getRowsAndSetter = () => {
+
+
+   const currentColumns = tableColumns[isITC04 ? selectedItcTable : selectedSection] || [];
+   const getRowsAndSetter = () => {
+  if (isITC04) {
+    switch (selectedItcTable) {
+      case "Table 4":
+        return [itc04Table4Rows, setItc04Table4Rows];
+      case "Table 5(A)":
+        return [itc04Table5ARows, setItc04Table5ARows];
+      case "Table 5(B)":
+        return [itc04Table5BRows, setItc04Table5BRows];
+      case "Table 5(C)":
+        return [itc04Table5CRows, setItc04Table5CRows];
+      default:
+        return [[], () => {}];
+    }
+  } 
       switch (selectedSection) {
         case "1 - 4A, 4B, 6B, 6C - B2B, SEZ, DE Invoices": return [b2bRows, setB2bRows];
         case "2 - B2C (Large) Invoices": return [b2cLargeRows, setB2cLargeRows];
@@ -1341,22 +2174,267 @@ useEffect(() => {
         alert("Saved successfully!");
       }
     };
+    const toNum = (value) => Number(value || 0);
+
+const getGstr3bSectionFileName = (sectionName) => {
+  const map = {
+    [gstr3bSections[0]]: "GSTR-3B-3.1-Outward-Reverse-Charge.xlsx",
+    [gstr3bSections[1]]: "GSTR-3B-3.1.1-Supplies-u-s-9(5).xlsx",
+    [gstr3bSections[2]]: "GSTR-3B-3.2-Inter-State-Supplies.xlsx",
+    [gstr3bSections[3]]: "GSTR-3B-4-Eligible-ITC.xlsx",
+    [gstr3bSections[4]]: "GSTR-3B-5-Exempt-Nil-Non-GST.xlsx",
+    [gstr3bSections[5]]: "GSTR-3B-5.1-Interest-Late-Fee.xlsx",
+    [gstr3bSections[6]]: "GSTR-3B-6.1-Payment-of-Tax.xlsx"
+  };
+  return map[sectionName] || "GSTR-3B-Section.xlsx";
+};
+
+const buildGstr3bSectionPayload = (sectionName) => {
+  if (sectionName === gstr3bSections[0]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: outwardSupplies.map((row) => ({
+        "Nature of Supplies": row.nature,
+        "Taxable Value": toNum(row.taxable),
+        IGST: row.igst === "Hide" ? "" : toNum(row.igst),
+        CGST: row.cgst === "Hide" ? "" : toNum(row.cgst),
+        SGST: row.sgst === "Hide" ? "" : toNum(row.sgst),
+        CESS: row.cess === "Hide" ? "" : toNum(row.cess)
+      }))
+    };
+  }
+
+  if (sectionName === gstr3bSections[1]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: ecoSupplies.map((row) => ({
+        "Nature of Supplies": row.nature,
+        "Taxable Value": toNum(row.taxable),
+        IGST: toNum(row.igst),
+        CGST: toNum(row.cgst),
+        SGST: toNum(row.sgst),
+        CESS: toNum(row.cess),
+        Total: toNum(row.total)
+      }))
+    };
+  }
+
+  if (sectionName === gstr3bSections[2]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: [
+        ...unregisteredSupplies.map((row) => ({
+          Category: "Unregistered Persons",
+          "Place of Supply": row.placeOfSupply,
+          "Taxable Value": toNum(row.taxableValue),
+          IGST: toNum(row.igst)
+        })),
+        ...compositionSupplies.map((row) => ({
+          Category: "Composition Taxable Persons",
+          "Place of Supply": row.placeOfSupply,
+          "Taxable Value": toNum(row.taxableValue),
+          IGST: toNum(row.igst)
+        })),
+        ...uinSupplies.map((row) => ({
+          Category: "UIN Holders",
+          "Place of Supply": row.placeOfSupply,
+          "Taxable Value": toNum(row.taxableValue),
+          IGST: toNum(row.igst)
+        }))
+      ]
+    };
+  }
+
+  if (sectionName === gstr3bSections[3]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: [
+        ...itcDetails.available.map((row) => ({
+          Block: "ITC Available",
+          Description: row.desc,
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess)
+        })),
+        ...itcDetails.reversed.map((row) => ({
+          Block: "ITC Reversed",
+          Description: row.desc,
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess)
+        })),
+        {
+          Block: "Net ITC",
+          Description: "Net ITC Available (A - B)",
+          IGST: toNum(itcDetails.netItc.igst),
+          CGST: toNum(itcDetails.netItc.cgst),
+          SGST: toNum(itcDetails.netItc.sgst),
+          CESS: toNum(itcDetails.netItc.cess)
+        },
+        ...itcDetails.ineligible.map((row) => ({
+          Block: "Other Details",
+          Description: row.desc,
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess)
+        }))
+      ]
+    };
+  }
+
+  if (sectionName === gstr3bSections[4]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: exemptNonGst.map((row) => ({
+        "Nature of Supplies": row.nature,
+        "Inter-State": toNum(row.interstate),
+        "Intra-State": toNum(row.intrastate),
+        Total: toNum(row.interstate) + toNum(row.intrastate)
+      }))
+    };
+  }
+
+  if (sectionName === gstr3bSections[5]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: interestLateFee.map((row) => ({
+        Description: row.desc,
+        IGST: toNum(row.igst),
+        CGST: toNum(row.cgst),
+        SGST: toNum(row.sgst),
+        CESS: toNum(row.cess),
+        Total: toNum(row.igst) + toNum(row.cgst) + toNum(row.sgst) + toNum(row.cess)
+      }))
+    };
+  }
+
+  if (sectionName === gstr3bSections[6]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: [
+        ...cashLedger.map((row) => ({
+          Block: "Cash Ledger",
+          Description: row.desc,
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess),
+          Total: toNum(row.igst) + toNum(row.cgst) + toNum(row.sgst) + toNum(row.cess)
+        })),
+        ...creditLedger.map((row) => ({
+          Block: "Credit Ledger",
+          Description: "Credit Ledger Balance",
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess),
+          Total: toNum(row.igst) + toNum(row.cgst) + toNum(row.sgst) + toNum(row.cess)
+        }))
+      ]
+    };
+  }
+
+  return null;
+};
+
+const handleGstr3bSave = () => {
+  if (!selectedSection) {
+    alert("Please select section first.");
+    return;
+  }
+
+  const payload = buildGstr3bSectionPayload(selectedSection);
+
+  if (!payload || !payload.rows || payload.rows.length === 0) {
+    alert("No data found to save.");
+    return;
+  }
+
+  setGstr3bSavedSummary((prev) => ({
+    ...prev,
+    [selectedSection]: {
+      ...payload,
+      savedAt: new Date().toLocaleString("en-IN")
+    }
+  }));
+
+  setActiveSubTab("Summary");
+  alert(`${selectedSection} saved successfully!`);
+};
+
+const downloadGstr3bSectionExcel = (sectionName) => {
+  const payload = gstr3bSavedSummary[sectionName];
+  if (!payload || !payload.rows || payload.rows.length === 0) {
+    alert("No saved data found for download.");
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  const headingRows = [
+    ["GSTR-3B Summary Report"],
+    ["Section", payload.sectionName],
+    ["Financial Year", selectedYear || ""],
+    ["Month", selectedMonth || ""],
+    ["Saved At", payload.savedAt || ""],
+    []
+  ];
+
+  const dataRows = payload.rows;
+  const ws = XLSX.utils.json_to_sheet([]);
+
+  XLSX.utils.sheet_add_aoa(ws, headingRows, { origin: "A1" });
+  XLSX.utils.sheet_add_json(ws, dataRows, {
+    origin: "A7",
+    skipHeader: false
+  });
+
+  XLSX.utils.book_append_sheet(wb, ws, "Summary");
+  XLSX.writeFile(wb, payload.fileName || "GSTR-3B-Section.xlsx");
+};
     const formatIndian = (num) => num === 0 ? "—" : Number(num).toLocaleString("en-IN");
     // Visible Summary
     const visibleSummary = [];
-    if (summaryTotals.b2b.total > 0) visibleSummary.push({ id: "b2b", label: "1. B2B Supplies", ...summaryTotals.b2b });
-    if (summaryTotals.b2cLarge.total > 0) visibleSummary.push({ id: "b2cLarge", label: "2. B2C (Large)", ...summaryTotals.b2cLarge });
-    if (summaryTotals.b2cOthers.total > 0) visibleSummary.push({ id: "b2cOthers", label: "3. B2C Small", ...summaryTotals.b2cOthers });
-    if (summaryTotals.hsn.total > 0) visibleSummary.push({ id: "hsn", label: "HSN wise", ...summaryTotals.hsn });
-    const grandTotal = visibleSummary.reduce((acc, item) => {
-      acc.taxable += item.taxable || 0;
-      acc.igst += item.igst || 0;
-      acc.cgst += item.cgst || 0;
-      acc.sgst += item.sgst || 0;
-      acc.cess += item.cess || 0;
-      acc.total += item.total || 0;
-      return acc;
-    }, { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 });
+    if ((summaryTotals?.b2b?.total || 0) > 0) {
+  visibleSummary.push({ id: "b2b", label: "B2B Supplies", ...summaryTotals.b2b });
+}
+
+if ((summaryTotals?.b2cLarge?.total || 0) > 0) {
+  visibleSummary.push({ id: "b2cLarge", label: "B2C Large", ...summaryTotals.b2cLarge });
+}
+
+if ((summaryTotals?.b2cOthers?.total || 0) > 0) {
+  visibleSummary.push({ id: "b2cOthers", label: "B2C Others", ...summaryTotals.b2cOthers });
+}
+
+if ((summaryTotals?.hsn?.total || 0) > 0) {
+  visibleSummary.push({ id: "hsn", label: "HSN wise", ...summaryTotals.hsn });
+}
+
+if ((summaryTotals?.eco?.total || 0) > 0) {
+  visibleSummary.push({ id: "eco", label: "14A / ECO Amendment", ...summaryTotals.eco });
+}
+   const grandTotal = visibleSummary.reduce(
+  (acc, item) => ({
+    taxable: acc.taxable + Number(item?.taxable || 0),
+    igst: acc.igst + Number(item?.igst || 0),
+    cgst: acc.cgst + Number(item?.cgst || 0),
+    sgst: acc.sgst + Number(item?.sgst || 0),
+    cess: acc.cess + Number(item?.cess || 0),
+    total: acc.total + Number(item?.total || 0)
+  }),
+  { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+);
     // Checkbox handlers
     const toggleSelectAll = () => {
       if (selectAll) {
@@ -1399,6 +2477,27 @@ useEffect(() => {
       newItc.ineligible[index][field] = value;
       setItcDetails(newItc);
     };
+
+    const addInterstateRow = (setter) => {
+  setter((prev) => [
+    ...prev,
+    { placeOfSupply: "", taxableValue: "", igst: "" }
+  ]);
+};
+
+const deleteInterstateRow = (setter, rows, index) => {
+  if (rows.length === 1) {
+    setter([{ placeOfSupply: "", taxableValue: "", igst: "" }]);
+    return;
+  }
+  setter(rows.filter((_, i) => i !== index));
+};
+
+const updateInterstateCell = (setter, rows, index, field, value) => {
+  const updated = [...rows];
+  updated[index][field] = value;
+  setter(updated);
+};
     const renderInput = (value, onChange) => (
       <input
         type="number"
@@ -1419,7 +2518,13 @@ useEffect(() => {
     const tableActions = (
       <div style={{ padding: "20px", display: "flex", justifyContent: "flex-end", gap: 16, borderTop: "1px solid #e5e7eb" }}>
         <button
-          onClick={() => alert("Data Saved Successfully!")}
+          onClick={() => {
+  if (isGSTR3B) {
+    handleGstr3bSave();
+  } else {
+    alert("Data Saved Successfully!");
+  }
+}}
           style={{
             padding: "12px 36px",
             background: "#10b981",
@@ -1473,48 +2578,104 @@ useEffect(() => {
                 {title}
               </h1>
               {/* Financial Year + Month → title ke right side pe sabke liye */}
-              {activeSubTab === "Manually" && (
-                <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-                  <div style={{ width: 120 }}>
-                    <label style={{ display: "block", marginBottom: 4, fontWeight: 600 ,fontSize: "0.85rem"}}>Financial Year</label>
-                    <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #c7d2fe" , fontSize: "0.85rem"}}>
-                      {years.map(y => <option key={y}>{y}</option>)}
-                    </select>
-                  </div>
-                  <div style={{ width: 120 }}>
-                    <label style={{ display: "block", marginBottom: 4, fontWeight: 600 , fontSize: "0.85rem" }}>Month</label>
-                    <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #c7d2fe" , fontSize: "0.85rem" }}>
-                      <option value="">Select</option>
-                      {months.map(m => <option key={m}>{m}</option>)}
-                    </select>
-                  </div>
-                </div>
+              {activeSubTab === "Manually" && !isDownloadCenter && !isReports && (
+  <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+    <div style={{ width: 120 }}>
+      <label style={{ display: "block", marginBottom: 4, fontWeight: 600, fontSize: "0.85rem" }}>
+        Financial Year
+      </label>
+      <select
+        value={selectedYear}
+        onChange={e => {
+          setSelectedYear(e.target.value);
+          setSelectedSection("");
+          setSelectedItcTable("");
+          setSelectedTdsTcsSection("");
+        }}
+        style={{
+          width: "100%",
+          padding: "6px",
+          borderRadius: 4,
+          border: "1px solid #c7d2fe",
+          fontSize: "0.85rem"
+        }}
+      >
+        {years.map(y => <option key={y}>{y}</option>)}
+      </select>
+    </div>
+
+    {!isTDSTCS && (
+      <div style={{ width: 120 }}>
+        <label style={{ display: "block", marginBottom: 4, fontWeight: 600, fontSize: "0.85rem" }}>
+          Month
+        </label>
+        <select
+          value={selectedMonth}
+          onChange={e => {
+            setSelectedMonth(e.target.value);
+            setSelectedSection("");
+            setSelectedItcTable("");
+          }}
+          style={{
+            width: "100%",
+            padding: "6px",
+            borderRadius: 4,
+            border: "1px solid #c7d2fe",
+            fontSize: "0.85rem"
+          }}
+        >
+          <option value="">Select</option>
+          {months.map(m => <option key={m}>{m}</option>)}
+        </select>
+      </div>
+    )}
+ 
+    {isITC04 && (
+      <div style={{ width: 180 }}>
+        <label style={{ display: "block", marginBottom: 4, fontWeight: 600 , fontSize: "0.85rem" }}>State</label>
+        <select
+          value={selectedState}
+          onChange={e => {
+            setSelectedState(e.target.value);
+            setSelectedItcTable("");
+          }}
+          style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #c7d2fe" , fontSize: "0.85rem" }}
+        >
+          <option value="">Select</option>
+          {stateOptions.map(state => <option key={state} value={state}>{state}</option>)}
+        </select>
+      </div>
+    )}
+  </div>
+
               )}
             </div>
           </div>
           {/* Tabs */}
-          <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#fafbff" }}>
-            {["Manually", "Import", "Summary"].map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveSubTab(tab)}
-                style={{
-                  flex: 1,
-  padding: "10px",                    // ← padding kam
-  background: activeSubTab === tab ? "white" : "transparent",
-  color: "#64748b",
-  border: "none",
-  fontSize: "0.95rem",                // ← font chhota
-  fontWeight: activeSubTab === tab ? 600 : 400,
-  cursor: "pointer",
-  borderBottom: activeSubTab === tab ? "2px solid #7c3aed" : "none"
-                }}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
+          {/* Tabs */}
+{!isTDSTCS && !isDownloadCenter && !isReports && (
+  <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#fafbff" }}>
+    {["Manually", "Import", "Summary"].map(tab => (
+      <button
+        key={tab}
+        onClick={() => setActiveSubTab(tab)}
+        style={{
+          flex: 1,
+          padding: "10px",
+          background: activeSubTab === tab ? "white" : "transparent",
+          color: "#64748b",
+          border: "none",
+          fontSize: "0.95rem",
+          fontWeight: activeSubTab === tab ? 600 : 400,
+          cursor: "pointer",
+          borderBottom: activeSubTab === tab ? "2px solid #7c3aed" : "none"
+        }}
+      >
+        {tab}
+      </button>
+    ))}
+  </div>
+)}
 {activeSubTab === "Import" && (
   <div style={{ padding: "24px 16px", background: "#f9fafb", minHeight: "80vh" }}>
 
@@ -1872,15 +3033,19 @@ useEffect(() => {
           <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px" }}>
             <button
               disabled={!uploadedFile || isUploading}
-              onClick={() => {
-                setIsUploading(true);
-                setTimeout(() => {
-                  setIsUploading(false);
-                  alert(`Uploaded successfully for ${selectedSource}`);
-                  setUploadedFile(null);
-                  setImportStep("sources");
-                }, 1400);
-              }}
+              
+             onClick={() => {
+  handleImportFile();
+  setIsUploading(true);
+
+  setTimeout(() => {
+    setIsUploading(false);
+    alert(`Uploaded successfully for ${selectedSource}`);
+    setUploadedFile(null);
+    setImportStep("sources");
+  }, 1400);
+}}
+
               style={{
                 padding: "10px 40px",
                 background: uploadedFile && !isUploading ? "#4f46e5" : "#9ca3af",
@@ -1955,10 +3120,41 @@ useEffect(() => {
                 ))}
               </div>
             </div>
+            
           )}
+          {isITC04 && canSelect && (
+  <div style={{
+    padding: "16px 0 24px 0",
+    background: "#f8fafc",
+    overflowX: "auto",
+    whiteSpace: "nowrap",
+    marginBottom: "20px"
+  }}>
+    <div style={{ display: "inline-flex", gap: "12px" }}>
+      {itc04Sections.map((section) => (
+        <button
+          key={section}
+          onClick={() => setSelectedItcTable(section)}
+          style={{
+            padding: "6px 14px",
+            background: selectedItcTable === section ? "#e0f2fe" : "white",
+            color: selectedItcTable === section ? "#0f172a" : "#166534",
+            border: selectedItcTable === section ? "1px solid #38bdf8" : "1px solid #86efac",
+            borderRadius: "8px",
+            fontSize: "0.85rem",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          {section}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
 
           {/* GSTR-3B ke alawa sabke liye purana dropdown */}
-          {!isGSTR3B && (
+         {!isGSTR3B && !isTDSTCS && !isDownloadCenter && !isReports && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "8px" }}>
            
               <div style={{ flex: 1, minWidth: 300 }}>
@@ -1967,6 +3163,39 @@ useEffect(() => {
                   <option value="">{canSelect ? "Choose section..." : "Select period first"}</option>
                   {currentSections.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
+              </div>
+            </div>
+          )}
+
+                    {isTDSTCS && selectedYear && (
+            <div style={{
+              padding: "16px 0 24px 0",
+              background: "#f8fafc",
+              overflowX: "auto",
+              whiteSpace: "nowrap",
+              marginBottom: "20px"
+            }}>
+              <div style={{ display: "inline-flex", gap: "12px" }}>
+                {tdsTcsSections.map((section) => (
+                  <button
+                    key={section}
+                    onClick={() => setSelectedTdsTcsSection(section)}
+                    style={{
+                      padding: "8px 18px",
+                      background: selectedTdsTcsSection === section ? "#fef3c7" : "white",
+                      color: "#92400e",
+                      border: selectedTdsTcsSection === section ? "1px solid #f59e0b" : "1px solid #fed7aa",
+                      borderRadius: "8px",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      boxShadow: selectedTdsTcsSection === section ? "0 1px 4px rgba(245,158,11,0.25)" : "none",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    {section}
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -2064,34 +3293,322 @@ useEffect(() => {
               {/* ───────────────────────────────────────────────
                   SECTION 3: Inter-State Supplies
               ─────────────────────────────────────────────── */}
-              {selectedSection === gstr3bSections[2] && (
-                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                 <table style={{ 
-  width: "100%", 
-  borderCollapse: "collapse", 
-  fontSize: "13px",           // thoda chhota text
-  border: "1px solid #d1d5db" // outer border
-}}>
-                    <thead>
-                      <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
-                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
-                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Inter-State Supplies</th>
-                        <th style={{ padding: "14px", textAlign: "right" }}>Intra-State Supplies</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {interstateSupplies.map((row, i) => (
-                        <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
-                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.interstate, v => handleChange(setInterstateSupplies, interstateSupplies, i, "interstate", v))}</td>
-                          <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.intrastate, v => handleChange(setInterstateSupplies, interstateSupplies, i, "intrastate", v))}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {tableActions}
-                </div>
-              )}
+             {selectedSection === gstr3bSections[2] && (
+  <div style={{ display: "flex", flexDirection: "column", gap: "26px" }}>
+    
+    <div>
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "10px",
+          background: "#fef3c7",
+          padding: "6px 12px",
+          fontWeight: 700,
+          fontSize: "18px",
+          borderRadius: "4px",
+          marginBottom: "10px"
+        }}
+      >
+        <span style={{ fontSize: "18px", fontWeight: 700 }}>1.</span>
+        <span>Supplies made to Unregistered Persons</span>
+      </div>
+
+      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+            border: "1px solid #d1d5db"
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#bfdbfe", fontWeight: 700 }}>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center", width: "60px" }}></th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: "280px" }}>
+                Place of Supply (State/UT)
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "180px" }}>
+                Total Taxable Value
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "140px" }}>
+                IGST
+              </th>
+              <th style={{ padding: "12px", textAlign: "left", minWidth: "170px" }}>
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {unregisteredSupplies.map((row, i) => (
+              <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>
+                  <input type="checkbox" />
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>
+                  {renderInput(
+                    row.placeOfSupply,
+                    (v) => updateInterstateCell(setUnregisteredSupplies, unregisteredSupplies, i, "placeOfSupply", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.taxableValue,
+                    (v) => updateInterstateCell(setUnregisteredSupplies, unregisteredSupplies, i, "taxableValue", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.igst,
+                    (v) => updateInterstateCell(setUnregisteredSupplies, unregisteredSupplies, i, "igst", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-start" }}>
+                    <button
+                      type="button"
+                      onClick={() => addInterstateRow(setUnregisteredSupplies)}
+                      style={{ border: "none", background: "transparent", color: "green", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      style={{ border: "none", background: "transparent", color: "#d946ef", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteInterstateRow(setUnregisteredSupplies, unregisteredSupplies, i)}
+                      style={{ border: "none", background: "transparent", color: "red", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "10px",
+          background: "#fef3c7",
+          padding: "6px 12px",
+          fontWeight: 700,
+          fontSize: "18px",
+          borderRadius: "4px",
+          marginBottom: "10px"
+        }}
+      >
+        <span style={{ fontSize: "18px", fontWeight: 700 }}>2.</span>
+        <span>Supplies made to Composition Taxable Persons</span>
+      </div>
+
+      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+            border: "1px solid #d1d5db"
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#bfdbfe", fontWeight: 700 }}>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center", width: "60px" }}></th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: "280px" }}>
+                Place of Supply (State/UT)
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "180px" }}>
+                Total Taxable Value
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "140px" }}>
+                IGST
+              </th>
+              <th style={{ padding: "12px", textAlign: "left", minWidth: "170px" }}>
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {compositionSupplies.map((row, i) => (
+              <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>
+                  <input type="checkbox" />
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>
+                  {renderInput(
+                    row.placeOfSupply,
+                    (v) => updateInterstateCell(setCompositionSupplies, compositionSupplies, i, "placeOfSupply", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.taxableValue,
+                    (v) => updateInterstateCell(setCompositionSupplies, compositionSupplies, i, "taxableValue", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.igst,
+                    (v) => updateInterstateCell(setCompositionSupplies, compositionSupplies, i, "igst", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-start" }}>
+                    <button
+                      type="button"
+                      onClick={() => addInterstateRow(setCompositionSupplies)}
+                      style={{ border: "none", background: "transparent", color: "green", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      style={{ border: "none", background: "transparent", color: "#d946ef", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteInterstateRow(setCompositionSupplies, compositionSupplies, i)}
+                      style={{ border: "none", background: "transparent", color: "red", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "10px",
+          background: "#fef3c7",
+          padding: "6px 12px",
+          fontWeight: 700,
+          fontSize: "18px",
+          borderRadius: "4px",
+          marginBottom: "10px"
+        }}
+      >
+        <span style={{ fontSize: "18px", fontWeight: 700 }}>3.</span>
+        <span>Supplies made to UIN Holders</span>
+      </div>
+
+      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+            border: "1px solid #d1d5db"
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#bfdbfe", fontWeight: 700 }}>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center", width: "60px" }}></th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: "280px" }}>
+                Place of Supply (State/UT)
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "180px" }}>
+                Total Taxable Value
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "140px" }}>
+                IGST
+              </th>
+              <th style={{ padding: "12px", textAlign: "left", minWidth: "170px" }}>
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {uinSupplies.map((row, i) => (
+              <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>
+                  <input type="checkbox" />
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>
+                  {renderInput(
+                    row.placeOfSupply,
+                    (v) => updateInterstateCell(setUinSupplies, uinSupplies, i, "placeOfSupply", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.taxableValue,
+                    (v) => updateInterstateCell(setUinSupplies, uinSupplies, i, "taxableValue", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.igst,
+                    (v) => updateInterstateCell(setUinSupplies, uinSupplies, i, "igst", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-start" }}>
+                    <button
+                      type="button"
+                      onClick={() => addInterstateRow(setUinSupplies)}
+                      style={{ border: "none", background: "transparent", color: "green", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      style={{ border: "none", background: "transparent", color: "#d946ef", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteInterstateRow(setUinSupplies, uinSupplies, i)}
+                      style={{ border: "none", background: "transparent", color: "red", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+)}
               {/* ───────────────────────────────────────────────
                   SECTION 4: Eligible ITC (sabse lamba table)
               ─────────────────────────────────────────────── */}
@@ -2364,13 +3881,656 @@ useEffect(() => {
   </div>
 )}
 
+{isReports && (
+  <div style={{ padding: "4px 0 12px 0" }}>
+    <div
+      style={{
+        background: "#ffffff",
+        border: "1px solid #e5e7eb",
+        borderRadius: "10px",
+        padding: "12px 14px",
+        boxShadow: "0 1px 6px rgba(15, 23, 42, 0.04)"
+      }}
+    >
+      {/* Top Header + Date Filters */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "10px",
+          flexWrap: "wrap",
+          marginBottom: "10px"
+        }}
+      >
+        <div
+          style={{
+            padding: "4px 10px",
+            border: "1px solid #93c5fd",
+            borderRadius: "7px",
+            color: "#2563eb",
+            fontWeight: 700,
+            background: "#eff6ff",
+            fontSize: "0.82rem",
+            lineHeight: 1.2
+          }}
+        >
+          Reports
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            flexWrap: "nowrap"
+          }}
+        >
+          <label style={{ fontWeight: 600, color: "#1f2937", fontSize: "0.82rem" }}>
+            From 
+          </label>
+          <input
+            type="date"
+            value={reportFromDate}
+            onChange={(e) => setReportFromDate(e.target.value)}
+            style={{
+              padding: "5px 8px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "6px",
+              fontSize: "0.8rem",
+              height: "32px"
+            }}
+          />
+
+          <label style={{ fontWeight: 600, color: "#1f2937", fontSize: "0.82rem", marginLeft: "2px" }}>
+            To 
+          </label>
+          <input
+            type="date"
+            value={reportToDate}
+            onChange={(e) => setReportToDate(e.target.value)}
+            style={{
+              padding: "5px 8px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "6px",
+              fontSize: "0.8rem",
+              height: "32px"
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Tabs only after date selected */}
+      {reportFromDate && reportToDate && (
+        <>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              flexWrap: "wrap",
+              marginBottom: "12px"
+            }}
+          >
+            {reportTabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveReportTab(tab)}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "6px",
+                  border: activeReportTab === tab ? "1px solid #f59e0b" : "1px solid #e5e7eb",
+                  background: activeReportTab === tab ? "#fef3c7" : "#ffffff",
+                  color: activeReportTab === tab ? "#92400e" : "#334155",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  lineHeight: 1.2
+                }}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <div
+            style={{
+              borderTop: "1px solid #eef2f7",
+              paddingTop: "10px",
+              display: "grid",
+              gap: "6px"
+            }}
+          >
+            {getCurrentReportList().map((report, index) => (
+              <div
+                key={report}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "8px",
+                  padding: "6px 8px",
+                  border: "1px solid #f5f7fa",
+                  borderRadius: "7px",
+                  background: "#fafafa",
+                  flexWrap: "wrap"
+                }}
+              >
+                <div
+                  style={{
+                    color: "#334155",
+                    fontSize: "0.82rem",
+                    fontWeight: 500,
+                    lineHeight: 1.25,
+                    flex: 1,
+                    minWidth: "220px"
+                  }}
+                >
+                  {index + 1}. {report}
+                </div>
+
+                <button
+                  onClick={() => handleReportDownload(report)}
+                  style={{
+                    padding: "4px 10px",
+                    background: "#ffffff",
+                    color: "#2563eb",
+                    border: "1px solid #93c5fd",
+                    borderRadius: "6px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontSize: "0.76rem",
+                    minWidth: "78px",
+                    lineHeight: 1.2
+                  }}
+                >
+                  Download
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+)}
+{isDownloadCenter && (
+  <div style={{ padding: "8px 0 24px 0" }}>
+    <div
+      style={{
+        maxWidth: "900px",
+        margin: "0 auto",
+        background: "#ffffff",
+        border: "1px solid #dbe2ea",
+        borderRadius: "16px",
+        padding: "28px",
+        boxShadow: "0 6px 20px rgba(15, 23, 42, 0.06)"
+      }}
+    >
+      <div style={{ marginBottom: "22px" }}>
+        <h2 style={{ margin: 0, fontSize: "1.9rem", fontWeight: 800, color: "#5b3df5" }}>
+          Download Center
+        </h2>
+      </div>
+
+      <div
+  style={{
+    display: "flex",
+    gap: "18px",
+    flexWrap: "wrap",
+    alignItems: "flex-end",
+    overflow: "visible"
+  }}
+>
+        <div style={{ minWidth: "220px", flex: 1 }}>
+          <label style={{ display: "block", marginBottom: "8px", fontWeight: 700, color: "#1f2937" }}>
+            Year
+          </label>
+          <select
+            value={downloadCenterYear}
+            onChange={(e) => {
+              setDownloadCenterYear(e.target.value);
+              setSelectedDownloadMonths([]);
+              setSelectedDownloadOptions([]);
+              setDownloadCenterSelectAll(false);
+            }}
+            style={{
+              width: "100%",
+              padding: "12px 14px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "10px",
+              fontSize: "1rem",
+              background: "#fff"
+            }}
+          >
+            <option value="">Select</option>
+            {downloadCenterYears.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+
+     <div
+  ref={monthDropdownRef}
+  style={{
+    minWidth: "280px",
+    flex: 1,
+    position: "relative",
+    zIndex: 20
+  }}
+>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "8px",
+      fontWeight: 700,
+      color: "#1f2937"
+    }}
+  >
+    Month
+  </label>
+
+  <button
+    type="button"
+    onClick={() => setDownloadCenterMonthDropdownOpen(prev => !prev)}
+    style={{
+      width: "100%",
+      minHeight: "48px",
+      padding: "12px 14px",
+      border: "1px solid #cbd5e1",
+      borderRadius: "10px",
+      fontSize: "1rem",
+      background: "#fff",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      textAlign: "left",
+      boxSizing: "border-box"
+    }}
+  >
+    <span
+      style={{
+        color: selectedDownloadMonths.length ? "#111827" : "#9ca3af",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        paddingRight: "10px"
+      }}
+    >
+      {selectedDownloadMonths.length
+        ? selectedDownloadMonths.join(", ")
+        : "Select Month"}
+    </span>
+    <span
+      style={{
+        fontSize: "12px",
+        flexShrink: 0,
+        transform: downloadCenterMonthDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 0.2s ease"
+      }}
+    >
+      ▼
+    </span>
+  </button>
+
+  {downloadCenterMonthDropdownOpen && (
+    <div
+      style={{
+        position: "absolute",
+        top: "calc(100% + 8px)",
+        left: 0,
+        right: 0,
+        width: "100%",
+        maxHeight: "260px",
+        overflowY: "auto",
+        border: "1px solid #cbd5e1",
+        borderRadius: "12px",
+        background: "#ffffff",
+        zIndex: 9999,
+        boxShadow: "0 12px 30px rgba(15, 23, 42, 0.16)",
+        boxSizing: "border-box"
+      }}
+    >
+      <div
+        style={{
+          padding: "10px 14px",
+          fontWeight: 700,
+          fontSize: "0.95rem",
+          color: "#334155",
+          borderBottom: "1px solid #e2e8f0",
+          background: "#f8fafc",
+          position: "sticky",
+          top: 0
+        }}
+      >
+        Select Month
+      </div>
+
+      {downloadCenterMonths.map((month, index) => (
+        <label
+          key={month}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+            padding: "11px 14px",
+            borderBottom: index !== downloadCenterMonths.length - 1 ? "1px solid #f1f5f9" : "none",
+            cursor: "pointer",
+            background: selectedDownloadMonths.includes(month) ? "#f8fafc" : "#fff"
+          }}
+        >
+          <span style={{ color: "#1f2937", fontSize: "0.96rem" }}>{month}</span>
+          <input
+            type="checkbox"
+            checked={selectedDownloadMonths.includes(month)}
+            onChange={() => toggleDownloadMonth(month)}
+            style={{ width: 16, height: 16, cursor: "pointer", flexShrink: 0 }}
+          />
+        </label>
+      ))}
+    </div>
+  )}
+</div>
+      </div>
+
+      {downloadCenterYear && selectedDownloadMonths.length > 0 && (
+        <>
+          <div style={{ marginTop: "28px", marginBottom: "14px", display: "flex", alignItems: "center", gap: "12px" }}>
+            <span
+              onClick={handleDownloadCenterSelectAll}
+              style={{
+                fontWeight: 800,
+                textDecoration: "underline",
+                cursor: "pointer",
+                color: "#111827",
+                fontSize: "1rem"
+              }}
+            >
+              Select all
+            </span>
+
+            <input
+              type="checkbox"
+              checked={downloadCenterSelectAll}
+              onChange={handleDownloadCenterSelectAll}
+              style={{ width: 18, height: 18, cursor: "pointer" }}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: "12px"
+            }}
+          >
+            {downloadCenterOptions.map((option, index) => (
+              <label
+                key={option}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "12px 14px",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "10px",
+                  background: "#fafafa"
+                }}
+              >
+                <span style={{ fontSize: "0.98rem", color: "#334155" }}>
+                  {index + 1}- {option}
+                </span>
+
+                <input
+                  type="checkbox"
+                  checked={selectedDownloadOptions.includes(option)}
+                  onChange={() => toggleDownloadOption(option)}
+                  style={{ width: 18, height: 18, cursor: "pointer" }}
+                />
+              </label>
+            ))}
+          </div>
+        </>
+      )}
+
+      <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "30px", flexWrap: "wrap" }}>
+        <button
+          onClick={handleDownloadCenterCancel}
+          style={{
+            padding: "11px 30px",
+            background: "#fff7ed",
+            color: "#ea580c",
+            border: "1px solid #fdba74",
+            borderRadius: "10px",
+            fontWeight: 800,
+            cursor: "pointer",
+            minWidth: "130px"
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleDownloadCenterDownload}
+          style={{
+            padding: "11px 30px",
+            background: "#d9f99d",
+            color: "#365314",
+            border: "1px solid #84cc16",
+            borderRadius: "10px",
+            fontWeight: 800,
+            cursor: "pointer",
+            minWidth: "150px"
+          }}
+        >
+          Download
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+          {isTDSTCS && selectedTdsTcsSection === "Download" && (
+            <>
+              <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8, background: "white" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", border: "1px solid #d1d5db" }}>
+                  <thead>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Taxation Type</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>GSTIN of Deductor</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Tax Period of GSTR-7</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Trade Name / Legal Name of Deductor</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Taxable Value</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>CGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>SGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Status</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>Select</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tdsTcsDownloadRows.map((row) => (
+                      <tr key={row.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.taxationType}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.gstin}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.taxPeriod}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.tradeName}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.taxableValue).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.igst).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.cgst}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.sgst}</td>
+                        <td style={{
+                          padding: "12px",
+                          borderRight: "1px solid #d1d5db",
+                          textAlign: "center",
+                          color: row.status === "Accepted" ? "#16a34a" : row.status === "Rejected" ? "#ea580c" : "#7c3aed",
+                          fontWeight: 600
+                        }}>
+                          {row.status}
+                        </td>
+                        <td style={{ padding: "12px", textAlign: "center" }}>
+                          <input
+                            type="checkbox"
+                            checked={row.selected}
+                            onChange={() => toggleTdsTcsRow(setTdsTcsDownloadRows, row.id)}
+                            style={{ width: 18, height: 18, cursor: "pointer" }}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "18px", flexWrap: "wrap" }}>
+                <button onClick={handleTdsTcsDownload} style={{ padding: "8px 16px", background: "#dbeafe", color: "#1d4ed8", border: "1px solid #93c5fd", borderRadius: 8, fontWeight: 600, cursor: "pointer" }}>
+                  Download
+                </button>
+                <button onClick={handleTdsTcsAllAccept} style={{ padding: "8px 16px", background: "#ecfccb", color: "#3f6212", border: "1px solid #a3e635", borderRadius: 8, fontWeight: 600, cursor: "pointer" }}>
+                  All Accept
+                </button>
+                <button onClick={handleTdsTcsReject} style={{ padding: "8px 16px", background: "#ffedd5", color: "#c2410c", border: "1px solid #fdba74", borderRadius: 8, fontWeight: 600, cursor: "pointer" }}>
+                  Reject
+                </button>
+                <button onClick={handleTdsTcsDelete} style={{ padding: "8px 16px", background: "#fee2e2", color: "#b91c1c", border: "1px solid #fca5a5", borderRadius: 8, fontWeight: 600, cursor: "pointer" }}>
+                  Delete
+                </button>
+              </div>
+            </>
+          )}
+
+          {isTDSTCS && selectedTdsTcsSection === "Upload" && (
+            <>
+              <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8, background: "white" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", border: "1px solid #d1d5db" }}>
+                  <thead>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Taxation Type</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>GSTIN of Deductor</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Tax Period of GSTR-7</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Trade Name / Legal Name of Deductor</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Taxable Value</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>CGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>SGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Status</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>Select</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tdsTcsUploadRows.map((row) => (
+                      <tr key={row.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.taxationType}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.gstin}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.taxPeriod}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.tradeName}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.taxableValue).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.igst).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.cgst}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.sgst}</td>
+                        <td style={{
+                          padding: "12px",
+                          borderRight: "1px solid #d1d5db",
+                          textAlign: "center",
+                          color: row.status === "Accepted" ? "#16a34a" : "#ea580c",
+                          fontWeight: 600
+                        }}>
+                          {row.status}
+                        </td>
+                        <td style={{ padding: "12px", textAlign: "center" }}>
+                          <input
+                            type="checkbox"
+                            checked={row.selected}
+                            onChange={() => toggleTdsTcsRow(setTdsTcsUploadRows, row.id)}
+                            style={{ width: 18, height: 18, cursor: "pointer" }}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "18px" }}>
+                <button
+                  onClick={handleTdsTcsUploadPortal}
+                  style={{
+                    padding: "10px 18px",
+                    background: "#dbeafe",
+                    color: "#1d4ed8",
+                    border: "1px solid #93c5fd",
+                    borderRadius: 8,
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  Upload on Portal
+                </button>
+              </div>
+            </>
+          )}
+
+          {isTDSTCS && selectedTdsTcsSection === "TDS/TCS Filing" && (
+            <>
+              <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8, background: "white" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", border: "1px solid #d1d5db" }}>
+                  <thead>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>SL</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left" }}>Category</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>Status</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>No of Records</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Taxable Value</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>IGST</th>
+                      <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>CGST</th>
+                      <th style={{ padding: "12px", textAlign: "center" }}>SGST</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tdsTcsFilingRows.map((row) => (
+                      <tr key={row.sl} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.sl}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>{row.category}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center", color: "#16a34a", fontWeight: 600 }}>{row.status}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.records}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.taxableValue).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{Number(row.igst).toFixed(2)}</td>
+                        <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>{row.cgst}</td>
+                        <td style={{ padding: "12px", textAlign: "center" }}>{row.sgst}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "18px" }}>
+                <button
+                  onClick={handleTdsTcsSubmit}
+                  style={{
+                    padding: "10px 20px",
+                    background: "#ecfccb",
+                    color: "#365314",
+                    border: "1px solid #a3e635",
+                    borderRadius: 8,
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  Submit File
+                </button>
+              </div>
+            </>
+          )}
           
           
       
-
-            {selectedSection && currentColumns.length > 0 && (
+{!isDownloadCenter && !isTDSTCS && !isReports && ((isITC04 && selectedItcTable) || (!isITC04 && selectedSection)) && currentColumns.length > 0 && (          
   <>
-    <h2 style={{ margin: "8px 0 8px 0", fontSize: "1.2rem", color: "#1e293b" }}>{selectedSection}</h2>
+    {!isReports && !isDownloadCenter && !isTDSTCS && (
+  <h2 style={{ margin: "8px 0 8px 0", fontSize: "1.2rem", color: "#1e293b" }}>
+    {isITC04 ? selectedItcTable : selectedSection}
+  </h2>
+)}
     <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 8, background: "white", marginTop: "0px",     // ← yahan 0 ya -4px daal sakte ho agar bhi space dikhe
   padding: "0" }}>
       <table style={{ 
@@ -2608,7 +4768,34 @@ useEffect(() => {
     dropdownWidth = "320px";
     optionsArray = natureOptions.map(opt => ({ label: opt, value: opt }));
     textAlign = "left";
-  }
+  }else if (col.key === "jobWorkerType") {
+  dropdownType = "jobWorkerType";
+  placeholderText = "Select Type";
+  dropdownWidth = "140px";
+  optionsArray = [
+    { label: "SEZ", value: "SEZ" },
+    { label: "Non SEZ", value: "Non SEZ" }
+  ];
+}
+else if (col.key === "goodsType") {
+  dropdownType = "goodsType";
+  placeholderText = "Select Goods Type";
+  dropdownWidth = "160px";
+  optionsArray = [
+    { label: "Capital Goods", value: "Capital Goods" },
+    { label: "Inputs", value: "Inputs" }
+  ];
+}
+else if (col.key === "uqc") {
+  dropdownType = "uqc";
+  placeholderText = "Select UQC";
+  dropdownWidth = "120px";
+  optionsArray = [
+    { label: "KGS", value: "KGS" },
+    { label: "MTR", value: "MTR" },
+    { label: "SQF", value: "SQF" }
+  ];
+}
 
   const isOpen = openDropdown?.row === rowIndex && openDropdown?.type === dropdownType;
 
@@ -2842,78 +5029,158 @@ return (
 )}
           </div>
         )}
-        
 
-        {/* Summary Tab */}
-        {activeSubTab === "Summary" && (
-          <div style={{ padding: "20px" }}>
-            <h2 style={{ textAlign: "center", marginBottom: "32px", fontSize: "2rem", color: "#1e293b" }}>GSTR-1 Summary</h2>
-            <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
-                <thead>
-                  <tr style={{ background: "#f1f5f9", fontWeight: 700, borderBottom: "2px solid #cbd5e1" }}>
-                    <th style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
-                      <input
-                        type="checkbox"
-                        checked={selectAll}
-                        onChange={toggleSelectAll}
-                        style={{ cursor: "pointer" }}
-                      />
-                    </th>
-                    <th style={{ padding: "16px", textAlign: "left", border: "1px solid #cbd5e1" }}>Act</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Taxable</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>IGST</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>CGST</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>SGST</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Cess</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Total</th>
-                    <th style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>Action</th>
+      {/* Summary Tab */}
+{activeSubTab === "Summary" && !isDownloadCenter && !isReports && (
+  <div style={{ padding: "20px" }}>
+    {isGSTR3B ? (
+      <>
+        <h2
+          style={{
+            textAlign: "center",
+            marginBottom: "24px",
+            fontSize: "2rem",
+            color: "#1e293b"
+          }}
+        >
+          GSTR-3B Summary
+        </h2>
+
+        <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
+            <thead>
+              <tr style={{ background: "#f1f5f9", fontWeight: 700 }}>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "left" }}>Section Name</th>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>Status</th>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>Rows</th>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>Saved At</th>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {gstr3bSections.map((section) => {
+                const item = gstr3bSavedSummary[section];
+                return (
+                  <tr key={section}>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1" }}>{section}</td>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>
+                      {item ? "Saved" : "Not Saved"}
+                    </td>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>
+                      {item?.rows?.length || 0}
+                    </td>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>
+                      {item?.savedAt || "—"}
+                    </td>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>
+                      <button
+                        disabled={!item}
+                        onClick={() => downloadGstr3bSectionExcel(section)}
+                        style={{
+                          padding: "8px 14px",
+                          background: item ? "#eff6ff" : "#f3f4f6",
+                          border: item ? "1px solid #3b82f6" : "1px solid #d1d5db",
+                          borderRadius: 6,
+                          color: item ? "#1d4ed8" : "#9ca3af",
+                          cursor: item ? "pointer" : "not-allowed",
+                          fontWeight: 600
+                        }}
+                      >
+                        Download Excel
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {visibleSummary.map((item, index) => (
-                    <tr key={index}>
-                      <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
-                        <input
-                          type="checkbox"
-                          checked={selectedRows.includes(item.id)}
-                          onChange={() => toggleRow(item.id)}
-                          style={{ cursor: "pointer" }}
-                        />
-                      </td>
-                      <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>{item.label}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.taxable)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.igst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cgst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.sgst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cess)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.total)}</td>
-                      <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
-                    </tr>
-                  ))}
-                  {visibleSummary.length > 0 && (
-                    <tr style={{ background: "#e0f2fe", fontWeight: 700 }}>
-                      <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}></td>
-                      <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>Grand Total</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.taxable)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.igst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cgst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.sgst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cess)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.total)}</td>
-                      <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
-                    </tr>
-                  )}
-                  {visibleSummary.length === 0 && (
-                    <tr>
-                      <td colSpan={10} style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>
-                        No data saved yet
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                );
+              })}
+
+              {Object.keys(gstr3bSavedSummary).length === 0 && (
+                <tr>
+                  <td colSpan={5} style={{ padding: "32px", textAlign: "center", color: "#64748b" }}>
+                    No GSTR-3B section saved yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </>
+    ) : (
+      <>
+        <h2 style={{ textAlign: "center", marginBottom: "32px", fontSize: "2rem", color: "#1e293b" }}>
+          GSTR-1 Summary
+        </h2>
+
+        <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
+            <thead>
+              <tr style={{ background: "#f1f5f9", fontWeight: 700, borderBottom: "2px solid #cbd5e1" }}>
+                <th style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={toggleSelectAll}
+                    style={{ cursor: "pointer" }}
+                  />
+                </th>
+                <th style={{ padding: "16px", textAlign: "left", border: "1px solid #cbd5e1" }}>Act</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Taxable</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>IGST</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>CGST</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>SGST</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Cess</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Total</th>
+                <th style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleSummary.map((item, index) => (
+                <tr key={index}>
+                  <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
+                    <input
+                      type="checkbox"
+                      checked={selectedRows.includes(item.id)}
+                      onChange={() => toggleRow(item.id)}
+                      style={{ cursor: "pointer" }}
+                    />
+                  </td>
+                  <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>{item.label}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.taxable)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.igst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cgst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.sgst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cess)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.total)}</td>
+                  <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
+                </tr>
+              ))}
+
+              {visibleSummary.length > 0 && (
+                <tr style={{ background: "#e0f2fe", fontWeight: 700 }}>
+                  <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}></td>
+                  <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>Grand Total</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.taxable)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.igst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cgst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.sgst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cess)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.total)}</td>
+                  <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
+                </tr>
+              )}
+
+              {visibleSummary.length === 0 && (
+                <tr>
+                  <td colSpan={10} style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>
+                    No data saved yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </>
+    )}
+  
 
             {/* Bottom Buttons */}
             <div style={{ marginTop: 24, display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
@@ -2990,4 +5257,803 @@ return (
       </div>
     </div>
   );
+};
+
+
+  const [activeTurnoverView, setActiveTurnoverView] = useState('overview');
+  const renderContent = () => {
+    if (activeMenu !== "Dashboard") {
+      if (activeMenu === "Client Detail") {
+        return (
+          <div style={{ padding: "24px", background: "#f8fafc" }}>
+            <div style={{ marginBottom: "40px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", padding: "16px", background: "#f0f9ff", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                <h3 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "700", color: "#1f2937" }}>Client Details</h3>
+                <button style={{ background: "#10b981", color: "white", padding: "10px 20px", border: "none", borderRadius: "8px", fontSize: "0.95rem", fontWeight: "600", cursor: "pointer" }}>Get Data From GSTN</button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
+                <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                  <h4 style={{ margin: "0 0 20px 0", color: "#0d9488", fontWeight: "700", fontSize: "1.1rem" }}>Personal Details</h4>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Name <span style={{ color: "red" }}>(required)</span></label>
+                    <input name="name" value={formData.name} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Address</label>
+                    <input name="address" value={formData.address} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Place</label>
+                    <input name="place" value={formData.place} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>PIN</label>
+                    <input name="pin" value={formData.pin} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>State <span style={{ color: "red" }}>(required)</span></label>
+                    <select name="state" value={formData.state} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>Uttar Pradesh</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Mobile Number</label>
+                    <input name="mobile" value={formData.mobile} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Email Id</label>
+                    <input name="email" value={formData.email} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Phone Number</label>
+                    <input name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Phone Number" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                </div>
+                <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                  <h4 style={{ margin: "0 0 20px 0", color: "#0d9488", fontWeight: "700", fontSize: "1.1rem" }}>Business Details</h4>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Trade Name</label>
+                    <input name="tradeName" value={formData.tradeName} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Business Type</label>
+                    <select name="businessType" value={formData.businessType} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>Proprietorship</option>
+                      <option>Partnership</option>
+                      <option>Private Limited</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Status</label>
+                    <select name="status" value={formData.status} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>Select</option>
+                      <option>Active</option>
+                      <option>Inactive</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>GSTIN <span style={{ color: "red" }}>(required)</span></label>
+                    <input name="gstin" value={formData.gstin} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Registration Date <span style={{ color: "red" }}>(required)</span></label>
+                    <input name="regDate" value={formData.regDate} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>TAN</label>
+                    <input name="tan" value={formData.tan} onChange={handleInputChange} placeholder="TAN" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>PAN</label>
+                    <input name="pan" value={formData.pan} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>CIN Number</label>
+                    <input name="cin" value={formData.cin} onChange={handleInputChange} placeholder="CIN Number" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                </div>
+                <div style={{ background: "#ffffff", padding: "24px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                  <h4 style={{ margin: "0 0 20px 0", color: "#0d9488", fontWeight: "700", fontSize: "1.1rem" }}>Other Details</h4>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>File No</label>
+                    <input name="fileNo" value={formData.fileNo} onChange={handleInputChange} placeholder="File No" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Responsible Person</label>
+                    <input name="responsiblePerson" value={formData.responsiblePerson} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Designation</label>
+                    <input name="designation" value={formData.designation} onChange={handleInputChange} placeholder="Designation" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Alternate Mobile</label>
+                    <input name="alternateMobile" value={formData.alternateMobile} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>GST User ID <span style={{ color: "red" }}>(required)</span></label>
+                    <input name="gstUserId" value={formData.gstUserId} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Tax Payer Type <span style={{ color: "red" }}>(required)</span></label>
+                    <select name="taxPayerType" value={formData.taxPayerType} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>Normal</option>
+                      <option>Composition</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>Upload Type <span style={{ color: "red" }}>(required)</span></label>
+                    <select name="uploadType" value={formData.uploadType} onChange={handleInputChange} style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }}>
+                      <option>GST</option>
+                    </select>
+                  </div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{ fontSize: "0.9rem", fontWeight: "600", color: "#374151" }}>LUT Number</label>
+                    <input name="lutNumber" value={formData.lutNumber} onChange={handleInputChange} placeholder="LUT Number" style={{ width: "100%", padding: "10px", marginTop: "6px", borderRadius: "6px", border: "1px solid #ccc" }} />
+                  </div>
+                </div>
+              </div>
+              <div style={{ textAlign: "right", marginTop: "30px" }}>
+                <button onClick={handleUpdate} style={{ background: "#16a34a", color: "white", padding: "12px 36px", border: "none", borderRadius: "8px", fontSize: "1rem", fontWeight: "600", cursor: "pointer" }}>Update</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      const regularGstrTabs = ["gstr-1", "gstr-1A", "gstr 3b", "itc-04", "tds/tcs", "reports","download center"];
+    if (regularGstrTabs.includes(activeMenu)) {
+  const displayTitle =
+    activeMenu === "tds/tcs"
+      ? "TDS/TCS"
+      : activeMenu === "download center"
+      ? "Download Center"
+      : activeMenu.toUpperCase().replace("GSTR ", "GSTR-").replace(" 3B", " 3B");
+
+  return <GSTRLayout title={displayTitle} />;
+}
+
+ 
+      if (activeMenu === "Annual Return") {
+        return (
+          <div style={{ padding: "20px", background: "#f8fafc" }}>
+            <div style={{ background: "#ffffff", borderRadius: "12px", padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
+              <div style={{ display: "flex", gap: "12px", marginBottom: "32px", borderBottom: "2px solid #e2e8f0" }}>
+                {["GSTR-9", "GSTR-9C"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveAnnualSubTab(tab)}
+                    style={{
+                      padding: "12px 28px",
+                      background: activeAnnualSubTab === tab ? "#7c3aed" : "transparent",
+                      color: activeAnnualSubTab === tab ? "white" : "#475569",
+                      border: "none",
+                      borderRadius: "10px 10px 0 0",
+                      fontSize: "1.1rem",
+                      fontWeight: activeAnnualSubTab === tab ? "600" : "500",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+              <GSTRLayout title={activeAnnualSubTab} />
+            </div>
+          </div>
+        );
+      }
+      return (
+        <div style={{ padding: "80px 40px", textAlign: "center", color: "#64748b" }}>
+          <h2 style={{ fontSize: "2rem", color: "#7c3aed", marginBottom: "20px" }}>{activeMenu.toUpperCase().replace(/-/g, " ")}</h2>
+          <p style={{ fontSize: "1.3rem" }}>This section is under development.</p>
+        </div>
+      );
+    }
+    // ───────── DASHBOARD ─────────
+    return (
+      <div style={{ padding: "20px 28px", background: "#f8fafc" }}>
+        {/* ───────── Unified Tabs on Left, Update on Right ───────── */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "16px" }}>
+          {/* Left: Dashboard Tabs */}
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {dashboardTabs.map((tab) => {
+              const isActive = activeDashboardTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveDashboardTab(tab.id)}
+                  style={{
+                    padding: "8px 16px",
+                    background: isActive ? "linear-gradient(135deg, #1e40af, #2563eb)" : "#ffffff",
+                    color: isActive ? "white" : "#334155",
+                    border: isActive ? "none" : "1px solid #e5e7eb",
+                    borderRadius: "999px",
+                    fontWeight: isActive ? "700" : "600",
+                    fontSize: "0.9rem",
+                    cursor: "pointer",
+                    boxShadow: isActive ? "0 4px 12px rgba(30,64,175,0.3)" : "0 2px 6px rgba(0,0,0,0.08)",
+                    transition: "all 0.25s ease",
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+          {/* Right: Update button */}
+          <button
+            style={{
+              background: "linear-gradient(180deg, #34d399 0%, #22c55e 45%, #16a34a 100%)",
+              color: "#ffffff",
+              padding: "8px 20px",
+              border: "none",
+              borderRadius: "999px",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              cursor: "pointer",
+              boxShadow: "0 8px 20px rgba(22,163,74,0.45), inset 0 2px 4px rgba(255,255,255,0.35)",
+            }}
+          >
+            Update
+          </button>
+        </div>
+        {/* ───────── Content based on active tab ───────── */}
+        <div style={{ background: "#ffffff", borderRadius: "16px", boxShadow: "0 8px 28px rgba(0,0,0,0.12)", padding: "20px", overflow: "hidden" }}>
+          {activeDashboardTab === "returns-status" && (
+            <>
+              {/* Months header */}
+              <div style={{ display: "grid", gridTemplateColumns: "120px repeat(12, 1fr)", gap: "8px", marginBottom: "16px", fontWeight: "700", fontSize: "0.9rem", minWidth: "1000px", overflowX: "auto" }}>
+                <div style={{ paddingLeft: "8px" }}>Return</div>
+                {months.map((m) => (
+                  <div key={m} style={{ textAlign: "center", padding: "8px 0", background: "#e0e7ff", borderRadius: "8px", color: "#4338ca" }}>{m}</div>
+                ))}
+              </div>
+              {/* Return rows */}
+              {[
+                { name: "GSTR-1", filed: 9 },
+                { name: "GSTR-1A", filed: 0 },
+                { name: "GSTR-3B", filed: 8 },
+                { name: "TDS/TCS", filed: 8 },
+              ].map((ret) => (
+                <div key={ret.name} style={{ display: "grid", gridTemplateColumns: "120px repeat(12, 1fr)", gap: "8px", marginBottom: "12px", minWidth: "1000px", overflowX: "auto" }}>
+                  <div style={{ fontWeight: "700", color: "#0d9488", fontSize: "1rem", paddingLeft: "8px" }}>
+                    {ret.name}
+                    <br />
+                    <a href="#" style={{ fontSize: "0.8rem", color: "#2563eb", textDecoration: "underline" }}>All Download →</a>
+                  </div>
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const filed = i < ret.filed;
+                    const isCurrentPeriod = i >= 9;
+                    const arn = filed ? `AA09${String(i + 4).padStart(2, "0")}24R${String(i + 1).padStart(3, "0")}` : isCurrentPeriod ? "" : "Pending";
+                    return (
+                      <div key={i} style={{ background: "#ffffff", borderRadius: "8px", boxShadow: "0 2px 6px rgba(0,0,0,0.06)", padding: "10px 6px", textAlign: "center", fontSize: "0.85rem", minHeight: "80px" }}>
+                        {filed ? (
+                          <>
+                            <span style={{ color: "#059669", fontWeight: "700", fontSize: "0.9rem" }}>Filed</span>
+                            <br />
+                            <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN:</span>
+                            <span style={{ color: "#333", fontWeight: "600", fontSize: "0.8rem" }}>{arn}</span>
+                            <br />
+                            <a href="#" style={{ color: "#2563eb", fontSize: "0.75rem", textDecoration: "underline" }}>Download</a>
+                          </>
+                        ) : isCurrentPeriod ? (
+                          <>
+                            <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Due</span>
+                            <br />
+                            <span style={{ color: "#999", fontSize: "0.75rem" }}>Not Filed</span>
+                          </>
+                        ) : (
+                          <>
+                            <span style={{ color: "#dc2626", fontWeight: "700", fontSize: "0.9rem" }}>Not Filed</span>
+                            <br />
+                            <span style={{ color: "#666", fontSize: "0.75rem" }}>ARN: {arn}</span>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+              {/* DUE badges */}
+              <div style={{ position: "absolute", right: "28px", bottom: "14px", display: "flex", gap: "10px", zIndex: 10 }}>
+                {[
+                  { label: "GSTR-9", color: "#f59e0b" },
+                  { label: "GSTR-9C", color: "#f97316" },
+                  { label: "IMS", color: "#3b82f6" },
+                ].map((item) => (
+                  <div key={item.label} style={{ display: "flex", alignItems: "center", gap: "6px", background: "#ffffff", border: `1px solid ${item.color}`, color: item.color, padding: "6px 10px", borderRadius: "999px", fontSize: "0.78rem", fontWeight: "600", boxShadow: "0 6px 18px rgba(0,0,0,0.08)" }}>
+                    <span>{item.label}</span>
+                    <span style={{ background: item.color, color: "white", padding: "2px 8px", borderRadius: "999px", fontSize: "0.7rem" }}>DUE</span>
+                  </div>
+                ))}
+              </div>
+              {/* PDF / Excel buttons */}
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginBottom: "24px" }}>
+                <button style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "14px", border: "none", background: "#fff5f5", color: "#dc2626", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "0 8px 20px rgba(220,38,38,0.18)" }}>
+                  <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span> PDF
+                </button>
+                <button style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "14px", border: "none", background: "#ecfdf5", color: "#15803d", fontSize: "15px", fontWeight: "600", cursor: "pointer", boxShadow: "0 8px 20px rgba(22,163,74,0.22)" }}>
+                  <span style={{ fontSize: "18px", fontWeight: "700" }}>↓</span> Excel
+                </button>
+              </div>
+            </>
+          )}
+          {activeDashboardTab === "summary" && (
+            <div style={{ display: "grid", gridTemplateColumns: "3fr ", gap: "24px" }}>
+              {/* Electronic Ledger Card */}
+              <div style={{ borderRadius: "12px", background: "#ffffff", boxShadow: "0 3px 14px rgba(0,0,0,0.07)", padding: "20px" ,width:"100%"}}>
+                <div style={{ display: "inline-block", background: "linear-gradient(135deg, #1e3a8a, #2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "18px", boxShadow: "0 4px 10px rgba(37,99,235,0.35)" }}>
+                  Electronic Ledger Balances
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", fontWeight: "600", fontSize: "1.05rem" }}>
+                  <span>Cash Balance</span>
+                  <strong style={{ color: "#2563eb", cursor: "pointer", textDecoration: "underline" }} onClick={() => setShowCreditLedger(!showCreditLedger)}>
+                    ₹58,756.00
+                  </strong>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "18px", fontWeight: "600", fontSize: "1.05rem" }}>
+                  <span>Credit Balance</span>
+                  <strong>₹36,845.00</strong>
+                </div>
+                {showCreditLedger && (
+                  <div style={{ marginTop: "18px", paddingTop: "18px", borderTop: "1px solid #e5e7eb" }}>
+                    <div style={{ display: "inline-block", background: "linear-gradient(135deg, #16a34a, #22c55e)", color: "#fff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.9rem", marginBottom: "10px", boxShadow: "0 3px 8px rgba(34,197,94,0.35)" }}>
+                      Balance of Electronic Credit Ledger
+                    </div>
+                    <table style={{ width: "100%", borderCollapse: "collapse", background: "#ecfdf5", borderRadius: "10px", overflow: "hidden", fontSize: "0.9rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ padding: "10px", textAlign: "center" }}>IGST</th>
+                          <th style={{ padding: "10px", textAlign: "center" }}>CGST</th>
+                          <th style={{ padding: "10px", textAlign: "center" }}>SGST</th>
+                          <th style={{ padding: "10px", textAlign: "center" }}>CESS</th>
+                          <th style={{ padding: "10px", textAlign: "center" }}>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: "10px", textAlign: "center" }}>₹25,165</td>
+                          <td style={{ padding: "10px", textAlign: "center" }}>₹12,324</td>
+                          <td style={{ padding: "10px", textAlign: "center" }}>₹5,632</td>
+                          <td style={{ padding: "10px", textAlign: "center" }}>₹15,635</td>
+                          <td style={{ padding: "10px", textAlign: "center", fontWeight: "700" }}>₹58,756</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+              
+            
+            </div>
+          )}
+           
+          {activeDashboardTab === "turnover" && (
+            <div style={{ padding: "28px" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "14px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontWeight: "600", fontSize: "0.85rem", color: "#475569" }}>Financial Year</span>
+                  <select style={{ padding: "5px 10px", border: "1px solid #d1d5db", borderRadius: "8px", fontSize: "0.8rem", minWidth: "110px" }}>
+                    <option>2017-18</option>
+                    <option>2018-19</option>
+                    <option>2019-20</option>
+                    <option>2020-21</option>
+                    <option>2021-22</option>
+                    <option>2022-23</option>
+                    <option>2023-24</option>
+                    <option>2024-25</option>
+                    <option selected>2025-26</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "8px", marginBottom: "18px" }}>
+                {[
+                  { id: "overview", label: "Overview", color: "#2563eb" },
+                  { id: "cash", label: "Electronic Cash Ledger", color: "#10b981" },
+                  { id: "credit", label: "Electronic Credit Ledger", color: "#3b82f6" },
+                ].map((tab) => {
+                  const active = activeTurnoverView === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTurnoverView(tab.id)}
+                      style={{
+                        padding: "6px 14px",
+                        background: active ? `linear-gradient(135deg, ${tab.color}, ${tab.color}cc)` : "#ffffff",
+                        color: active ? "#ffffff" : "#475569",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "999px",
+                        fontWeight: "600",
+                        fontSize: "0.8rem",
+                        cursor: "pointer",
+                        boxShadow: active ? "0 4px 14px rgba(0,0,0,0.25)" : "0 2px 5px rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {activeTurnoverView === "overview" && (
+                <div>
+                  <div style={{ fontWeight: "600", marginBottom: "12px", color: "#334155" }}>Turnover Balances</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                    {[
+                      { label: "Turnover Estimated", value: "₹1,25,65,635.00" },
+                      { label: "Aggregate Turnover", value: "₹1,25,65,635.00" },
+                    ].map((item) => (
+                      <div key={item.label} style={{ padding: "14px", background: "#f8fafc", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}>
+                        <div style={{ fontWeight: "600", fontSize: "0.85rem", color: "#475569" }}>{item.label}</div>
+                        <div style={{ fontSize: "1.1rem", fontWeight: "700", color: "#0f172a" }}>{item.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {(activeTurnoverView === "cash" || activeTurnoverView === "credit") && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
+                    <div>
+                      <strong>From:</strong>
+                      <input type="date" defaultValue="2025-04-01" style={{ marginLeft: "6px", padding: "6px 8px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "0.8rem" }} />
+                    </div>
+                    <div>
+                      <strong>To:</strong>
+                      <input type="date" defaultValue="2025-06-30" style={{ marginLeft: "6px", padding: "6px 8px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "0.8rem" }} />
+                    </div>
+                    <button style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", padding: "6px 18px", border: "none", borderRadius: "8px", fontWeight: "600", fontSize: "0.85rem", boxShadow: "0 4px 12px rgba(37,99,235,0.35)" }}>GO</button>
+                  </div>
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
+                      <thead>
+                        <tr style={{ background: "#f1f5f9" }}>
+                          {["Sr.No", "Date", "Reference No.", "Description", "Integrated Tax", "Central Tax", "State Tax", "Cess", "Total"].map((h) => (
+                            <th key={h} style={{ padding: "10px" }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td align="center">1</td>
+                          <td>-</td>
+                          <td>-</td>
+                          <td>Opening Balance</td>
+                          <td align="right">0.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right" style={{ fontWeight: "700" }}>0.00</td>
+                        </tr>
+                        <tr>
+                          <td align="center">2</td>
+                          <td>03/04/2025</td>
+                          <td>AC09253604536</td>
+                          <td>ITC accrued through - Inputs</td>
+                          <td align="right">0.00</td>
+                          <td align="right">16,390.00</td>
+                          <td align="right">16,390.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right">32,780.00</td>
+                        </tr>
+                        <tr style={{ background: "#ecfdf5", fontWeight: "700" }}>
+                          <td colSpan="4">Closing Balance</td>
+                          <td align="right">52,671.00</td>
+                          <td align="right">2,68,221.00</td>
+                          <td align="right">19,809.00</td>
+                          <td align="right">0.00</td>
+                          <td align="right" style={{ color: "#16a34a" }}>3,40,701.00</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style={{ marginTop: "18px", display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+                    <button style={{ background: "#ffffff", padding: "8px 18px", borderRadius: "8px", border: "1px solid #d1d5db", fontWeight: "600", fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(0,0,0,0.18)" }}>SAVE AS PDF ↓</button>
+                    <button style={{ background: "#ffffff", padding: "8px 18px", borderRadius: "8px", border: "1px solid #a7f3d0", fontWeight: "600", fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }}>SAVE AS EXCEL ↓</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          {activeDashboardTab === "liability" && (
+            <div style={{ padding: "28px" }}>
+              <div style={{ display: "inline-block", background: "linear-gradient(135deg,#1e40af,#2563eb)", color: "#ffffff", padding: "6px 14px", borderRadius: "8px", fontWeight: "600", fontSize: "0.95rem", marginBottom: "16px", boxShadow: "0 4px 12px rgba(37,99,235,0.35)" }}>
+                Liability Ledger – Detailed View
+              </div>
+              <div style={{ background: "#ffffff", borderRadius: "14px", boxShadow: "0 8px 26px rgba(0,0,0,0.12)", padding: "18px" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.95rem" }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>Liability (GSTR-1)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹10,25,365.25</td>
+                    </tr>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>Liability (GSTR-3B)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹10,20,365.25</td>
+                    </tr>
+                    <tr style={{ background: "#fee2e2", color: "#b91c1c", fontWeight: "700" }}>
+                      <td style={{ padding: "12px" }}>Difference</td>
+                      <td style={{ padding: "12px", textAlign: "right" }}>₹5,000.00</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>ITC (GSTR-2B)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹11,11,265.50</td>
+                    </tr>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>ITC (GSTR-3B)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹11,10,265.50</td>
+                    </tr>
+                    <tr style={{ background: "#fef3c7", color: "#b45309", fontWeight: "700" }}>
+                      <td style={{ padding: "12px" }}>Difference</td>
+                      <td style={{ padding: "12px", textAlign: "right" }}>-₹1,000.00</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>ITC (GSTR-2A)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹11,11,265.50</td>
+                    </tr>
+                    <tr style={{ background: "#f8fafc" }}>
+                      <td style={{ padding: "12px", fontWeight: "600" }}>ITC (GSTR-3B)</td>
+                      <td style={{ padding: "12px", textAlign: "right", fontWeight: "700" }}>₹11,10,265.50</td>
+                    </tr>
+                    <tr style={{ background: "#ecfdf5", color: "#166534", fontWeight: "700" }}>
+                      <td style={{ padding: "12px" }}>Difference</td>
+                      <td style={{ padding: "12px", textAlign: "right" }}>₹0.00</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {activeDashboardTab === "payment" && (
+            <div style={{ padding: "28px" }}>
+              <div style={{ background: "#ffffff", padding: "16px 20px", display: "grid", gridTemplateColumns: "1fr 2fr 2fr", gap: "16px", fontWeight: "600", borderRadius: "14px", boxShadow: "0 6px 20px rgba(37,99,235,0.15)", marginBottom: "20px" }}>
+                <div>
+                  <div style={{ fontSize: "0.85rem", color: "#475569" }}>GSTIN / TEMP ID</div>
+                  <div style={{ fontSize: "0.95rem", fontFamily: "monospace" }}>09ACNPU2195H1ZY</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.85rem", color: "#475569" }}>Legal Name</div>
+                  <div style={{ fontSize: "0.95rem" }}>Mohd Umair</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.85rem", color: "#475569" }}>Trade Name</div>
+                  <div style={{ fontSize: "0.95rem" }}>U.A.F ENTERPRISE'S</div>
+                </div>
+              </div>
+              <div style={{ background: "#ffffff", borderRadius: "16px", boxShadow: "0 10px 28px rgba(0,0,0,0.12)", overflow: "hidden" }}>
+                <div style={{ padding: "18px 20px", borderBottom: "1px solid #e5e7eb", background: "#ffffff" }}>
+                  <span style={{ display: "inline-block", padding: "4px 12px", background: "linear-gradient(135deg,#2563eb,#1e40af)", color: "#ffffff", fontSize: "0.95rem", fontWeight: "700", borderRadius: "8px", boxShadow: "0 4px 10px rgba(37,99,235,0.30)" }}>
+                    Outstanding Demand
+                  </span>
+                </div>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+                    <thead>
+                      <tr style={{ background: "#f1f5f9", color: "#334155" }}>
+                        <th style={{ padding: "10px", textAlign: "center" }}>Sr.No</th>
+                        <th style={{ padding: "10px" }}>Demand Date</th>
+                        <th style={{ padding: "10px" }}>Demand ID</th>
+                        <th style={{ padding: "10px", textAlign: "right" }}>Integrated Tax</th>
+                        <th style={{ padding: "10px", textAlign: "right" }}>Central Tax</th>
+                        <th style={{ padding: "10px", textAlign: "right" }}>State / UT Tax</th>
+                        <th style={{ padding: "10px", textAlign: "right" }}>Cess</th>
+                        <th style={{ padding: "10px", textAlign: "center" }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {outstandingDemands.map((item) => (
+                        <tr key={item.sr} style={{ borderBottom: "1px solid #e5e7eb", background: "#ffffff" }}>
+                          <td style={{ padding: "10px", textAlign: "center" }}>{item.sr}</td>
+                          <td style={{ padding: "10px" }}>{item.date}</td>
+                          <td style={{ padding: "10px", fontFamily: "monospace" }}>{item.demandId}</td>
+                          <td style={{ padding: "10px", textAlign: "right" }}>{item.integrated.toLocaleString()}</td>
+                          <td style={{ padding: "10px", textAlign: "right" }}>{item.central.toLocaleString()}</td>
+                          <td style={{ padding: "10px", textAlign: "right" }}>{item.state.toLocaleString()}</td>
+                          <td style={{ padding: "10px", textAlign: "right" }}>{item.cess.toLocaleString()}</td>
+                          <td style={{ padding: "10px", textAlign: "center" }}>
+                            <button
+                              onClick={() => setSelectedDemand(item)}
+                              style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#ffffff", border: "none", padding: "6px 18px", borderRadius: "8px", fontWeight: "600", cursor: "pointer", boxShadow: "0 4px 14px rgba(37,99,235,0.35)" }}
+                            >
+                              SELECT
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {selectedDemand && (
+                <div onClick={() => setSelectedDemand(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 2000 }}>
+                  <div
+  onClick={(e) => e.stopPropagation()}
+  style={{
+    width: "420px",
+    maxHeight: "70vh",
+    background: "white",
+    borderRadius: "10px",
+    boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column"
+  }}
+>
+                    <div style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#ffffff", padding: "14px", textAlign: "center", fontSize: "1rem", fontWeight: "600" }}>
+                      Payment towards Demand
+                    </div>
+                    <div style={{ padding: "20px" }}>
+                      <div style={{ marginBottom: "12px" }}>
+                        <strong>GSTIN</strong>
+                        <div style={{ fontFamily: "monospace" }}>09ACNPU2195H1ZY</div>
+                      </div>
+                      <div style={{ marginBottom: "12px" }}>
+                        <strong>Trade Name</strong>
+                        <div>U.A.F ENTERPRISE'S</div>
+                      </div>
+                      <div style={{ marginBottom: "18px" }}>
+                        <strong>Demand ID</strong>
+                        <div style={{ color: "#2563eb" }}>{selectedDemand.demandId}</div>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "22px" }}>
+                        <div>
+                          <div style={{ fontSize: "0.85rem", color: "#64748b" }}>Central Tax</div>
+                          <div style={{ fontSize: "1.15rem", fontWeight: 700 }}>₹{selectedDemand.central.toLocaleString()}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: "0.85rem", color: "#64748b" }}>State / UT Tax</div>
+                          <div style={{ fontSize: "1.15rem", fontWeight: 700 }}>₹{selectedDemand.state.toLocaleString()}</div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "center" }}>
+                        <button
+                          onClick={() => {
+                            alert("Payment initiation simulation...");
+                            setSelectedDemand(null);
+                          }}
+                          style={{ background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#ffffff", border: "none", padding: "12px 44px", fontSize: "0.95rem", fontWeight: "600", borderRadius: "12px", cursor: "pointer", boxShadow: "0 6px 20px rgba(37,99,235,0.4)" }}
+                        >
+                          Proceed to Pay
+                        </button>
+                      </div>
+                    </div>
+                    <div style={{ borderTop: "1px solid #e5e7eb", padding: "12px", textAlign: "center" }}>
+                      <button onClick={() => setSelectedDemand(null)} style={{ background: "none", border: "none", color: "#2563eb", fontWeight: "600", cursor: "pointer" }}>Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+  return (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.4)",          // ← bahut light black (dark theme mein 0.5–0.6 bhi try kar sakte ho)
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 9999,
+      // backdropFilter: "blur(4px)",         // ← optional – blur hata bhi sakte ho agar bilkul clean chahiye
+    }}
+    onClick={onClose}
+  >
+    <div
+      style={{
+        width: "100vw",                        // ← pura width
+        height: "100vh",                       // ← pura height
+        background: "#ffffff",
+        overflow: "hidden",
+        boxShadow: "none",                     // ← shadow hata diya full-screen feel ke liye
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: 0,                       // ← zero radius → bilkul edge-to-edge
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Header – thoda compact aur full-width feel */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #4f46e5, #4338ca)",
+          color: "white",
+          padding: "12px 24px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontSize: "1rem",
+          fontWeight: "600",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: "rgba(255,255,255,0.25)",
+              border: "none",
+              color: "white",
+              padding: "8px 18px",
+              borderRadius: "8px",
+              fontSize: "0.98rem",
+              fontWeight: "700",
+              cursor: "pointer",
+            }}
+          >
+            ← Back to Clients
+          </button>
+
+          <div>
+            GSTIN: <strong>{dynamicClient.gstin}</strong>  |  
+            Reg Date: <strong>{dynamicClient.registrationDate}</strong>  |  
+            Name: <strong>{dynamicClient.company}</strong>  |  
+            Status: <strong style={{ color: "#a7f3d0" }}>{dynamicClient.status}</strong>
+          </div>
+        </div>
+
+        <a
+          href="https://services.gst.gov.in/services/login"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "white", textDecoration: "underline", fontWeight: "500" }}
+        >
+          GST Portal →
+        </a>
+      </div>
+
+      {/* Menu Bar */}
+      <div style={{
+        background: "#eef2ff",
+        padding: "0 24px",
+        borderBottom: "1px solid #e5e7eb",
+      }}>
+        <div style={{
+          display: "flex",
+          gap: "10px",
+          padding: "14px 0",
+          flexWrap: "wrap",
+        }}>
+          {menuItems.map((item) => {
+            const isActive = activeMenu === item;
+            return (
+              <button
+                key={item}
+                onClick={() => {
+                  setActiveMenu(item);
+                  setActiveSubTab("Manually");
+                  if (item === "Annual Return") setActiveAnnualSubTab("GSTR-9");
+                }}
+                style={{
+                  padding: "10px 22px",
+                  fontSize: "0.95rem",
+                  fontWeight: isActive ? "700" : "600",
+                  background: isActive ? "#4f46e5" : "#ffffff",
+                  color: isActive ? "#ffffff" : "#1e293b",
+                  border: isActive ? "none" : "1px solid #d1d5db",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  minWidth: "120px",
+                }}
+              >
+                {item.toUpperCase().replace(/-/g, " ")}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Content – pura bacha hua area */}
+      <div style={{
+        flex: 1,
+        overflowY: "auto",
+        background: "#f9fafb",
+        padding: "20px 24px",
+      }}>
+        {renderContent()}
+      </div>
+    </div>
+  </div>
+);
 };

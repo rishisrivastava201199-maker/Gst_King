@@ -2,17 +2,30 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { HiMenu, HiArrowLeft, HiX, HiHome, HiMail, HiPhone } from "react-icons/hi";
-import { HiNewspaper } from "react-icons/hi";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+
+
 
 
 import {
-  HiLockClosed,      // ← add this
+  HiLockClosed,
   HiCreditCard,
   HiUserGroup,
+  HiNewspaper,
   HiDocumentText,
   HiFolder,
   HiChartBar,
+  HiMenu,
+  HiArrowLeft,
+  HiX,
+  HiHome,
+  HiMail,
+  HiPhone,
+  HiSearch,
+  HiChevronDown,
+  HiShare,
+  HiPrinter,
   HiBell,
   HiCog,
   HiMoon,
@@ -46,7 +59,7 @@ import {
   Filler,
 } from "chart.js";
 import { Line, Pie, Bar } from "react-chartjs-2";
-import { HiSearch, HiChevronDown } from "react-icons/hi";
+
 
 
 
@@ -2421,9 +2434,8 @@ const handleClientSelect = () => {
     "gstr 3b",
     "itc-04",
     "tds/tcs",
-    "Reports",
+    "reports",
     "download center",
-    
   ];
   const dashboardTabs = [
     { id: "returns-status", label: "Returns Status" },
@@ -2633,26 +2645,50 @@ const handleClientSelect = () => {
   // ==============================================
 
   // LocalStorage keys
-  const STORAGE_KEYS = {
-    b2b: "gstr_b2bRows",
-    b2cLarge: "gstr_b2cLargeRows",
-    b2cOthers: "gstr_b2cOthersRows",
-    nilExempt: "gstr_nilExemptRows",
-    creditDebitRegistered: "gstr_creditDebitRegisteredRows",
-    creditDebitUnregistered: "gstr_creditDebitUnregisteredRows",
-    advanceLiability: "gstr_advanceLiabilityRows",
-    advanceAdjustment: "gstr_advanceAdjustmentRows",
-    hsn: "gstr_hsnRows",
-    documents: "gstr_documentsRows",
-    eco: "gstr_ecoRows",
-    summaryTotals: "gstr_summaryTotals",
-    outward: "gstr3b_outwardSupplies",
-    eco: "gstr3b_ecoSupplies",
-    interstate: "gstr3b_interstateSupplies",
-    itc: "gstr3b_itcDetails",
-    exempt: "gstr3b_exemptNonGst",
-    interestLateFee: "gstr3b_interestLateFee"
-  };
+  // const STORAGE_KEYS = {
+  //   b2b: "gstr_b2bRows",
+  //   b2cLarge: "gstr_b2cLargeRows",
+  //   b2cOthers: "gstr_b2cOthersRows",
+  //   nilExempt: "gstr_nilExemptRows",
+  //   creditDebitRegistered: "gstr_creditDebitRegisteredRows",
+  //   creditDebitUnregistered: "gstr_creditDebitUnregisteredRows",
+  //   advanceLiability: "gstr_advanceLiabilityRows",
+  //   advanceAdjustment: "gstr_advanceAdjustmentRows",
+  //   hsn: "gstr_hsnRows",
+  //   documents: "gstr_documentsRows",
+  //   eco: "gstr_ecoRows",
+  //   summaryTotals: "gstr_summaryTotals",
+  //   outward: "gstr3b_outwardSupplies",
+  //   eco: "gstr3b_ecoSupplies",
+  //   interstate: "gstr3b_interstateSupplies",
+  //   itc: "gstr3b_itcDetails",
+  //   exempt: "gstr3b_exemptNonGst",
+  //   interestLateFee: "gstr3b_interestLateFee"
+  // };
+
+const STORAGE_KEYS = {
+  b2b: "gstr_b2bRows",
+  b2cLarge: "gstr_b2cLargeRows",
+  b2cOthers: "gstr_b2cOthersRows",
+  nilExempt: "gstr_nilExemptRows",
+  creditDebitRegistered: "gstr_creditDebitRegisteredRows",
+  creditDebitUnregistered: "gstr_creditDebitUnregisteredRows",
+  advanceLiability: "gstr_advanceLiabilityRows",
+  advanceAdjustment: "gstr_advanceAdjustmentRows",
+  hsn: "gstr_hsnRows",
+  documents: "gstr_documentsRows",
+  ecoRows: "gstr_ecoRows",
+  summaryTotals: "gstr_summaryTotals",
+  outward: "gstr3b_outwardSupplies",
+  ecoSupplies: "gstr3b_ecoSupplies",
+  interstateUnregistered: "gstr3b_interstateUnregistered",
+interstateComposition: "gstr3b_interstateComposition",
+interstateUin: "gstr3b_interstateUin",
+  itc: "gstr3b_itcDetails",
+  exempt: "gstr3b_exemptNonGst",
+ interestLateFee: "gstr3b_interestLateFee",
+gstr3bSavedSummary: "gstr3b_saved_summary"
+};
   // Full State list for POS dropdown
   const stateList = [
     { name: "ANDAMAN AND NICOBAR ISLANDS", code: "35", stateCode: "AN" },
@@ -2766,6 +2802,12 @@ const handleClientSelect = () => {
     const [selectedState, setSelectedState] = useState("");
     const [selectedItcTable, setSelectedItcTable] = useState("");
         const [selectedTdsTcsSection, setSelectedTdsTcsSection] = useState("");
+        const [hoveredTdsTcsSection, setHoveredTdsTcsSection] = useState("");
+        const [reportFromDate, setReportFromDate] = useState("");
+const [reportToDate, setReportToDate] = useState("");
+const [activeReportTab, setActiveReportTab] = useState("Summary");
+
+
 
 
 
@@ -2836,33 +2878,40 @@ const downloadCenterOptions = [
   "Electronic Cash/Credit Ledger",
   "Notice/Order"
 ];
-    
-    const importOptions = [
-      "B2B",
-      "B2CL",
-      "B2C",
-      "Export",
-      "SEZ",
-      "Deemed Export",
-      "Credit/debit note",
-      "Credit/debit note unreg",
-      "Nil rated",
-      "Advance received",
-      "Advance adjusted",
-      "HSN Summary",
-      "Document issued",
-      "Ecom CollectTax",
-      "Ecom PayTax",
-      "E-com B2B",
-      "E-com B2C",
-      "E-com URP2B",
-      "E-com URP2C",
-      "B2BA",
-      "B2CLA",
-      "CDNRA",
-      "CDNURA",
-      "ECO URP2C Amendment"
-    ]
+    const EXCEL_IMPORT_OPTIONS = [
+  "b2b,sez,de",
+  "b2ba",
+  "b2cl",
+  "b2cla",
+  "b2cs",
+  "b2csa",
+  "cdnr",
+  "cdnra",
+  "cdnur",
+  "cdnura",
+  "exp",
+  "expa",
+  "at",
+  "ata",
+  "atadj",
+  "atadja",
+  "exemp",
+  "hsn(b2b)",
+  "hsn(b2c)",
+  "docs",
+  "eco",
+  "ecoa",
+  "ecob2b",
+  "ecourp2b",
+  "ecob2c",
+  "ecourp2c",
+  "ecoab2b",
+  "ecoab2c",
+  "ecoaurp2b",
+  "ecoaurp2c"
+];
+
+const [importOptions, setImportOptions] = useState(EXCEL_IMPORT_OPTIONS);
     // 7. Payment of Tax - Cash Ledger
 const [cashLedger, setCashLedger] = useState([
   { desc: "Tax", igst: "", cgst: "", sgst: "", cess: "" },
@@ -2874,14 +2923,311 @@ const [cashLedger, setCashLedger] = useState([
 const [creditLedger, setCreditLedger] = useState([
   { igst: "", cgst: "", sgst: "", cess: "" }
 ]);
-    const handleSelectAllImport = () => {
-      if (selectAllImport) {
-        setSelectedOptions([]);
-      } else {
-        setSelectedOptions(importOptions);
-      }
-      setSelectAllImport(!selectAllImport);
+
+const normalizeText = (value = "") =>
+  String(value)
+    .toLowerCase()
+    .replace(/[\s_\-./()]+/g, "")
+    .trim();
+
+const EXCLUDED_IMPORT_SHEETS = ["helpinstruction", "master"];
+
+const getWorkbookImportOptions = (workbook) => {
+  return workbook.SheetNames
+    .filter((name) => !EXCLUDED_IMPORT_SHEETS.includes(normalizeText(name)))
+    .map((name) => String(name).trim());
+};
+
+const getImportStorageConfig = (sheetName) => {
+  const key = normalizeText(sheetName);
+
+  const configMap = {
+    b2bsezde: { stateKey: "b2bRows", setter: setB2bRows, storageKey: STORAGE_KEYS.b2b, summaryKey: "b2b" },
+    b2ba: { stateKey: "b2baRows", setter: setB2baRows, storageKey: STORAGE_KEYS.b2bAmendment, summaryKey: "b2b" },
+    b2cl: { stateKey: "b2cLargeRows", setter: setB2cLargeRows, storageKey: STORAGE_KEYS.b2cLarge, summaryKey: "b2cLarge" },
+    b2cla: { stateKey: "b2claRows", setter: setB2claRows, storageKey: STORAGE_KEYS.b2cla, summaryKey: "b2cLarge" },
+    b2cs: { stateKey: "b2cOthersRows", setter: setB2cOthersRows, storageKey: STORAGE_KEYS.b2cOthers, summaryKey: "b2cOthers" },
+    b2csa: { stateKey: "b2cOthersRows", setter: setB2cOthersRows, storageKey: STORAGE_KEYS.b2cOthers, summaryKey: "b2cOthers" },
+    cdnr: { stateKey: "creditDebitRegisteredRows", setter: setCreditDebitRegisteredRows, storageKey: STORAGE_KEYS.creditDebitRegistered, summaryKey: "b2b" },
+    cdnra: { stateKey: "cdnraRows", setter: setCdnraRows, storageKey: STORAGE_KEYS.cdnra, summaryKey: "b2b" },
+    cdnur: { stateKey: "creditDebitUnregisteredRows", setter: setCreditDebitUnregisteredRows, storageKey: STORAGE_KEYS.creditDebitUnregistered, summaryKey: "b2cLarge" },
+    cdnura: { stateKey: "cdnuraRows", setter: setCdnuraRows, storageKey: STORAGE_KEYS.cdnura, summaryKey: "b2cLarge" },
+    exp: { stateKey: "b2cOthersRows", setter: setB2cOthersRows, storageKey: STORAGE_KEYS.b2cOthers, summaryKey: "b2cOthers" },
+    expa: { stateKey: "exportAmendmentRows", setter: setExportAmendmentRows, storageKey: STORAGE_KEYS.exportAmendment, summaryKey: "b2cOthers" },
+    at: { stateKey: "advanceLiabilityRows", setter: setAdvanceLiabilityRows, storageKey: STORAGE_KEYS.advanceLiability, summaryKey: null },
+    ata: { stateKey: "amendedTaxLiabilityRows", setter: setAmendedTaxLiabilityRows, storageKey: "amendedTaxLiability", summaryKey: null },
+    atadj: { stateKey: "advanceAdjustmentRows", setter: setAdvanceAdjustmentRows, storageKey: STORAGE_KEYS.advanceAdjustment, summaryKey: null },
+    atadja: { stateKey: "advanceAdjustmentRows", setter: setAdvanceAdjustmentRows, storageKey: STORAGE_KEYS.advanceAdjustment, summaryKey: null },
+    exemp: { stateKey: "nilExemptRows", setter: setNilExemptRows, storageKey: STORAGE_KEYS.nilExempt, summaryKey: null },
+    hsnb2b: { stateKey: "hsnRows", setter: setHsnRows, storageKey: STORAGE_KEYS.hsn, summaryKey: "hsn" },
+    hsnb2c: { stateKey: "hsnRows", setter: setHsnRows, storageKey: STORAGE_KEYS.hsn, summaryKey: "hsn" },
+    docs: { stateKey: "documentsRows", setter: setDocumentsRows, storageKey: STORAGE_KEYS.documents, summaryKey: null },
+    eco: { stateKey: "ecoRows", setter: setEcoRows, storageKey: STORAGE_KEYS.ecoRows, summaryKey: null },
+    ecoa: { stateKey: "ecoRows", setter: setEcoRows, storageKey: STORAGE_KEYS.ecoRows, summaryKey: null },
+    ecob2b: { stateKey: "ecoB2bRows", setter: setEcoB2bRows, storageKey: STORAGE_KEYS.ecoB2b, summaryKey: null },
+    ecourp2b: { stateKey: "ecoUrpB2bRows", setter: setEcoUrpB2bRows, storageKey: STORAGE_KEYS.ecoUrpB2b, summaryKey: null },
+    ecob2c: { stateKey: "ecoB2cRows", setter: setEcoB2cRows, storageKey: STORAGE_KEYS.ecoB2c, summaryKey: null },
+    ecourp2c: { stateKey: "ecoUrpB2cRows", setter: setEcoUrpB2cRows, storageKey: STORAGE_KEYS.ecoUrpB2c, summaryKey: null },
+    ecoab2b: { stateKey: "ecoAmendmentB2bRows", setter: setEcoAmendmentB2bRows, storageKey: STORAGE_KEYS.ecoAmendmentB2b, summaryKey: null },
+    ecoab2c: { stateKey: "ecoAmendmentB2cRows", setter: setEcoAmendmentB2cRows, storageKey: STORAGE_KEYS.ecoAmendmentB2c, summaryKey: null },
+    ecoaurp2b: { stateKey: "ecoAmendmentUrpB2bRows", setter: setEcoAmendmentUrpB2bRows, storageKey: STORAGE_KEYS.ecoAmendmentUrpB2b, summaryKey: null },
+    ecoaurp2c: { stateKey: "ecoUrp2cAmendmentRows", setter: setEcoUrp2cAmendmentRows, storageKey: STORAGE_KEYS.ecoUrp2cAmendment, summaryKey: null }
+  };
+
+  return configMap[key] || null;
+};
+
+const getHeaderRowIndex = (sheetData) => {
+  for (let i = 0; i < Math.min(sheetData.length, 12); i++) {
+    const row = (sheetData[i] || []).map(cell => normalizeText(cell));
+    const rowText = row.join("|");
+
+    if (
+      rowText.includes("taxablevalue") ||
+      rowText.includes("integratedtaxamount") ||
+      rowText.includes("integratedtax") ||
+      rowText.includes("centraltaxamount") ||
+      rowText.includes("stateuttaxamount") ||
+      rowText.includes("invoicevalue") ||
+      rowText.includes("gstin") ||
+      rowText.includes("invoicenumber")
+    ) {
+      return i;
+    }
+  }
+  return 3;
+};
+
+const sheetToObjects = (worksheet) => {
+  const raw = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+
+  if (!raw || !raw.length) return [];
+
+  let headerRowIndex = 0;
+
+  for (let i = 0; i < Math.min(raw.length, 15); i++) {
+    const rowText = (raw[i] || []).join(" ").toLowerCase();
+
+    if (
+      rowText.includes("taxable") ||
+      rowText.includes("invoice") ||
+      rowText.includes("gstin")
+    ) {
+      headerRowIndex = i;
+      break;
+    }
+  }
+
+  const headers = (raw[headerRowIndex] || []).map((h) => String(h || "").trim());
+
+  return raw.slice(headerRowIndex + 1).map((row) => {
+    const obj = {};
+    headers.forEach((h, i) => {
+      obj[h] = row[i];
+    });
+    return obj;
+  });
+};
+
+const toNumber = (value) => {
+  if (value === null || value === undefined || value === "") return 0;
+  const cleaned = String(value).replace(/,/g, "").trim();
+  const num = Number(cleaned);
+  return Number.isFinite(num) ? num : 0;
+};
+
+const getValueByPossibleHeaders = (row, possibleHeaders) => {
+  const entries = Object.entries(row || {});
+  for (const [key, value] of entries) {
+    const normalizedKey = normalizeText(key);
+    if (possibleHeaders.some((h) => normalizedKey === normalizeText(h))) {
+      return value;
+    }
+  }
+  return "";
+};
+
+const getSheetSummaryTotals = (worksheet) => {
+  const raw = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+
+  if (!raw || raw.length < 3) {
+    return {
+      taxable: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0,
+      total: 0
     };
+  }
+
+  const normalize = (value = "") =>
+    String(value).toLowerCase().replace(/[\s_\-./()]+/g, "").trim();
+
+  const headerRowIndex = 1;
+  const valueRowIndex = 2;
+
+  const headers = raw[headerRowIndex] || [];
+  const values = raw[valueRowIndex] || [];
+
+  const findValue = (possibleHeaders) => {
+    for (let i = 0; i < headers.length; i++) {
+      const currentHeader = normalize(headers[i]);
+      const matched = possibleHeaders.some((h) => currentHeader === normalize(h));
+      if (matched) {
+        const value = values[i];
+        const cleaned = String(value ?? "").replace(/,/g, "").trim();
+        const num = Number(cleaned);
+        return Number.isFinite(num) ? num : 0;
+      }
+    }
+    return 0;
+  };
+
+  const taxable = findValue([
+    "Total Taxable Value",
+    "Total Taxable  Value",
+    "Total Advance Received",
+    "Total Advance Adjusted",
+    "Total Net Value of Supplies",
+    "Total Nil Rated Supplies",
+    "Total Exempted Supplies",
+    "Total Non-GST Supplies"
+  ]);
+
+  const igst = findValue([
+    "Total Integrated Tax",
+    "Integrated Tax Amount"
+  ]);
+
+  const cgst = findValue([
+    "Total Central Tax",
+    "Central Tax Amount",
+    "Total Central Tax "
+  ]);
+
+  const sgst = findValue([
+    "Total State/UT Tax",
+    "State/UT Tax Amount",
+    "Total State/UT Tax "
+  ]);
+
+  const cess = findValue([
+    "Total Cess",
+    "Cess Amount",
+    "Total Cancelled"
+  ]);
+
+  return {
+    taxable: taxable || 0,
+    igst: igst || 0,
+    cgst: cgst || 0,
+    sgst: sgst || 0,
+    cess: cess || 0,
+    total: (taxable || 0) + (igst || 0) + (cgst || 0) + (sgst || 0) + (cess || 0)
+  };
+};
+
+const calculateSummaryFromRows = (rows) => {
+  let taxable = 0;
+  let igst = 0;
+  let cgst = 0;
+  let sgst = 0;
+  let cess = 0;
+
+  if (!rows || !rows.length) {
+    return {
+      taxable: 0,
+      igst: 0,
+      cgst: 0,
+      sgst: 0,
+      cess: 0,
+      total: 0
+    };
+  }
+
+  // 🔥 IMPORTANT: sirf first valid row use karenge (summary row)
+  const row = rows[0];
+
+  const getVal = (keys) => {
+    for (let key of Object.keys(row)) {
+      const cleanKey = key.toLowerCase().replace(/\s+/g, "");
+      for (let k of keys) {
+        if (cleanKey.includes(k)) {
+          return Number(row[key]) || 0;
+        }
+      }
+    }
+    return 0;
+  };
+
+  taxable = getVal(["totaltaxablevalue", "taxablevalue"]);
+  igst = getVal(["totalintegratedtax", "igst"]);
+  cgst = getVal(["totalcentraltax", "cgst"]);
+  sgst = getVal(["totalstate", "sgst", "utgst"]);
+  cess = getVal(["totalcess", "cess"]);
+
+  return {
+    taxable,
+    igst,
+    cgst,
+    sgst,
+    cess,
+    total: taxable + igst + cgst + sgst + cess
+  };
+};
+const applyImportedSummaryByKey = (summaryKey, totals) => {
+  if (!summaryKey) return;
+
+  setSummaryTotals((prev) => ({
+  ...prev,
+    [summaryKey]: {
+      taxable: totals.taxable || 0,
+      igst: totals.igst || 0,
+      cgst: totals.cgst || 0,
+      sgst: totals.sgst || 0,
+      cess: totals.cess || 0,
+      total: totals.total || 0
+    }
+  }));
+};
+
+const syncImportedRowsToState = (sheetName, rows, worksheet) => {
+  const config = getImportStorageConfig(sheetName);
+  if (!config || typeof config.setter !== "function") return;
+
+  const safeRows = Array.isArray(rows) ? rows : [];
+  config.setter(safeRows);
+
+  if (config.storageKey && typeof config.storageKey === "string") {
+    try {
+      localStorage.setItem(config.storageKey, JSON.stringify(safeRows));
+    } catch (error) {
+      console.warn(`Could not save ${sheetName} to localStorage:`, error);
+    }
+  }
+
+  const totals = worksheet
+    ? getSheetSummaryTotals(worksheet)
+    : {
+        taxable: 0,
+        igst: 0,
+        cgst: 0,
+        sgst: 0,
+        cess: 0,
+        total: 0
+      };
+
+  applyImportedSummaryByKey(config.summaryKey, totals);
+};
+    const handleSelectAllImport = () => {
+  if (selectAllImport) {
+    setSelectedOptions([]);
+  } else {
+    setSelectedOptions(importOptions);
+  }
+  setSelectAllImport(!selectAllImport);
+};
     const handleOptionToggle = (option) => {
       if (selectedOptions.includes(option)) {
         setSelectedOptions(selectedOptions.filter(o => o !== option));
@@ -3060,10 +3406,12 @@ const [itc04Table5CRows, setItc04Table5CRows] = useState(() => {
       const saved = localStorage.getItem(STORAGE_KEYS.documents);
       return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Invoice for Outward Supply", srFrom: "", srTo: "", totalNumber: 0, cancelled: 0 }];
     });
-    const [ecoRows, setEcoRows] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.eco);
-      return saved ? JSON.parse(saved) : [{ sl: 1, nature: "1 - Liable to Collect Tax u/s 52(TCS)", gstinEco: "", nameEco: "", netValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }];
-    });
+   const [ecoRows, setEcoRows] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.ecoRows);
+  return saved ? JSON.parse(saved) : [
+    { sl: 1, nature: "1 - Liable to Collect Tax u/s 52(TCS)", gstinEco: "", nameEco: "", netValue: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+  ];
+});
     const [b2bAmendmentRows, setB2bAmendmentRows] = useState(() => {
   const saved = localStorage.getItem(STORAGE_KEYS.b2bAmendment);
   return saved ? JSON.parse(saved) : [
@@ -3399,41 +3747,215 @@ const [amendedTaxLiabilityRows, setAmendedTaxLiabilityRows] = useState(() => {
   }];
 });
     
-    const [summaryTotals, setSummaryTotals] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.summaryTotals);
-      return saved ? JSON.parse(saved) : {
-        b2b: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
-        b2cLarge: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
-        b2cOthers: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
-        hsn: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
-      };
+  const [summaryTotals, setSummaryTotals] = useState(() => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.summaryTotals);
+    return saved ? JSON.parse(saved) : {
+      b2b: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cLarge: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cOthers: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      hsn: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+    };
+  } catch {
+    return {
+      b2b: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cLarge: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      b2cOthers: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 },
+      hsn: { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+    };
+  }
+});
+    const defaultOutwardSupplies = [
+  {
+    nature: "(a) Total Taxable Supplies (Other than Zero Rated, Nil Rated and Exempted supplies)",
+    taxable: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  },
+  {
+    nature: "(b) Total Taxable Supplies (Zero Rated)",
+    taxable: "",
+    igst: "",
+    cgst: "Hide",
+    sgst: "Hide",
+    cess: ""
+  },
+  {
+    nature: "(c) Total Exempt Supplies (Nil Rated and Exempted)",
+    taxable: "",
+    igst: "Hide",
+    cgst: "Hide",
+    sgst: "Hide",
+    cess: "Hide"
+  },
+  {
+    nature: "(d) Inward Supplies (Liable to Reverse Charge)",
+    taxable: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: ""
+  },
+  {
+    nature: "(e) Non-GST Outward Supplies)",
+    taxable: "",
+    igst: "Hide",
+    cgst: "Hide",
+    sgst: "Hide",
+    cess: "Hide"
+  }
+];
+
+const handleImportFile = async () => {
+  if (!uploadedFile) {
+    alert("Please select a file first.");
+    return;
+  }
+
+  if (!selectedOptions.length) {
+    alert("Please select at least one import section.");
+    return;
+  }
+
+  try {
+    setIsUploading(true);
+
+    const buffer = await uploadedFile.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array" });
+
+    const workbookSections = getWorkbookImportOptions(workbook);
+    setImportOptions(workbookSections);
+
+    const isSelectAll = selectedOptions.length === workbookSections.length;
+
+    const sheetsToProcess = isSelectAll ? workbookSections : selectedOptions;
+
+    // selected section ke liye pehle zero set kar do,
+    // taaki empty sheet bhi summary me dikhe
+    sheetsToProcess.forEach((option) => {
+      const config = getImportStorageConfig(option);
+      if (config?.summaryKey) {
+        applyImportedSummaryByKey(config.summaryKey, {
+          taxable: 0,
+          igst: 0,
+          cgst: 0,
+          sgst: 0,
+          cess: 0,
+          total: 0
+        });
+      }
     });
-     const [outwardSupplies, setOutwardSupplies] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.outward);
-      return saved ? JSON.parse(saved) : [
-        { nature: "(a) Total Taxable Supplies (Other than Zero Rated, Nil Rated and Exempted supplies)", taxable: "", igst: "", cgst: "", sgst: "", cess: "" },
-        { nature: "(b) Total Taxable Supplies (Zero Rated)", taxable: "", igst: "", cgst: "Hide", sgst: "Hide", cess: "" },
-        { nature: "(c) Total Exempt Supplies (Nil Rated and Exempted)", taxable: "", igst: "Hide", cgst: "Hide", sgst: "Hide", cess: "Hide" },
-        { nature: "(d) Inward Supplies (Liable to Reverse Charge)", taxable: "", igst: "", cgst: "", sgst: "", cess: "" },
-        { nature: "(e) Non-GST Outward Supplies", taxable: "", igst: "Hide", cgst: "Hide", sgst: "Hide", cess: "Hide" }
-      ];
+
+    sheetsToProcess.forEach((option) => {
+      const matchedSheetName = workbook.SheetNames.find(
+        (sheetName) => normalizeText(sheetName) === normalizeText(option)
+      );
+
+      if (!matchedSheetName) {
+        syncImportedRowsToState(option, [], null);
+        return;
+      }
+
+      const worksheet = workbook.Sheets[matchedSheetName];
+      const rows = sheetToObjects(worksheet);
+
+      const filteredRows = Array.isArray(rows)
+        ? rows.filter((row) =>
+            Object.values(row || {}).some(
+              (value) => String(value || "").trim() !== ""
+            )
+          )
+        : [];
+
+      syncImportedRowsToState(matchedSheetName, filteredRows, worksheet);
     });
+
+    setActiveSubTab("Summary");
+    setImportStep("sources");
+    setUploadedFile(null);
+
+    alert("Excel imported successfully.");
+  } catch (error) {
+    console.error("Import failed:", error);
+    alert("File read failed.");
+  } finally {
+    setIsUploading(false);
+  }
+};
+const [outwardSupplies, setOutwardSupplies] = useState(() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.outward));
+
+    if (
+      Array.isArray(saved) &&
+      saved.length === 5
+    ) {
+      return saved;
+    }
+
+    return defaultOutwardSupplies;
+  } catch {
+    return defaultOutwardSupplies;
+  }
+});
     // 2. ECO u/s 9(5)
-    const [ecoSupplies, setEcoSupplies] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.eco);
-      return saved ? JSON.parse(saved) : [
-        { nature: "1- Taxable Supplies on which ECO pays tax u/s 9(5) [To be furnished by ECO]", taxable: "", igst: "", cgst: "", sgst: "", cess: "", total: "" },
-        { nature: "2- Taxable Supplies made by registered person through ECO, on which ECO is required to pay tax u/s 9(5) [To be furnished by Registered person making Supplies through ECO]", taxable: "", igst: "", cgst: "", sgst: "", cess: "", total: "" }
-      ];
-    });
+    const defaultEcoSupplies = [
+  {
+    nature: "1- Taxable Supplies on which ECO pays tax u/s 9(5) [To be furnished by ECO]",
+    taxable: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: "",
+    total: ""
+  },
+  {
+    nature: "2- Taxable Supplies made by registered person through ECO, on which ECO is required to pay tax u/s 9(5) [To be furnished by Registered person making Supplies through ECO]",
+    taxable: "",
+    igst: "",
+    cgst: "",
+    sgst: "",
+    cess: "",
+    total: ""
+  }
+];
+
+const [ecoSupplies, setEcoSupplies] = useState(() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.ecoSupplies));
+
+    if (Array.isArray(saved) && saved.length === 2) {
+      return saved;
+    }
+
+    return defaultEcoSupplies;
+  } catch {
+    return defaultEcoSupplies;
+  }
+});
     // 3. Inter-State Supplies (composition, exempt, nil, non-GST)
-    const [interstateSupplies, setInterstateSupplies] = useState(() => {
-      const saved = localStorage.getItem(STORAGE_KEYS.interstate);
-      return saved ? JSON.parse(saved) : [
-        { nature: "From a supplier under composition scheme, Exempt and NIL Rated Supply", interstate: "", intrastate: "" },
-        { nature: "Non GST Supply", interstate: "", intrastate: "" }
-      ];
-    });
+  const [unregisteredSupplies, setUnregisteredSupplies] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.interstateUnregistered);
+  return saved
+    ? JSON.parse(saved)
+    : [{ placeOfSupply: "", taxableValue: "", igst: "" }];
+});
+
+const [compositionSupplies, setCompositionSupplies] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.interstateComposition);
+  return saved
+    ? JSON.parse(saved)
+    : [{ placeOfSupply: "", taxableValue: "", igst: "" }];
+});
+
+const [uinSupplies, setUinSupplies] = useState(() => {
+  const saved = localStorage.getItem(STORAGE_KEYS.interstateUin);
+  return saved
+    ? JSON.parse(saved)
+    : [{ placeOfSupply: "", taxableValue: "", igst: "" }];
+});
     // 4. Eligible ITC (sabse bada table)
     const [itcDetails, setItcDetails] = useState(() => {
       const saved = localStorage.getItem(STORAGE_KEYS.itc);
@@ -3485,6 +4007,15 @@ const [skipValidation, setSkipValidation] = useState(false);
 
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
+
+    const [gstr3bSavedSummary, setGstr3bSavedSummary] = useState(() => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.gstr3bSavedSummary);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+});
     // Dropdown controls
     const [openPosDropdownRow, setOpenPosDropdownRow] = useState(null);
     const [openSupplyTypeDropdownRow, setOpenSupplyTypeDropdownRow] = useState(null);
@@ -3535,17 +4066,41 @@ useEffect(() => {
     useEffect(() => localStorage.setItem(STORAGE_KEYS.advanceAdjustment, JSON.stringify(advanceAdjustmentRows)), [advanceAdjustmentRows]);
     useEffect(() => localStorage.setItem(STORAGE_KEYS.hsn, JSON.stringify(hsnRows)), [hsnRows]);
     useEffect(() => localStorage.setItem(STORAGE_KEYS.documents, JSON.stringify(documentsRows)), [documentsRows]);
-    useEffect(() => localStorage.setItem(STORAGE_KEYS.eco, JSON.stringify(ecoRows)), [ecoRows]);
+  useEffect(() => localStorage.setItem(STORAGE_KEYS.ecoRows, JSON.stringify(ecoRows)), [ecoRows]);
+  
     useEffect(() => localStorage.setItem(STORAGE_KEYS.summaryTotals, JSON.stringify(summaryTotals)), [summaryTotals]);
+    useEffect(() => {
+  localStorage.setItem(
+    STORAGE_KEYS.gstr3bSavedSummary,
+    JSON.stringify(gstr3bSavedSummary)
+  );
+}, [gstr3bSavedSummary]);
     useEffect(() => {
       localStorage.setItem(STORAGE_KEYS.outward, JSON.stringify(outwardSupplies));
     }, [outwardSupplies]);
     useEffect(() => {
-      localStorage.setItem(STORAGE_KEYS.eco, JSON.stringify(ecoSupplies));
-    }, [ecoSupplies]);
+  localStorage.setItem(STORAGE_KEYS.ecoSupplies, JSON.stringify(ecoSupplies));
+}, [ecoSupplies]);
     useEffect(() => {
-      localStorage.setItem(STORAGE_KEYS.interstate, JSON.stringify(interstateSupplies));
-    }, [interstateSupplies]);
+  localStorage.setItem(
+    STORAGE_KEYS.interstateUnregistered,
+    JSON.stringify(unregisteredSupplies)
+  );
+}, [unregisteredSupplies]);
+
+useEffect(() => {
+  localStorage.setItem(
+    STORAGE_KEYS.interstateComposition,
+    JSON.stringify(compositionSupplies)
+  );
+}, [compositionSupplies]);
+
+useEffect(() => {
+  localStorage.setItem(
+    STORAGE_KEYS.interstateUin,
+    JSON.stringify(uinSupplies)
+  );
+}, [uinSupplies]);
     useEffect(() => {
       localStorage.setItem(STORAGE_KEYS.itc, JSON.stringify(itcDetails));
     }, [itcDetails]);
@@ -3600,16 +4155,13 @@ useEffect(() => {
     ];
     
   const isGSTR3B = title.toUpperCase().includes("3B");
+  const isITC04 = title.toUpperCase().includes("ITC-04");
 const isTDSTCS = title.toUpperCase().includes("TDS/TCS");
-const isITC04 = title.toUpperCase().includes("ITC-04");
-const isDownloadCenter = title.toUpperCase().includes("DOWNLOAD CENTER");
-
 const tdsTcsSections = ["Download", "Upload", "TDS/TCS Filing"];
-
-
-
+const isReports = title.toUpperCase().includes("REPORTS");
 
 const itc04Sections = ["Table 4", "Table 5(A)", "Table 5(B)", "Table 5(C)"];
+const isDownloadCenter = title.toUpperCase().includes("DOWNLOAD CENTER");
 
 const stateOptions = [
   "Andhra Pradesh",
@@ -3643,9 +4195,7 @@ const currentSections = isGSTR3B
     ? itc04Sections
     : gstr1Sections;
 
-const canSelect = isITC04
-  ? selectedYear && selectedMonth && selectedState
-  : selectedYear && selectedMonth;
+const canSelect = selectedYear && selectedMonth;
 
 
 const toggleDownloadMonth = (month) => {
@@ -3700,6 +4250,1397 @@ useEffect(() => {
     document.removeEventListener("mousedown", handleClickOutside);
   };
 }, []);
+
+
+const reportTabs = ["Summary", "Month Wise", "Compare", "Annual"];
+
+const summaryReports = [
+  "GSTR-3B Summary",
+  "GSTR-1 Summary",
+  "GSTR-1A Summary",
+  "GSTR-2A Summary",
+  "GSTR-2B Summary",
+  "GSTR Consolidated Reports",
+  "GSTR-3B All Table Details",
+  "GSTR-1 Financial Year Invoice Dates",
+  "GSTR-2B Download Invoice Date in Next FY"
+];
+
+const monthWiseReports = [
+  "GSTR-3B Monthly / Yearly Report",
+  "GSTR-2B ITC Reclaim Reports",
+  "GSTR-1 Return Filed PDF Download",
+  "GSTR-3B Return Filed PDF Download",
+  "RCM Report in GSTR-3B",
+  "Electronic Credit / Cash Ledger Report"
+];
+
+const compareReports = [
+  "GSTR-2 vs GSTR-2A",
+  "GSTR-2 vs GSTR-2A (Party Wise)",
+  "GSTR-2 vs GSTR-2B",
+  "GSTR-2 vs GSTR-2B (Party Wise)",
+  "GSTR-2A vs GSTR-3B (ITC)",
+  "GSTR-2B vs GSTR-3B (ITC)",
+  "GSTR-3B vs GSTR-1",
+  "Tax Compare Report",
+  "GSTR-9 Compare Report",
+  "GSTR-3B vs TDS/TCS"
+];
+
+const annualReports = [
+  "GSTR-2 Annual Report",
+  "GSTR-2A Annual Report",
+  "GSTR-2B Annual Reports",
+  "GSTR-1 Annual Report",
+  "GSTR-1A Annual Report",
+  "GSTR-3B vs GSTR-2A",
+  "GSTR-3B vs GSTR-2B",
+  "GSTR-3B vs GSTR-1",
+  "GSTR-2A vs GSTR-2B",
+  "Rate Wise Reports",
+  "GSTR-9 Report",
+  "GSTR-9C Report",
+  "Interest and Late Fee Report",
+  "Trading Report",
+  "TDS/TCS Annual Report",
+  "Tax Liability and ITC Summary"
+];
+
+const getCurrentReportList = () => {
+  switch (activeReportTab) {
+    case "Summary":
+      return summaryReports;
+    case "Month Wise":
+      return monthWiseReports;
+    case "Compare":
+      return compareReports;
+    case "Annual":
+      return annualReports;
+    default:
+      return [];
+  }
+};
+
+const REPORT_FILE_MAP = {
+  // =========================
+  // Summary
+  // =========================
+  "GSTR-3B Summary": {
+    url: "/GSTR-3B%20Summary%20(1).xlsx",
+    downloadName: "GSTR-3B Summary (1).xlsx",
+  },
+  "GSTR-1 Summary": {
+    url: "/GSTR-1%20Summary.xlsx",
+    downloadName: "GSTR-1 Summary.xlsx",
+  },
+  "GSTR-1A Summary": {
+    url: "/GSTR-1A%20Summary.xlsx",
+    downloadName: "GSTR-1A Summary.xlsx",
+  },
+  "GSTR-2A Summary": {
+    url: "/GSTR-2A%20Summary.xlsx",
+    downloadName: "GSTR-2A Summary.xlsx",
+  },
+  "GSTR-2B Summary": {
+    url: "/GSTR-2B%20Summary.xlsx",
+    downloadName: "GSTR-2B Summary.xlsx",
+  },
+  "GSTR Consolidated Reports": {
+    url: "/CONSOLIDATED%20SUMMARY%20(1-1A-2A-2B-3B).xlsx",
+    downloadName: "CONSOLIDATED SUMMARY (1-1A-2A-2B-3B).xlsx",
+  },
+  "GSTR-3B All Table Details": {
+    url: "/GSTR-3B%20All%20Table%20Details.xlsx",
+    downloadName: "GSTR-3B All Table Details.xlsx",
+  },
+
+  // =========================
+  // Compare
+  // =========================
+  "GSTR-2 vs GSTR-2A": {
+    url: "/GSTR-2%20VS%20GSTR-2A%20(Invoice%20Wise).xlsx",
+    downloadName: "GSTR-2 VS GSTR-2A (Invoice Wise).xlsx",
+  },
+  "GSTR-2 vs GSTR-2A (Party Wise)": {
+    url: "/GSTR-2%20VS%20GSTR-2A%20(Party%20Wise).xlsx",
+    downloadName: "GSTR-2 VS GSTR-2A (Party Wise).xlsx",
+  },
+  "GSTR-2 vs GSTR-2B": {
+    url: "/GSTR-2%20VS%20GSTR-2B%20(Invoice%20Wise).xlsx",
+    downloadName: "GSTR-2 VS GSTR-2B (Invoice Wise).xlsx",
+  },
+  "GSTR-2 vs GSTR-2B (Party Wise)": {
+    url: "/GSTR-2%20VS%20GSTR-2B%20(Party%20Wise).xlsx",
+    downloadName: "GSTR-2 VS GSTR-2B (Party Wise).xlsx",
+  },
+  "GSTR-2A vs GSTR-3B (ITC)": {
+    url: "/GSTR-2A%20vs%20GSTR-3B.xlsx",
+    downloadName: "GSTR-2A vs GSTR-3B.xlsx",
+  },
+  "GSTR-2B vs GSTR-3B (ITC)": {
+    url: "/GSTR-2B%20vs%20GSTR-3B.xlsx",
+    downloadName: "GSTR-2B vs GSTR-3B.xlsx",
+  },
+  "GSTR-3B vs GSTR-1": {
+    url: "/GSTR-3B%20vs%20GSTR-1.xlsx",
+    downloadName: "GSTR-3B vs GSTR-1.xlsx",
+  },
+  "Tax Compare Report": {
+    url: "/Tax%20Compare%20Report.xlsx",
+    downloadName: "Tax Compare Report.xlsx",
+  },
+  "GSTR-9 Compare Report": {
+    url: "/GSTR-9%20Compare%20Report.xlsx",
+    downloadName: "GSTR-9 Compare Report.xlsx",
+  },
+  "GSTR-3B vs TDS/TCS": {
+    url: "/GSTR3B%20vs%20TDS-TCS.xlsx",
+    downloadName: "GSTR3B vs TDS-TCS.xlsx",
+  },
+};
+
+const removeBrokenValidations = (ws) => {
+  try {
+    const sheetName = (ws.name || "").toLowerCase().trim();
+
+    // Only target the broken sheet(s)
+    if (
+      sheetName === "gstr-2b amended summary" ||
+      sheetName === "gstr-2b summary"
+    ) {
+      console.log(`🧹 Removing broken data validations from ${ws.name}`);
+
+      // ExcelJS runtime object
+      if (ws.dataValidations) {
+        if (Array.isArray(ws.dataValidations.model)) {
+          ws.dataValidations.model = [];
+        }
+
+        if (ws.dataValidations.model && typeof ws.dataValidations.model === "object") {
+          ws.dataValidations.model = [];
+        }
+      }
+
+      // Worksheet model
+      if (ws.model && ws.model.dataValidations) {
+        if (Array.isArray(ws.model.dataValidations.model)) {
+          ws.model.dataValidations.model = [];
+        } else {
+          ws.model.dataValidations = { model: [] };
+        }
+      }
+
+      // Extra hard cleanup for some ExcelJS versions
+      if (ws._model && ws._model.dataValidations) {
+        if (Array.isArray(ws._model.dataValidations.model)) {
+          ws._model.dataValidations.model = [];
+        } else {
+          ws._model.dataValidations = { model: [] };
+        }
+      }
+
+      console.log(`✅ Broken validations removed from ${ws.name}`);
+    }
+  } catch (err) {
+    console.warn(`⚠ Failed removing validations from ${ws.name}`, err);
+  }
+};
+
+
+
+
+
+const trimProblematicTemplate = (ws, reportName) => {
+  try {
+    if (!ws) return;
+
+    // remove very wide merges that go till XFD
+    const badMergeRefs = [];
+    if (ws.model?.merges) {
+      ws.model.merges.forEach((ref) => {
+        if (String(ref).includes("XFD")) {
+          badMergeRefs.push(ref);
+        }
+      });
+    }
+
+    badMergeRefs.forEach((ref) => {
+      try {
+        ws.unMergeCells(ref);
+      } catch (e) {
+        // ignore
+      }
+    });
+
+    if (ws.model?.merges) {
+      ws.model.merges = ws.model.merges.filter(
+        (ref) => !String(ref).includes("XFD")
+      );
+    }
+
+    if (ws._merges) {
+      Object.keys(ws._merges).forEach((key) => {
+        if (String(key).includes("XFD")) {
+          delete ws._merges[key];
+        }
+      });
+    }
+
+    // trim hidden/fake columns after actual visible area
+    let maxAllowedCol = 20;
+
+    if (reportName === "GSTR-2A vs GSTR-3B (ITC)") {
+      maxAllowedCol = 13; // A:M
+    }
+
+    if (reportName === "GSTR-2B vs GSTR-3B (ITC)") {
+      maxAllowedCol = 16; // A:P
+    }
+
+    if (ws.model?.cols) {
+      ws.model.cols = ws.model.cols
+        .filter((c) => Number(c.min) <= maxAllowedCol)
+        .map((c) => ({
+          ...c,
+          max: Math.min(Number(c.max), maxAllowedCol),
+        }));
+    }
+
+    if (ws._columns && ws._columns.length > maxAllowedCol) {
+      ws._columns = ws._columns.slice(0, maxAllowedCol);
+    }
+
+    // re-add only valid visible merges
+    if (reportName === "GSTR-2A vs GSTR-3B (ITC)") {
+      try { ws.mergeCells("A5:M5"); } catch(e) {}
+    }
+
+    if (reportName === "GSTR-2B vs GSTR-3B (ITC)") {
+      try { ws.mergeCells("D3:P3"); } catch(e) {}
+    }
+
+  } catch (err) {
+    console.error("❌ trimProblematicTemplate error:", err);
+  }
+};
+
+const handleDownload = async (reportName) => {
+  try {
+    const file = REPORT_FILE_MAP[reportName];
+
+    if (!file) {
+      alert("Invalid report");
+      return;
+    }
+
+    const response = await fetch(file.url);
+    const arrayBuffer = await response.arrayBuffer();
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(arrayBuffer);
+
+    // =========================
+    // GSTR-1 Summary
+    // =========================
+    if (reportName === "GSTR-1 Summary") {
+      const ws = workbook.getWorksheet("GSTR-1 Summary");
+
+      ws.getCell("B8").value = 10;
+      ws.getCell("B9").value = 50000;
+      ws.getCell("B10").value = 9000;
+      ws.getCell("B11").value = 4500;
+      ws.getCell("B12").value = 4500;
+      ws.getCell("B13").value = 500;
+    }
+
+    // =========================
+    // GSTR-1A Summary
+    // =========================
+    if (reportName === "GSTR-1A Summary") {
+      const ws = workbook.getWorksheet("GSTR-1A Summary");
+
+      ws.getCell("B8").value = 12;
+      ws.getCell("B9").value = 65000;
+      ws.getCell("B10").value = 11700;
+      ws.getCell("B11").value = 5850;
+      ws.getCell("B12").value = 5850;
+      ws.getCell("B13").value = 650;
+    }
+    
+
+    if (reportName === "GSTR-2A Summary") {
+  console.log("Filling GSTR-2A Summary");
+
+  const ws = workbook.worksheets.find(s =>
+    s.name.includes("2A Summary")
+  );
+
+  if (!ws) {
+    console.error("Sheet not found!", workbook.worksheets.map(s => s.name));
+    return;
+  }
+
+  ws.getCell("B8").value = 10;
+  ws.getCell("B9").value = 50000;
+  ws.getCell("B10").value = 9000;
+  ws.getCell("B11").value = 4500;
+  ws.getCell("B12").value = 4500;
+  ws.getCell("B13").value = 500;
+}
+if (reportName === "GSTR Consolidated Reports") {
+  console.log("✅ Filling Consolidated Report");
+
+  const summaryData = {
+    gstr1:  { b8: 10, b9: 50000, b10: 9000,  b11: 4500, b12: 4500, b13: 500 },
+    gstr1a: { b8: 12, b9: 65000, b10: 11700, b11: 5850, b12: 5850, b13: 650 },
+    gstr2a: { b8: 20, b9: 80000, b10: 14400, b11: 7200, b12: 7200, b13: 800 },
+    gstr2b: { b8: 25, b9: 90000, b10: 16200, b11: 8100, b12: 8100, b13: 900 },
+    gstr3b: { b8: 15, b9: 70000, b10: 12600, b11: 6300, b12: 6300, b13: 700 },
+  };
+
+  const fillRangeB8ToB13 = (ws, values) => {
+    ws.getCell("B8").value  = values.b8 ?? "";
+    ws.getCell("B9").value  = values.b9 ?? "";
+    ws.getCell("B10").value = values.b10 ?? "";
+    ws.getCell("B11").value = values.b11 ?? "";
+    ws.getCell("B12").value = values.b12 ?? "";
+    ws.getCell("B13").value = values.b13 ?? "";
+  };
+
+  const fillRangeB9ToB13 = (ws, values) => {
+    ws.getCell("B9").value  = values.b9 ?? "";
+    ws.getCell("B10").value = values.b10 ?? "";
+    ws.getCell("B11").value = values.b11 ?? "";
+    ws.getCell("B12").value = values.b12 ?? "";
+    ws.getCell("B13").value = values.b13 ?? "";
+  };
+
+  const removeBrokenValidations = (ws) => {
+    try {
+      const sheetName = (ws.name || "").toLowerCase().trim();
+
+      if (
+        sheetName === "gstr-2b amended summary" ||
+        sheetName === "gstr-2b summary"
+      ) {
+        console.log(`🧹 Removing broken data validations from ${ws.name}`);
+
+        if (ws.dataValidations) {
+          if (Array.isArray(ws.dataValidations.model)) {
+            ws.dataValidations.model = [];
+          } else {
+            ws.dataValidations.model = [];
+          }
+        }
+
+        if (ws.model && ws.model.dataValidations) {
+          if (Array.isArray(ws.model.dataValidations.model)) {
+            ws.model.dataValidations.model = [];
+          } else {
+            ws.model.dataValidations = { model: [] };
+          }
+        }
+
+        if (ws._model && ws._model.dataValidations) {
+          if (Array.isArray(ws._model.dataValidations.model)) {
+            ws._model.dataValidations.model = [];
+          } else {
+            ws._model.dataValidations = { model: [] };
+          }
+        }
+
+        console.log(`✅ Broken validations removed from ${ws.name}`);
+      }
+    } catch (err) {
+      console.warn(`⚠ Failed removing validations from ${ws.name}`, err);
+    }
+  };
+
+  workbook.worksheets.forEach((ws) => {
+    const sheetName = (ws.name || "").toLowerCase().replace(/\s+/g, "");
+    console.log("➡ Processing sheet:", ws.name);
+
+    try {
+      if (
+        (sheetName.includes("gstr-1") || sheetName.includes("gstr1")) &&
+        !sheetName.includes("1a")
+      ) {
+        fillRangeB8ToB13(ws, summaryData.gstr1);
+      } else if (
+        sheetName.includes("gstr-1a") ||
+        sheetName.includes("gstr1a") ||
+        sheetName.includes("1a")
+      ) {
+        fillRangeB8ToB13(ws, summaryData.gstr1a);
+      } else if (
+        (sheetName.includes("gstr-2a") || sheetName.includes("gstr2a") || sheetName.includes("2a")) &&
+        !sheetName.includes("2b")
+      ) {
+        fillRangeB8ToB13(ws, summaryData.gstr2a);
+      } else if (
+        sheetName.includes("gstr-2b") ||
+        sheetName.includes("gstr2b") ||
+        sheetName.includes("2b")
+      ) {
+        fillRangeB8ToB13(ws, summaryData.gstr2b);
+      } else if (
+        sheetName.includes("gstr-3b") ||
+        sheetName.includes("gstr3b") ||
+        sheetName.includes("3b")
+      ) {
+        fillRangeB8ToB13(ws, summaryData.gstr3b);
+      } else {
+        fillRangeB9ToB13(ws, {
+          b9: 50000,
+          b10: 9000,
+          b11: 4500,
+          b12: 4500,
+          b13: 500,
+        });
+      }
+
+      // only remove broken validation metadata
+      removeBrokenValidations(ws);
+
+    } catch (err) {
+      console.error("❌ Error while filling sheet:", ws.name, err);
+    }
+  });
+
+  try {
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const blob = new Blob(
+      [buffer],
+      {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      }
+    );
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "GSTR Consolidated Reports.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+
+    console.log("✅ Consolidated report downloaded successfully");
+  } catch (err) {
+    console.error("❌ Final writeBuffer failed:", err);
+  }
+}
+
+    
+    if (reportName === "GSTR-3B Summary") {
+      const ws = workbook.worksheets[0];
+
+      ws.getCell("B10").value = 50000;
+      ws.getCell("C10").value = 75000;
+      ws.getCell("B11").value = 9000;
+      ws.getCell("B12").value = 4500;
+      ws.getCell("B13").value = 4500;
+    }
+
+
+    // =========================
+// GSTR-1 vs GSTR-2A COMPARE
+// =========================
+if (reportName === "GSTR-1 vs GSTR-2A") {
+  console.log("Filling Compare Report");
+
+  const ws = workbook.worksheets[0]; // first sheet
+
+  if (!ws) {
+    console.error("Sheet not found");
+    return;
+  }
+
+  // 🔥 Dummy Data (tu yaha API ka data daal sakta hai)
+  const data = [
+    {
+      party: "D.K. IRON STORE",
+      inv2: 18,
+      inv2a: 32,
+      taxable2: 4334314.05,
+      taxable2a: 8040688.61,
+      tax2: 780176.5,
+      tax2a: 1447323.94,
+    },
+    {
+      party: "INTERIOR DECOR",
+      inv2: 5,
+      inv2a: 5,
+      taxable2: 1400000,
+      taxable2a: 1400000,
+      tax2: 252000,
+      tax2a: 252000,
+    },
+    {
+      party: "MEERUT STEELS",
+      inv2: 1,
+      inv2a: 1,
+      taxable2: 296704,
+      taxable2a: 296704.4,
+      tax2: 53406.72,
+      tax2a: 53406.8,
+    }
+  ];
+
+  let startRow = 9;
+
+  data.forEach((item, index) => {
+    const row = startRow + index;
+
+    // D & E (invoice count)
+    ws.getCell(`D${row}`).value = item.inv2;
+    ws.getCell(`E${row}`).value = item.inv2a;
+
+    // F & G (taxable)
+    ws.getCell(`F${row}`).value = item.taxable2;
+    ws.getCell(`G${row}`).value = item.taxable2a;
+
+    // H & I (tax)
+    ws.getCell(`H${row}`).value = item.tax2;
+    ws.getCell(`I${row}`).value = item.tax2a;
+
+    // J (taxable diff)
+    ws.getCell(`J${row}`).value =
+      item.taxable2a - item.taxable2;
+
+    // K (tax diff)
+    ws.getCell(`K${row}`).value =
+      item.tax2a - item.tax2;
+  });
+
+  console.log("✅ Compare report filled");
+}
+
+// =========================
+// GSTR-2 vs GSTR-2A (INVOICE WISE)
+// =========================
+if (reportName.includes("GSTR-2 vs GSTR-2A")) {
+  console.log("🔥 Filling 2 vs 2A Invoice Wise");
+
+  const ws = workbook.worksheets[0];
+
+  if (!ws) {
+    console.error("❌ Sheet not found");
+    return;
+  }
+
+  let startRow = 11;
+
+  const data = [
+    {
+      invoice: "04",
+      party: "Ultimate Decor Particle",
+      month: "Mar-2025",
+      date: "04-04-2024",
+      taxable: 37650,
+      cgst: 3388.58,
+      sgst: 3388.58,
+    }
+  ];
+
+  data.forEach((item, i) => {
+    const r = startRow + i;
+
+    ws.getCell(`A${r}`).value = item.invoice;
+    ws.getCell(`B${r}`).value = item.party;
+    ws.getCell(`C${r}`).value = item.month;
+    ws.getCell(`D${r}`).value = item.date;
+
+    ws.getCell(`E${r}`).value = item.taxable;
+    ws.getCell(`G${r}`).value = item.cgst;
+    ws.getCell(`H${r}`).value = item.sgst;
+
+    ws.getCell(`J${r}`).value = item.month;
+    ws.getCell(`K${r}`).value = item.date;
+    ws.getCell(`L${r}`).value = item.taxable;
+    ws.getCell(`N${r}`).value = item.cgst;
+    ws.getCell(`O${r}`).value = item.sgst;
+
+    ws.getCell(`Q${r}`).value = 0;
+  });
+
+  console.log("✅ 2A Done");
+}
+
+
+// =========================
+// GSTR-2 vs GSTR-2B (INVOICE WISE)
+// =========================
+if (reportName.includes("GSTR-2 vs GSTR-2B")) {
+  console.log("🔥 Filling 2 vs 2B Invoice Wise");
+
+  const ws = workbook.worksheets[0];
+
+  if (!ws) {
+    console.error("❌ Sheet not found");
+    return;
+  }
+
+  let startRow = 10;
+
+  const data = [
+    {
+      gstin: "09CMIPR8447Q2ZS",
+      note: "DN001",
+      date: "01-04-2024",
+      type: "Debit",
+      party: "RUBEENA",
+      month: "Apr-2024",
+      taxable: 50000,
+      cgst: 4500,
+      sgst: 4500,
+    }
+  ];
+
+  data.forEach((item, i) => {
+    const r = startRow + i;
+
+    ws.getCell(`A${r}`).value = item.gstin;
+    ws.getCell(`B${r}`).value = item.note;
+    ws.getCell(`C${r}`).value = item.date;
+    ws.getCell(`D${r}`).value = item.type;
+    ws.getCell(`E${r}`).value = item.party;
+
+    ws.getCell(`F${r}`).value = item.month;
+    ws.getCell(`G${r}`).value = item.taxable;
+    ws.getCell(`I${r}`).value = item.cgst;
+    ws.getCell(`J${r}`).value = item.sgst;
+
+    ws.getCell(`L${r}`).value = item.month;
+    ws.getCell(`M${r}`).value = item.taxable;
+    ws.getCell(`O${r}`).value = item.cgst;
+    ws.getCell(`P${r}`).value = item.sgst;
+
+    ws.getCell(`Q${r}`).value = 0;
+  });
+
+  console.log("✅ 2B Done");
+}
+
+// =========================
+// GSTR-2 vs GSTR-2B (PARTY WISE)
+// =========================
+if (reportName.includes("GSTR-2 vs GSTR-2B Party Wise")) {
+  console.log("🔥 Filling Party Wise Report");
+
+  const ws = workbook.worksheets[0];
+
+  if (!ws) {
+    console.error("❌ Sheet not found");
+    return;
+  }
+
+  const data = [
+    {
+      gstin: "09ALXPK5904B2ZV",
+      party: "D.K. IRON STORE",
+      section: "B2B",
+      inv2: 18,
+      inv2b: 32,
+      taxable2: 4334314.05,
+      taxable2b: 8040688.61,
+      tax2: 780176.5,
+      tax2b: 1447323.94,
+    },
+    {
+      gstin: "09DQHPS5297H1Z1",
+      party: "INTERIOR DECOR",
+      section: "B2B",
+      inv2: 5,
+      inv2b: 5,
+      taxable2: 1400000,
+      taxable2b: 1400000,
+      tax2: 252000,
+      tax2b: 252000,
+    }
+  ];
+
+  let startRow = 9;
+
+  data.forEach((item, i) => {
+    const r = startRow + i;
+
+    // Basic Info
+    ws.getCell(`A${r}`).value = item.gstin;
+    ws.getCell(`B${r}`).value = item.party;
+    ws.getCell(`C${r}`).value = item.section;
+
+    // Invoice Count
+    ws.getCell(`D${r}`).value = item.inv2;
+    ws.getCell(`E${r}`).value = item.inv2b;
+
+    // Taxable
+    ws.getCell(`F${r}`).value = item.taxable2;
+    ws.getCell(`G${r}`).value = item.taxable2b;
+
+    // Tax
+    ws.getCell(`H${r}`).value = item.tax2;
+    ws.getCell(`I${r}`).value = item.tax2b;
+
+    // Difference
+    ws.getCell(`J${r}`).value = item.taxable2b - item.taxable2;
+    ws.getCell(`K${r}`).value = item.tax2b - item.tax2;
+  });
+
+  console.log("✅ Party Wise Done");
+}
+if (reportName.includes("GSTR-2A vs GSTR-3B")) {
+  console.log("🔥 Filling 2A vs 3B");
+
+  const ws = workbook.worksheets[0];
+
+  const data = [
+    {
+      month: "Apr/2024",
+      gstr3b: { taxable: 1363557.32, cgst: 122720.17, sgst: 122720.17 },
+      gstr2a: { taxable: 1363557.32, cgst: 122720.17, sgst: 122720.17 },
+    },
+    {
+      month: "May/2024",
+      gstr3b: { taxable: 1273132.99, cgst: 114581.99, sgst: 114581.99 },
+      gstr2a: { taxable: 1305612.99, cgst: 117505.19, sgst: 117505.19 },
+    }
+  ];
+
+  let row = 7;
+
+  data.forEach((item) => {
+    // Month
+    ws.getCell(`A${row}`).value = item.month;
+
+    // GSTR-3B
+    ws.getCell(`B${row}`).value = "GSTR-3B :";
+    ws.getCell(`C${row}`).value = item.gstr3b.taxable;
+    ws.getCell(`E${row}`).value = item.gstr3b.cgst;
+    ws.getCell(`F${row}`).value = item.gstr3b.sgst;
+
+    row++;
+
+    // GSTR-2A
+    ws.getCell(`B${row}`).value = "GSTR-2A :";
+    ws.getCell(`C${row}`).value = item.gstr2a.taxable;
+    ws.getCell(`E${row}`).value = item.gstr2a.cgst;
+    ws.getCell(`F${row}`).value = item.gstr2a.sgst;
+
+    row++;
+
+    // Difference
+    ws.getCell(`B${row}`).value = "(Difference):";
+    ws.getCell(`C${row}`).value =
+      item.gstr3b.taxable - item.gstr2a.taxable;
+    ws.getCell(`E${row}`).value =
+      item.gstr3b.cgst - item.gstr2a.cgst;
+    ws.getCell(`F${row}`).value =
+      item.gstr3b.sgst - item.gstr2a.sgst;
+
+    row++;
+  });
+
+  console.log("✅ 2A vs 3B Done");
+}
+
+if (reportName.includes("GSTR-2B vs GSTR-3B")) {
+  console.log("🔥 Filling 2B vs 3B");
+
+  const ws = workbook.worksheets[0];
+
+  const data = [
+    {
+      month: "Apr/2024",
+      gstr3b: { taxable: 1363557.32, cgst: 122720.17, sgst: 122720.17 },
+      gstr2b: { taxable: 1363557.32, cgst: 122720.17, sgst: 122720.17 },
+    },
+    {
+      month: "May/2024",
+      gstr3b: { taxable: 1273132.99, cgst: 114581.99, sgst: 114581.99 },
+      gstr2b: { taxable: 1305612.99, cgst: 117505.19, sgst: 117505.19 },
+    }
+  ];
+
+  let row = 7;
+
+  data.forEach((item) => {
+    ws.getCell(`A${row}`).value = item.month;
+
+    // GSTR-3B
+    ws.getCell(`B${row}`).value = "GSTR-3B :";
+    ws.getCell(`C${row}`).value = item.gstr3b.taxable;
+    ws.getCell(`E${row}`).value = item.gstr3b.cgst;
+    ws.getCell(`F${row}`).value = item.gstr3b.sgst;
+
+    row++;
+
+    // GSTR-2B
+    ws.getCell(`B${row}`).value = "GSTR-2B :";
+    ws.getCell(`C${row}`).value = item.gstr2b.taxable;
+    ws.getCell(`E${row}`).value = item.gstr2b.cgst;
+    ws.getCell(`F${row}`).value = item.gstr2b.sgst;
+
+    row++;
+
+    // Difference
+    ws.getCell(`B${row}`).value = "(Difference):";
+    ws.getCell(`C${row}`).value =
+      item.gstr3b.taxable - item.gstr2b.taxable;
+    ws.getCell(`E${row}`).value =
+      item.gstr3b.cgst - item.gstr2b.cgst;
+    ws.getCell(`F${row}`).value =
+      item.gstr3b.sgst - item.gstr2b.sgst;
+
+    row++;
+  });
+
+  console.log("✅ 2B vs 3B Done");
+}
+
+
+if (reportName === "GSTR-2A vs GSTR-3B (ITC)") {
+  console.log("🔥 Creating fresh GSTR-2A vs GSTR-3B (ITC) workbook");
+
+  const workbook = new ExcelJS.Workbook();
+  const ws = workbook.addWorksheet("GSTR2A VS GSTR3B");
+
+  // widths
+  ws.columns = [
+    { width: 42 }, // A
+    { width: 14 }, // B
+    { width: 14 }, // C
+    { width: 14 }, // D
+    { width: 14 }, // E
+    { width: 14 }, // F
+    { width: 14 }, // G
+  ];
+
+  // title
+  ws.mergeCells("B1:G1");
+  ws.getCell("B1").value = "GSTR2A VS GSTR3B";
+  ws.getCell("B1").font = { bold: true, size: 14 };
+  ws.getCell("B1").alignment = { horizontal: "center", vertical: "middle" };
+
+  // GSTIN / FY
+  ws.getCell("A2").value = "GSTIN";
+  ws.getCell("B2").value = "09CMIPR8447Q2ZS";
+
+  ws.getCell("A3").value = "FIN YEAR";
+  ws.getCell("B3").value = "2024-25";
+
+  // Tax Details row
+  ws.getCell("A4").value = "Tax Details";
+  ["B4", "C4", "D4", "E4", "F4", "G4"].forEach((cell, i) => {
+    ws.getCell(cell).value = ["April", "May", "June", "July", "August", "September"][i];
+    ws.getCell(cell).font = { color: { argb: "4472C4" }, bold: false, size: 11 };
+    ws.getCell(cell).alignment = { horizontal: "center", vertical: "middle" };
+  });
+
+  // orange section row
+  ws.mergeCells("A5:G5");
+  ws.getCell("A5").value = "ITC Available details in GSTR-3B";
+  ws.getCell("A5").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "ED7D31" }
+  };
+  ws.getCell("A5").font = { bold: true };
+  ws.getCell("A5").alignment = { horizontal: "left", vertical: "middle" };
+
+  // labels
+  const labels = [
+    "1.Imports of Goods",
+    "IGST",
+    "CESS",
+    "",
+    "2.Imports of Services",
+    "IGST",
+    "CESS",
+    "",
+    "3. Inward Supplies liable to reverse charge(other than 1 & 2 Above)",
+    "IGST",
+    "CGST",
+    "SGST",
+    "CESS",
+    "",
+    "4. Inward Supplies from ISD",
+    "IGST",
+    "CGST",
+    "SGST",
+  ];
+
+  let startLabelRow = 6;
+  labels.forEach((text, idx) => {
+    ws.getCell(`A${startLabelRow + idx}`).value = text;
+    if (text && !["IGST", "CGST", "SGST", "CESS"].includes(text)) {
+      ws.getCell(`A${startLabelRow + idx}`).font = { bold: true };
+    }
+  });
+
+  // static data only B:G and rows 6:12 as you asked
+  const data = {
+    B: [0, 12000, 500, "", 0, 8000, 300],
+    C: [0, 13000, 550, "", 0, 8500, 320],
+    D: [0, 14000, 600, "", 0, 9000, 350],
+    E: [0, 15000, 650, "", 0, 9500, 370],
+    F: [0, 16000, 700, "", 0, 9800, 390],
+    G: [0, 17000, 750, "", 0, 10000, 400],
+  };
+
+  Object.entries(data).forEach(([col, values]) => {
+    values.forEach((value, idx) => {
+      ws.getCell(`${col}${6 + idx}`).value = value;
+      ws.getCell(`${col}${6 + idx}`).alignment = { horizontal: "center", vertical: "middle" };
+    });
+  });
+
+  // borders
+  for (let r = 2; r <= 23; r++) {
+    for (let c = 1; c <= 7; c++) {
+      ws.getRow(r).getCell(c).border = {
+        top: { style: "thin", color: { argb: "D9D9D9" } },
+        left: { style: "thin", color: { argb: "D9D9D9" } },
+        bottom: { style: "thin", color: { argb: "D9D9D9" } },
+        right: { style: "thin", color: { argb: "D9D9D9" } },
+      };
+    }
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  saveAs(blob, "Filled-GSTR-2A vs GSTR-3B.xlsx");
+  return;
+}
+
+
+if (reportName === "GSTR-2B vs GSTR-3B (ITC)") {
+  console.log("🔥 Creating fresh GSTR-2B vs GSTR-3B (ITC) workbook");
+
+  const workbook = new ExcelJS.Workbook();
+  const ws = workbook.addWorksheet("GSTR3B VS GSTR2B");
+
+  ws.columns = [
+    { width: 8 },   // A
+    { width: 42 },  // B
+    { width: 10 },  // C
+    { width: 14 },  // D
+    { width: 14 },  // E
+    { width: 14 },  // F
+    { width: 14 },  // G
+    { width: 14 },  // H
+    { width: 14 },  // I
+    { width: 14 },  // J
+    { width: 14 },  // K
+    { width: 14 },  // L
+    { width: 14 },  // M
+    { width: 14 },  // N
+    { width: 14 },  // O
+    { width: 14 },  // P
+  ];
+
+  ws.mergeCells("A1:C1");
+  ws.getCell("A1").value = "GSTR3B VS GSTR2B Report";
+  ws.getCell("A1").font = { bold: true, size: 14 };
+
+  ws.getCell("A2").value = "1";
+  ws.getCell("B2").value = "Assessee Name";
+  ws.getCell("D2").value = "RUBEENA";
+
+  ws.getCell("A3").value = "2";
+  ws.getCell("B3").value = "GSTIN";
+  ws.getCell("D3").value = "09CMIPR8447Q2ZS";
+
+  ws.getCell("A4").value = "3";
+  ws.getCell("B4").value = "Financial Year";
+  ws.getCell("D4").value = "2024-25";
+
+  const headers = [
+    "Sl.No", "Section", "Type",
+    "APR 2024", "MAY 2024", "JUN 2024", "JUL 2024", "AUG 2024", "SEP 2024",
+    "OCT 2024", "NOV 2024", "DEC 2024", "JAN 2025", "FEB 2025", "MAR 2025", "Total"
+  ];
+
+  headers.forEach((h, i) => {
+    const cell = ws.getRow(6).getCell(i + 1);
+    cell.value = h;
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "5B9BD5" }
+    };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+  });
+
+  const rows = {
+    7:  ["1", "ITC Claim - Import of Goods", ""],
+    8:  ["", "R3B: 4.A.1 Import of goods", "IGST"],
+    9:  ["", "R2B: Import of Goods Invoices", "IGST"],
+    10: ["", "R2B: Import of Goods from SEZ Invoices", "IGST"],
+    11: ["", "Difference", "IGST"],
+    12: ["", "R3B: 4.A.1 Import of goods", "CESS"],
+    13: ["", "R2B: Import of Goods Invoices", "CESS"],
+    14: ["", "R2B: Import of Goods from SEZ Invoices", "CESS"],
+    15: ["", "Difference", "CESS"],
+  };
+
+  Object.entries(rows).forEach(([row, vals]) => {
+    ws.getCell(`A${row}`).value = vals[0];
+    ws.getCell(`B${row}`).value = vals[1];
+    ws.getCell(`C${row}`).value = vals[2];
+  });
+
+  ws.getCell("B7").font = { bold: true };
+
+  // D:O , rows 8:15
+  const rowData = {
+    8:  [12000, 12500, 13000, 13500, 14000, 14500, 15000, 15500, 16000, 16500, 17000, 17500],
+    9:  [5000,  5200,  5400,  5600,  5800,  6000,  6200,  6400,  6600,  6800,  7000,  7200],
+    10: [2000,  2100,  2200,  2300,  2400,  2500,  2600,  2700,  2800,  2900,  3000,  3100],
+    11: [5000,  5200,  5400,  5600,  5800,  6000,  6200,  6400,  6600,  6800,  7000,  7200],
+    12: [300,   320,   340,   360,   380,   400,   420,   440,   460,   480,   500,   520],
+    13: [100,   110,   120,   130,   140,   150,   160,   170,   180,   190,   200,   210],
+    14: [50,    60,    70,    80,    90,    100,   110,   120,   130,   140,   150,   160],
+    15: [150,   150,   150,   150,   150,   150,   150,   150,   150,   150,   150,   150],
+  };
+
+  const cols = ["D","E","F","G","H","I","J","K","L","M","N","O"];
+
+  Object.entries(rowData).forEach(([row, values]) => {
+    let total = 0;
+    values.forEach((value, idx) => {
+      ws.getCell(`${cols[idx]}${row}`).value = value;
+      total += Number(value || 0);
+    });
+    ws.getCell(`P${row}`).value = total;
+  });
+
+  // styling
+  for (let r = 1; r <= 15; r++) {
+    for (let c = 1; c <= 16; c++) {
+      ws.getRow(r).getCell(c).border = {
+        top: { style: "thin", color: { argb: "D9D9D9" } },
+        left: { style: "thin", color: { argb: "D9D9D9" } },
+        bottom: { style: "thin", color: { argb: "D9D9D9" } },
+        right: { style: "thin", color: { argb: "D9D9D9" } },
+      };
+    }
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  saveAs(blob, "Filled-GSTR-2B vs GSTR-3B.xlsx");
+  return;
+} 
+
+
+if (reportName.includes("GSTR-3B vs GSTR-1")) {
+  console.log("🔥 Filling 3B vs 1");
+
+  const ws = workbook.worksheets[0];
+
+  if (!ws) {
+    console.error("Sheet not found");
+    return;
+  }
+
+  const months = [
+    "Apr-24", "May-24", "Jun-24", "Jul-24", "Aug-24", "Sep-24",
+    "Oct-24", "Nov-24", "Dec-24", "Jan-25", "Feb-25", "Mar-25"
+  ];
+
+  const gstr3b = [
+    1363557.32, 1273132.99, 2588385.85, 1619512.34, 1196552.60, 1066272.40,
+    1144881.34, 849063.00, 3426999.60, 2693976.30, 2222257.08, 2446589.92
+  ];
+
+  const gstr1 = [
+    1360457.72, 1267851.28, 2588385.85, 1484501.34, 1196552.60, 1062195.00,
+    1144881.34, 844075.00, 3426999.60, 2689677.92, 2212536.28, 2306475.92
+  ];
+
+  const row3b = 8;
+  const row1 = 9;
+  const rowDiff = 17;
+
+  months.forEach((m, i) => {
+    const col = 3 + i; // C = 3
+
+    ws.getRow(row3b).getCell(col).value = gstr3b[i];
+    ws.getRow(row1).getCell(col).value = gstr1[i];
+    ws.getRow(rowDiff).getCell(col).value = gstr3b[i] - gstr1[i];
+  });
+
+  const total3b = gstr3b.reduce((a, b) => a + b, 0);
+  const total1 = gstr1.reduce((a, b) => a + b, 0);
+
+  ws.getCell("O8").value = total3b;
+  ws.getCell("O9").value = total1;
+  ws.getCell("O17").value = total3b - total1;
+
+  // clear problematic shared formula cells
+  ["P17", "Q17", "R17", "S17"].forEach(cell => {
+    ws.getCell(cell).value = null;
+  });
+
+  console.log("✅ 3B vs 1 Done");
+}
+if (reportName === "GSTR-3B vs TDS/TCS") {
+  // remove old sheet if exists
+  const oldSheet = workbook.getWorksheet("GSTR3BVsTDS");
+  if (oldSheet) {
+    workbook.removeWorksheet(oldSheet.id);
+  }
+
+  // create fresh sheet
+  const ws = workbook.addWorksheet("GSTR3BVsTDS");
+
+  // column widths
+  ws.columns = [
+    { width: 18 }, // A
+    { width: 16 }, // B
+    { width: 16 }, // C
+    { width: 12 }, // D
+    { width: 12 }, // E
+    { width: 12 }, // F
+    { width: 12 }, // G
+  ];
+
+  // title
+  ws.mergeCells("A1:G1");
+  ws.getCell("A1").value = "GSTR-3B vs TDS Report";
+  ws.getCell("A1").alignment = { horizontal: "center", vertical: "middle" };
+  ws.getCell("A1").font = { bold: true, size: 16 };
+  ws.getCell("A1").fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "E26B0A" }
+  };
+  ws.getCell("A1").border = {
+    top: { style: "thin" },
+    left: { style: "thin" },
+    bottom: { style: "thin" },
+    right: { style: "thin" }
+  };
+
+  // info rows
+  ws.getCell("A2").value = "Name";
+  ws.getCell("B2").value = "LAVI INDIA INDUSTRIES";
+
+  ws.getCell("A3").value = "Legal Name";
+  ws.getCell("B3").value = "RUBEENA";
+
+  ws.getCell("A4").value = "GSTIN";
+  ws.getCell("B4").value = "09CMIPR8447Q2ZS";
+
+  ws.getCell("A5").value = "Financial Year";
+  ws.getCell("B5").value = "2024-25";
+
+  // header row
+  const headerRow = 7;
+  const headers = ["Month-Year", "Category", "Taxable", "IGST", "CGST", "SGST", "CESS"];
+  headers.forEach((h, i) => {
+    const cell = ws.getRow(headerRow).getCell(i + 1);
+    cell.value = h;
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 12 };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "366092" }
+    };
+    cell.border = {
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" }
+    };
+  });
+
+  const rows = [
+    ["Apr-24", "GSTR3B", 1363557.32, 0.0, 122720.17, 122720.17, 0.0],
+    ["", "TDS/TCS", 0.0, 0.0, 0.0, 0.0, 0.0],
+    ["", "Difference", 1363557.32, 0.0, 122720.17, 122720.17, 0.0],
+
+    ["May-24", "GSTR3B", 1273132.99, 0.0, 114581.99, 114581.99, 0.0],
+    ["", "TDS/TCS", 0.0, 0.0, 0.0, 0.0, 0.0],
+    ["", "Difference", 1273132.99, 0.0, 114581.99, 114581.99, 0.0],
+
+    ["Jun-24", "GSTR3B", 2588385.85, 0.0, 232954.74, 232954.74, 0.0],
+    ["", "TDS/TCS", 0.0, 0.0, 0.0, 0.0, 0.0],
+    ["", "Difference", 2588385.85, 0.0, 232954.74, 232954.74, 0.0],
+
+    ["Jul-24", "GSTR3B", 1619512.34, 0.0, 145756.12, 145756.12, 0.0],
+    ["", "TDS/TCS", 0.0, 0.0, 0.0, 0.0, 0.0],
+    ["", "Difference", 1619512.34, 0.0, 145756.12, 145756.12, 0.0],
+
+    ["Aug-24", "GSTR3B", 1196552.60, 0.0, 107689.74, 107689.74, 0.0],
+    ["", "TDS/TCS", 0.0, 0.0, 0.0, 0.0, 0.0],
+    ["", "Difference", 1196552.60, 0.0, 107689.74, 107689.74, 0.0],
+  ];
+
+  let startRow = 8;
+
+  rows.forEach((item, idx) => {
+    for (let col = 1; col <= 7; col++) {
+      const cell = ws.getRow(startRow).getCell(col);
+      cell.value = item[col - 1];
+
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" }
+      };
+
+      if (col >= 3) {
+        cell.numFmt = "0.00";
+      }
+
+      // yellow for difference rows
+      if (item[1] === "Difference") {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFC000" }
+        };
+      }
+
+      cell.alignment = {
+        horizontal: col <= 2 ? "center" : "right",
+        vertical: "middle"
+      };
+    }
+
+    startRow++;
+  });
+
+  // merge month cells for each 3-row group
+  const monthGroups = [8, 11, 14, 17, 20];
+  monthGroups.forEach((r) => {
+    ws.mergeCells(`A${r}:A${r + 2}`);
+    ws.getCell(`A${r}`).alignment = { horizontal: "center", vertical: "middle" };
+  });
+
+  console.log("✅ GSTR-3B vs TDS/TCS fresh sheet created");
+}
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(blob, `Filled-${file.downloadName}`);
+
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+<div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+  <button onClick={() => handleDownload("GSTR-3B Summary")}>GSTR-3B Summary</button>
+  <button onClick={() => handleDownload("GSTR-1 Summary")}>GSTR-1 Summary</button>
+  <button onClick={() => handleDownload("GSTR-1A Summary")}>GSTR-1A Summary</button>
+  <button onClick={() => handleDownload("GSTR-2A Summary")}>GSTR-2A Summary</button>
+  <button onClick={() => handleDownload("GSTR-2B Summary")}>GSTR-2B Summary</button>
+  <button onClick={() => handleDownload("GSTR Consolidated Reports")}>Consolidated</button>
+  <button onClick={() => handleDownload("GSTR-3B All Table Details")}>GSTR-3B Detailed</button>
+  <button
+  onClick={() => handleDownload("GSTR-1 vs GSTR-2A")}
+  style={{
+    padding: "10px 16px",
+    backgroundColor: "#28a745",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600"
+  }}
+>
+  Download GSTR-1 vs GSTR-2A
+</button>
+<button onClick={() => handleDownload("GSTR-2 vs GSTR-2A Invoice Wise")}>
+  Download GSTR-2 vs GSTR-2A
+</button>
+
+<button onClick={() => handleDownload("GSTR-2 vs GSTR-2B Invoice Wise")}>
+  Download GSTR-2 vs GSTR-2B
+</button>
+<button
+  onClick={() => handleDownload("GSTR-2 vs GSTR-2B Party Wise")}
+  style={{
+    padding: "10px 16px",
+    backgroundColor: "#6f42c1",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600",
+    marginTop: "10px"
+  }}
+>
+  Download GSTR-2 vs GSTR-2B (Party Wise)
+</button>
+<button onClick={() => handleDownload("GSTR-2A vs GSTR-3B ITC")}>
+  Download GSTR-2A vs GSTR-3B
+</button>
+
+<button onClick={() => handleDownload("GSTR-2B vs GSTR-3B ITC")}>
+  Download GSTR-2B vs GSTR-3B
+</button>
+
+
+<button
+  onClick={() => handleDownload("GSTR-3B vs GSTR-1")}
+  style={{
+    padding: "10px 16px",
+    backgroundColor: "#28a745",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600"
+  }}
+>
+  Download GSTR-3B vs GSTR-1
+</button>
+
+
+
+
+<button
+  onClick={() => handleDownload("GSTR-3B vs TDS/TCS")}
+  style={{
+    padding: "10px 16px",
+    backgroundColor: "#28a745",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600"
+  }}
+>
+  Download GSTR-3B vs TDS/TCS
+</button>
+<button onClick={() => handleDownload("GSTR-2A vs GSTR-3B (ITC)")}>
+  Download GSTR-2A vs GSTR-3B
+</button>
+
+<button onClick={() => handleDownload("GSTR-2B vs GSTR-3B (ITC)")}>
+  Download GSTR-2B vs GSTR-3B
+</button>
+
+
+</div>
+
+
 
 
 
@@ -4253,6 +6194,8 @@ useEffect(() => {
 };
 
 
+
+
    const currentColumns = tableColumns[isITC04 ? selectedItcTable : selectedSection] || [];
    const getRowsAndSetter = () => {
   if (isITC04) {
@@ -4344,29 +6287,271 @@ useEffect(() => {
       else if (selectedSection.includes("B2C (Others)")) key = "b2cOthers";
       else if (selectedSection.includes("HSN")) key = "hsn";
       if (key && total > 0) {
-        setSummaryTotals(prev => ({
-          ...prev,
-          [key]: { taxable, igst, cgst, sgst, cess, total }
-        }));
+        
         alert("Saved successfully!");
       }
     };
+    const toNum = (value) => Number(value || 0);
+
+const getGstr3bSectionFileName = (sectionName) => {
+  const map = {
+    [gstr3bSections[0]]: "GSTR-3B-3.1-Outward-Reverse-Charge.xlsx",
+    [gstr3bSections[1]]: "GSTR-3B-3.1.1-Supplies-u-s-9(5).xlsx",
+    [gstr3bSections[2]]: "GSTR-3B-3.2-Inter-State-Supplies.xlsx",
+    [gstr3bSections[3]]: "GSTR-3B-4-Eligible-ITC.xlsx",
+    [gstr3bSections[4]]: "GSTR-3B-5-Exempt-Nil-Non-GST.xlsx",
+    [gstr3bSections[5]]: "GSTR-3B-5.1-Interest-Late-Fee.xlsx",
+    [gstr3bSections[6]]: "GSTR-3B-6.1-Payment-of-Tax.xlsx"
+  };
+  return map[sectionName] || "GSTR-3B-Section.xlsx";
+};
+
+const buildGstr3bSectionPayload = (sectionName) => {
+  if (sectionName === gstr3bSections[0]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: outwardSupplies.map((row) => ({
+        "Nature of Supplies": row.nature,
+        "Taxable Value": toNum(row.taxable),
+        IGST: row.igst === "Hide" ? "" : toNum(row.igst),
+        CGST: row.cgst === "Hide" ? "" : toNum(row.cgst),
+        SGST: row.sgst === "Hide" ? "" : toNum(row.sgst),
+        CESS: row.cess === "Hide" ? "" : toNum(row.cess)
+      }))
+    };
+  }
+
+  if (sectionName === gstr3bSections[1]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: ecoSupplies.map((row) => ({
+        "Nature of Supplies": row.nature,
+        "Taxable Value": toNum(row.taxable),
+        IGST: toNum(row.igst),
+        CGST: toNum(row.cgst),
+        SGST: toNum(row.sgst),
+        CESS: toNum(row.cess),
+        Total: toNum(row.total)
+      }))
+    };
+  }
+
+  if (sectionName === gstr3bSections[2]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: [
+        ...unregisteredSupplies.map((row) => ({
+          Category: "Unregistered Persons",
+          "Place of Supply": row.placeOfSupply,
+          "Taxable Value": toNum(row.taxableValue),
+          IGST: toNum(row.igst)
+        })),
+        ...compositionSupplies.map((row) => ({
+          Category: "Composition Taxable Persons",
+          "Place of Supply": row.placeOfSupply,
+          "Taxable Value": toNum(row.taxableValue),
+          IGST: toNum(row.igst)
+        })),
+        ...uinSupplies.map((row) => ({
+          Category: "UIN Holders",
+          "Place of Supply": row.placeOfSupply,
+          "Taxable Value": toNum(row.taxableValue),
+          IGST: toNum(row.igst)
+        }))
+      ]
+    };
+  }
+
+  if (sectionName === gstr3bSections[3]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: [
+        ...itcDetails.available.map((row) => ({
+          Block: "ITC Available",
+          Description: row.desc,
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess)
+        })),
+        ...itcDetails.reversed.map((row) => ({
+          Block: "ITC Reversed",
+          Description: row.desc,
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess)
+        })),
+        {
+          Block: "Net ITC",
+          Description: "Net ITC Available (A - B)",
+          IGST: toNum(itcDetails.netItc.igst),
+          CGST: toNum(itcDetails.netItc.cgst),
+          SGST: toNum(itcDetails.netItc.sgst),
+          CESS: toNum(itcDetails.netItc.cess)
+        },
+        ...itcDetails.ineligible.map((row) => ({
+          Block: "Other Details",
+          Description: row.desc,
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess)
+        }))
+      ]
+    };
+  }
+
+  if (sectionName === gstr3bSections[4]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: exemptNonGst.map((row) => ({
+        "Nature of Supplies": row.nature,
+        "Inter-State": toNum(row.interstate),
+        "Intra-State": toNum(row.intrastate),
+        Total: toNum(row.interstate) + toNum(row.intrastate)
+      }))
+    };
+  }
+
+  if (sectionName === gstr3bSections[5]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: interestLateFee.map((row) => ({
+        Description: row.desc,
+        IGST: toNum(row.igst),
+        CGST: toNum(row.cgst),
+        SGST: toNum(row.sgst),
+        CESS: toNum(row.cess),
+        Total: toNum(row.igst) + toNum(row.cgst) + toNum(row.sgst) + toNum(row.cess)
+      }))
+    };
+  }
+
+  if (sectionName === gstr3bSections[6]) {
+    return {
+      sectionName,
+      fileName: getGstr3bSectionFileName(sectionName),
+      rows: [
+        ...cashLedger.map((row) => ({
+          Block: "Cash Ledger",
+          Description: row.desc,
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess),
+          Total: toNum(row.igst) + toNum(row.cgst) + toNum(row.sgst) + toNum(row.cess)
+        })),
+        ...creditLedger.map((row) => ({
+          Block: "Credit Ledger",
+          Description: "Credit Ledger Balance",
+          IGST: toNum(row.igst),
+          CGST: toNum(row.cgst),
+          SGST: toNum(row.sgst),
+          CESS: toNum(row.cess),
+          Total: toNum(row.igst) + toNum(row.cgst) + toNum(row.sgst) + toNum(row.cess)
+        }))
+      ]
+    };
+  }
+
+  return null;
+};
+
+const handleGstr3bSave = () => {
+  if (!selectedSection) {
+    alert("Please select section first.");
+    return;
+  }
+
+  const payload = buildGstr3bSectionPayload(selectedSection);
+
+  if (!payload || !payload.rows || payload.rows.length === 0) {
+    alert("No data found to save.");
+    return;
+  }
+
+  setGstr3bSavedSummary((prev) => ({
+    ...prev,
+    [selectedSection]: {
+      ...payload,
+      savedAt: new Date().toLocaleString("en-IN")
+    }
+  }));
+
+  setActiveSubTab("Summary");
+  alert(`${selectedSection} saved successfully!`);
+};
+
+const downloadGstr3bSectionExcel = (sectionName) => {
+  const payload = gstr3bSavedSummary[sectionName];
+  if (!payload || !payload.rows || payload.rows.length === 0) {
+    alert("No saved data found for download.");
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  const headingRows = [
+    ["GSTR-3B Summary Report"],
+    ["Section", payload.sectionName],
+    ["Financial Year", selectedYear || ""],
+    ["Month", selectedMonth || ""],
+    ["Saved At", payload.savedAt || ""],
+    []
+  ];
+
+  const dataRows = payload.rows;
+  const ws = XLSX.utils.json_to_sheet([]);
+
+  XLSX.utils.sheet_add_aoa(ws, headingRows, { origin: "A1" });
+  XLSX.utils.sheet_add_json(ws, dataRows, {
+    origin: "A7",
+    skipHeader: false
+  });
+
+  XLSX.utils.book_append_sheet(wb, ws, "Summary");
+  XLSX.writeFile(wb, payload.fileName || "GSTR-3B-Section.xlsx");
+};
     const formatIndian = (num) => num === 0 ? "—" : Number(num).toLocaleString("en-IN");
     // Visible Summary
     const visibleSummary = [];
-    if (summaryTotals.b2b.total > 0) visibleSummary.push({ id: "b2b", label: "1. B2B Supplies", ...summaryTotals.b2b });
-    if (summaryTotals.b2cLarge.total > 0) visibleSummary.push({ id: "b2cLarge", label: "2. B2C (Large)", ...summaryTotals.b2cLarge });
-    if (summaryTotals.b2cOthers.total > 0) visibleSummary.push({ id: "b2cOthers", label: "3. B2C Small", ...summaryTotals.b2cOthers });
-    if (summaryTotals.hsn.total > 0) visibleSummary.push({ id: "hsn", label: "HSN wise", ...summaryTotals.hsn });
-    const grandTotal = visibleSummary.reduce((acc, item) => {
-      acc.taxable += item.taxable || 0;
-      acc.igst += item.igst || 0;
-      acc.cgst += item.cgst || 0;
-      acc.sgst += item.sgst || 0;
-      acc.cess += item.cess || 0;
-      acc.total += item.total || 0;
-      return acc;
-    }, { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 });
+    if ((summaryTotals?.b2b?.total || 0) > 0) {
+  visibleSummary.push({ id: "b2b", label: "B2B Supplies", ...summaryTotals.b2b });
+}
+
+if ((summaryTotals?.b2cLarge?.total || 0) > 0) {
+  visibleSummary.push({ id: "b2cLarge", label: "B2C Large", ...summaryTotals.b2cLarge });
+}
+
+if ((summaryTotals?.b2cOthers?.total || 0) > 0) {
+  visibleSummary.push({ id: "b2cOthers", label: "B2C Others", ...summaryTotals.b2cOthers });
+}
+
+if ((summaryTotals?.hsn?.total || 0) > 0) {
+  visibleSummary.push({ id: "hsn", label: "HSN wise", ...summaryTotals.hsn });
+}
+
+if ((summaryTotals?.eco?.total || 0) > 0) {
+  visibleSummary.push({ id: "eco", label: "14A / ECO Amendment", ...summaryTotals.eco });
+}
+   const grandTotal = visibleSummary.reduce(
+  (acc, item) => ({
+    taxable: acc.taxable + Number(item?.taxable || 0),
+    igst: acc.igst + Number(item?.igst || 0),
+    cgst: acc.cgst + Number(item?.cgst || 0),
+    sgst: acc.sgst + Number(item?.sgst || 0),
+    cess: acc.cess + Number(item?.cess || 0),
+    total: acc.total + Number(item?.total || 0)
+  }),
+  { taxable: 0, igst: 0, cgst: 0, sgst: 0, cess: 0, total: 0 }
+);
     // Checkbox handlers
     const toggleSelectAll = () => {
       if (selectAll) {
@@ -4409,6 +6594,27 @@ useEffect(() => {
       newItc.ineligible[index][field] = value;
       setItcDetails(newItc);
     };
+
+    const addInterstateRow = (setter) => {
+  setter((prev) => [
+    ...prev,
+    { placeOfSupply: "", taxableValue: "", igst: "" }
+  ]);
+};
+
+const deleteInterstateRow = (setter, rows, index) => {
+  if (rows.length === 1) {
+    setter([{ placeOfSupply: "", taxableValue: "", igst: "" }]);
+    return;
+  }
+  setter(rows.filter((_, i) => i !== index));
+};
+
+const updateInterstateCell = (setter, rows, index, field, value) => {
+  const updated = [...rows];
+  updated[index][field] = value;
+  setter(updated);
+};
     const renderInput = (value, onChange) => (
       <input
         type="number"
@@ -4429,7 +6635,13 @@ useEffect(() => {
     const tableActions = (
       <div style={{ padding: "20px", display: "flex", justifyContent: "flex-end", gap: 16, borderTop: "1px solid #e5e7eb" }}>
         <button
-          onClick={() => alert("Data Saved Successfully!")}
+          onClick={() => {
+  if (isGSTR3B) {
+    handleGstr3bSave();
+  } else {
+    alert("Data Saved Successfully!");
+  }
+}}
           style={{
             padding: "12px 36px",
             background: "#10b981",
@@ -4483,7 +6695,7 @@ useEffect(() => {
                 {title}
               </h1>
               {/* Financial Year + Month → title ke right side pe sabke liye */}
-              {activeSubTab === "Manually" && !isDownloadCenter && (
+              {activeSubTab === "Manually" && !isDownloadCenter && !isReports && (
   <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
     <div style={{ width: 120 }}>
       <label style={{ display: "block", marginBottom: 4, fontWeight: 600, fontSize: "0.85rem" }}>
@@ -4509,76 +6721,60 @@ useEffect(() => {
       </select>
     </div>
 
-    {!isTDSTCS && (
-      <div style={{ width: 120 }}>
-        <label style={{ display: "block", marginBottom: 4, fontWeight: 600, fontSize: "0.85rem" }}>
-          Month
-        </label>
-        <select
-          value={selectedMonth}
-          onChange={e => {
-            setSelectedMonth(e.target.value);
-            setSelectedSection("");
-            setSelectedItcTable("");
-          }}
-          style={{
-            width: "100%",
-            padding: "6px",
-            borderRadius: 4,
-            border: "1px solid #c7d2fe",
-            fontSize: "0.85rem"
-          }}
-        >
-          <option value="">Select</option>
-          {months.map(m => <option key={m}>{m}</option>)}
-        </select>
-      </div>
-    )}
+   <div style={{ width: 120 }}>
+  <label style={{ display: "block", marginBottom: 4, fontWeight: 600, fontSize: "0.85rem" }}>
+    Month
+  </label>
+  <select
+    value={selectedMonth}
+    onChange={e => {
+      setSelectedMonth(e.target.value);
+      setSelectedSection("");
+      setSelectedItcTable("");
+      setSelectedTdsTcsSection("");
+    }}
+    style={{
+      width: "100%",
+      padding: "6px",
+      borderRadius: 4,
+      border: "1px solid #c7d2fe",
+      fontSize: "0.85rem"
+    }}
+  >
+    <option value="">Select</option>
+    {months.map(m => <option key={m} value={m}>{m}</option>)}
+  </select>
+</div>
  
-    {isITC04 && (
-      <div style={{ width: 180 }}>
-        <label style={{ display: "block", marginBottom: 4, fontWeight: 600 , fontSize: "0.85rem" }}>State</label>
-        <select
-          value={selectedState}
-          onChange={e => {
-            setSelectedState(e.target.value);
-            setSelectedItcTable("");
-          }}
-          style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #c7d2fe" , fontSize: "0.85rem" }}
-        >
-          <option value="">Select</option>
-          {stateOptions.map(state => <option key={state} value={state}>{state}</option>)}
-        </select>
-      </div>
-    )}
   </div>
 
               )}
             </div>
           </div>
-          {/* Tabs */}
-          <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#fafbff" }}>
-  {!isTDSTCS && ["Manually", "Import", "Summary"].map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveSubTab(tab)}
-                style={{
-                  flex: 1,
-  padding: "10px",                    // ← padding kam
-  background: activeSubTab === tab ? "white" : "transparent",
-  color: "#64748b",
-  border: "none",
-  fontSize: "0.95rem",                // ← font chhota
-  fontWeight: activeSubTab === tab ? 600 : 400,
-  cursor: "pointer",
-  borderBottom: activeSubTab === tab ? "2px solid #7c3aed" : "none"
-                }}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
+          
+{!isTDSTCS && !isDownloadCenter && !isReports && (
+  <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#fafbff" }}>
+    {["Manually", "Import", "Summary"].map(tab => (
+      <button
+        key={tab}
+        onClick={() => setActiveSubTab(tab)}
+        style={{
+          flex: 1,
+          padding: "10px",
+          background: activeSubTab === tab ? "white" : "transparent",
+          color: "#64748b",
+          border: "none",
+          fontSize: "0.95rem",
+          fontWeight: activeSubTab === tab ? 600 : 400,
+          cursor: "pointer",
+          borderBottom: activeSubTab === tab ? "2px solid #7c3aed" : "none"
+        }}
+      >
+        {tab}
+      </button>
+    ))}
+  </div>
+)}
 {activeSubTab === "Import" && (
   <div style={{ padding: "24px 16px", background: "#f9fafb", minHeight: "80vh" }}>
 
@@ -4933,18 +7129,38 @@ useEffect(() => {
             )}
           </div>
 
+          onChange={async (e) => {
+  const file = e.target.files[0];
+  setUploadedFile(file);
+
+  if (!file) return;
+
+  try {
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array" });
+    const workbookSections = getWorkbookImportOptions(workbook);
+
+    setImportOptions(workbookSections);
+    setSelectedOptions([]);
+    setSelectAllImport(false);
+  } catch (error) {
+    console.error("Failed to read uploaded file:", error);
+  }
+}}
+
           <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px" }}>
             <button
               disabled={!uploadedFile || isUploading}
-              onClick={() => {
-                setIsUploading(true);
-                setTimeout(() => {
-                  setIsUploading(false);
-                  alert(`Uploaded successfully for ${selectedSource}`);
-                  setUploadedFile(null);
-                  setImportStep("sources");
-                }, 1400);
-              }}
+              
+          onClick={() => {
+  setIsUploading(true);
+  handleImportFile();
+
+  setTimeout(() => {
+    setIsUploading(false);
+  }, 1400);
+}}
+
               style={{
                 padding: "10px 40px",
                 background: uploadedFile && !isUploading ? "#4f46e5" : "#9ca3af",
@@ -5032,41 +7248,77 @@ useEffect(() => {
     <div style={{ display: "inline-flex", gap: "12px" }}>
       {itc04Sections.map((section) => (
         <button
-          key={section}
-          onClick={() => setSelectedItcTable(section)}
-          style={{
-            padding: "6px 14px",
-            background: selectedItcTable === section ? "#e0f2fe" : "white",
-            color: selectedItcTable === section ? "#0f172a" : "#166534",
-            border: selectedItcTable === section ? "1px solid #38bdf8" : "1px solid #86efac",
-            borderRadius: "8px",
-            fontSize: "0.85rem",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          {section}
-        </button>
+  onClick={() => setSelectedItcTable(section)}
+  style={{
+    height: "36px",
+    minWidth: "140px",           // 🔥 box ki width badhayi
+    padding: "2px 10px",         // 🔥 andar left-right space
+
+    borderRadius: "6px",
+    border: "1.5px solid #3b82f6",
+    background: selectedItcTable === section ? "#e0edff" : "#ffffff",
+    color: "#000",
+    fontWeight: 600,
+    fontSize: "0.75rem",
+
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    lineHeight: "1.1",
+
+    margin: "26px",              // 🔥 🔥 🔥 aur zyada gap between boxes
+
+    transition: "all 0.2s ease"
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = "#f0f7ff";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background =
+      selectedItcTable === section ? "#e0edff" : "#ffffff";
+  }}
+>
+  {section}
+</button>
       ))}
     </div>
   </div>
 )}
 
           {/* GSTR-3B ke alawa sabke liye purana dropdown */}
-         {!isGSTR3B && !isTDSTCS && !isDownloadCenter && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "8px" }}>
-           
-              <div style={{ flex: 1, minWidth: 300 }}>
-                <label style={{ display: "block", marginBottom: 4, fontWeight: 600 , fontSize: "0.85rem" }}>Select sheet</label>
-                <select value={selectedSection} onChange={e => setSelectedSection(e.target.value)} disabled={!canSelect} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #c7d2fe" , fontSize: "0.85rem"}}>
-                  <option value="">{canSelect ? "Choose section..." : "Select period first"}</option>
-                  {currentSections.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-            </div>
-          )}
+        {!isGSTR3B && !isITC04 && !isTDSTCS && !isDownloadCenter && !isReports && (
+  <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "8px" }}>
+    <div style={{ flex: 1, minWidth: 300 }}>
+      <label style={{ display: "block", marginBottom: 4, fontWeight: 600, fontSize: "0.85rem" }}>
+        Select sheet
+      </label>
+      <select
+        value={selectedSection}
+        onChange={e => setSelectedSection(e.target.value)}
+        disabled={!canSelect}
+        style={{
+          width: "100%",
+          padding: "6px",
+          borderRadius: 4,
+          border: "1px solid #c7d2fe",
+          fontSize: "0.85rem"
+        }}
+      >
+        <option value="">{canSelect ? "Choose section." : "Select period first"}</option>
+        {currentSections.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
+)}
 
-                    {isTDSTCS && selectedYear && (
+
+                    {/* {isTDSTCS && selectedYear && selectedMonth && (
             <div style={{
               padding: "16px 0 24px 0",
               background: "#f8fafc",
@@ -5097,7 +7349,65 @@ useEffect(() => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
+{isTDSTCS && selectedYear && selectedMonth && (
+  <div
+    style={{
+      padding: "18px 0 28px 0",
+      background: "#f8fafc",
+      overflowX: "auto",
+      whiteSpace: "nowrap",
+      marginBottom: "24px"
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "32px"
+      }}
+    >
+      {tdsTcsSections.map((section) => {
+        const isActive = selectedTdsTcsSection === section;
+        const isHovered = hoveredTdsTcsSection === section;
+
+        return (
+          <button
+            key={section}
+            onClick={() => setSelectedTdsTcsSection(section)}
+            onMouseEnter={() => setHoveredTdsTcsSection(section)}
+            onMouseLeave={() => setHoveredTdsTcsSection("")}
+            style={{
+              minWidth: "140px",
+              width: "140px",
+              height: "38px",
+              padding: "0 18px",
+              background: isActive ? "#dbeafe" : isHovered ? "#eff6ff" : "#ffffff",
+              color: "#000000",
+              border: isActive || isHovered ? "1px solid #3b82f6" : "1px solid #2563eb",
+              borderRadius: "10px",
+              fontSize: "0.95rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: isActive
+                ? "0 4px 10px rgba(37, 99, 235, 0.18)"
+                : isHovered
+                ? "0 4px 10px rgba(59, 130, 246, 0.12)"
+                : "0 2px 6px rgba(37, 99, 235, 0.08)",
+              transition: "all 0.2s ease"
+            }}
+          >
+            {section}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+)}
+
 
           {selectedSection && isGSTR3B && (
             <>
@@ -5192,34 +7502,322 @@ useEffect(() => {
               {/* ───────────────────────────────────────────────
                   SECTION 3: Inter-State Supplies
               ─────────────────────────────────────────────── */}
-              {selectedSection === gstr3bSections[2] && (
-                <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
-                 <table style={{ 
-  width: "100%", 
-  borderCollapse: "collapse", 
-  fontSize: "13px",           // thoda chhota text
-  border: "1px solid #d1d5db" // outer border
-}}>
-                    <thead>
-                      <tr style={{ background: "#e0f2fe", fontWeight: 600 }}>
-                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: 340 }}>Nature of Supplies</th>
-                        <th style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>Inter-State Supplies</th>
-                        <th style={{ padding: "14px", textAlign: "right" }}>Intra-State Supplies</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {interstateSupplies.map((row, i) => (
-                        <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db" }}>{row.nature}</td>
-                          <td style={{ padding: "14px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>{renderInput(row.interstate, v => handleChange(setInterstateSupplies, interstateSupplies, i, "interstate", v))}</td>
-                          <td style={{ padding: "14px", textAlign: "right" }}>{renderInput(row.intrastate, v => handleChange(setInterstateSupplies, interstateSupplies, i, "intrastate", v))}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {tableActions}
-                </div>
-              )}
+             {selectedSection === gstr3bSections[2] && (
+  <div style={{ display: "flex", flexDirection: "column", gap: "26px" }}>
+    
+    <div>
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "10px",
+          background: "#fef3c7",
+          padding: "6px 12px",
+          fontWeight: 700,
+          fontSize: "18px",
+          borderRadius: "4px",
+          marginBottom: "10px"
+        }}
+      >
+        <span style={{ fontSize: "18px", fontWeight: 700 }}>1.</span>
+        <span>Supplies made to Unregistered Persons</span>
+      </div>
+
+      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+            border: "1px solid #d1d5db"
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#bfdbfe", fontWeight: 700 }}>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center", width: "60px" }}></th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: "280px" }}>
+                Place of Supply (State/UT)
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "180px" }}>
+                Total Taxable Value
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "140px" }}>
+                IGST
+              </th>
+              <th style={{ padding: "12px", textAlign: "left", minWidth: "170px" }}>
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {unregisteredSupplies.map((row, i) => (
+              <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>
+                  <input type="checkbox" />
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>
+                  {renderInput(
+                    row.placeOfSupply,
+                    (v) => updateInterstateCell(setUnregisteredSupplies, unregisteredSupplies, i, "placeOfSupply", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.taxableValue,
+                    (v) => updateInterstateCell(setUnregisteredSupplies, unregisteredSupplies, i, "taxableValue", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.igst,
+                    (v) => updateInterstateCell(setUnregisteredSupplies, unregisteredSupplies, i, "igst", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-start" }}>
+                    <button
+                      type="button"
+                      onClick={() => addInterstateRow(setUnregisteredSupplies)}
+                      style={{ border: "none", background: "transparent", color: "green", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      style={{ border: "none", background: "transparent", color: "#d946ef", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteInterstateRow(setUnregisteredSupplies, unregisteredSupplies, i)}
+                      style={{ border: "none", background: "transparent", color: "red", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "10px",
+          background: "#fef3c7",
+          padding: "6px 12px",
+          fontWeight: 700,
+          fontSize: "18px",
+          borderRadius: "4px",
+          marginBottom: "10px"
+        }}
+      >
+        <span style={{ fontSize: "18px", fontWeight: 700 }}>2.</span>
+        <span>Supplies made to Composition Taxable Persons</span>
+      </div>
+
+      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+            border: "1px solid #d1d5db"
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#bfdbfe", fontWeight: 700 }}>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center", width: "60px" }}></th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: "280px" }}>
+                Place of Supply (State/UT)
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "180px" }}>
+                Total Taxable Value
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "140px" }}>
+                IGST
+              </th>
+              <th style={{ padding: "12px", textAlign: "left", minWidth: "170px" }}>
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {compositionSupplies.map((row, i) => (
+              <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>
+                  <input type="checkbox" />
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>
+                  {renderInput(
+                    row.placeOfSupply,
+                    (v) => updateInterstateCell(setCompositionSupplies, compositionSupplies, i, "placeOfSupply", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.taxableValue,
+                    (v) => updateInterstateCell(setCompositionSupplies, compositionSupplies, i, "taxableValue", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.igst,
+                    (v) => updateInterstateCell(setCompositionSupplies, compositionSupplies, i, "igst", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-start" }}>
+                    <button
+                      type="button"
+                      onClick={() => addInterstateRow(setCompositionSupplies)}
+                      style={{ border: "none", background: "transparent", color: "green", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      style={{ border: "none", background: "transparent", color: "#d946ef", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteInterstateRow(setCompositionSupplies, compositionSupplies, i)}
+                      style={{ border: "none", background: "transparent", color: "red", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "10px",
+          background: "#fef3c7",
+          padding: "6px 12px",
+          fontWeight: 700,
+          fontSize: "18px",
+          borderRadius: "4px",
+          marginBottom: "10px"
+        }}
+      >
+        <span style={{ fontSize: "18px", fontWeight: 700 }}>3.</span>
+        <span>Supplies made to UIN Holders</span>
+      </div>
+
+      <div style={{ overflowX: "auto", border: "1px solid #d1d5db", borderRadius: 8 }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+            border: "1px solid #d1d5db"
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#bfdbfe", fontWeight: 700 }}>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center", width: "60px" }}></th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "left", minWidth: "280px" }}>
+                Place of Supply (State/UT)
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "180px" }}>
+                Total Taxable Value
+              </th>
+              <th style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right", minWidth: "140px" }}>
+                IGST
+              </th>
+              <th style={{ padding: "12px", textAlign: "left", minWidth: "170px" }}>
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {uinSupplies.map((row, i) => (
+              <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "center" }}>
+                  <input type="checkbox" />
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db" }}>
+                  {renderInput(
+                    row.placeOfSupply,
+                    (v) => updateInterstateCell(setUinSupplies, uinSupplies, i, "placeOfSupply", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.taxableValue,
+                    (v) => updateInterstateCell(setUinSupplies, uinSupplies, i, "taxableValue", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px", borderRight: "1px solid #d1d5db", textAlign: "right" }}>
+                  {renderInput(
+                    row.igst,
+                    (v) => updateInterstateCell(setUinSupplies, uinSupplies, i, "igst", v)
+                  )}
+                </td>
+
+                <td style={{ padding: "12px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-start" }}>
+                    <button
+                      type="button"
+                      onClick={() => addInterstateRow(setUinSupplies)}
+                      style={{ border: "none", background: "transparent", color: "green", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      style={{ border: "none", background: "transparent", color: "#d946ef", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteInterstateRow(setUinSupplies, uinSupplies, i)}
+                      style={{ border: "none", background: "transparent", color: "red", cursor: "pointer", fontWeight: 600 }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+)}
               {/* ───────────────────────────────────────────────
                   SECTION 4: Eligible ITC (sabse lamba table)
               ─────────────────────────────────────────────── */}
@@ -5492,6 +8090,178 @@ useEffect(() => {
   </div>
 )}
 
+{isReports && (
+  <div style={{ padding: "4px 0 12px 0" }}>
+    <div
+      style={{
+        background: "#ffffff",
+        border: "1px solid #e5e7eb",
+        borderRadius: "10px",
+        padding: "12px 14px",
+        boxShadow: "0 1px 6px rgba(15, 23, 42, 0.04)"
+      }}
+    >
+      {/* Top Header + Date Filters */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "10px",
+          flexWrap: "wrap",
+          marginBottom: "10px"
+        }}
+      >
+        <div
+          style={{
+            padding: "4px 10px",
+            border: "1px solid #93c5fd",
+            borderRadius: "7px",
+            color: "#2563eb",
+            fontWeight: 700,
+            background: "#eff6ff",
+            fontSize: "0.82rem",
+            lineHeight: 1.2
+          }}
+        >
+          Reports
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            flexWrap: "nowrap"
+          }}
+        >
+          <label style={{ fontWeight: 600, color: "#1f2937", fontSize: "0.82rem" }}>
+            From 
+          </label>
+          <input
+            type="date"
+            value={reportFromDate}
+            onChange={(e) => setReportFromDate(e.target.value)}
+            style={{
+              padding: "5px 8px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "6px",
+              fontSize: "0.8rem",
+              height: "32px"
+            }}
+          />
+
+          <label style={{ fontWeight: 600, color: "#1f2937", fontSize: "0.82rem", marginLeft: "2px" }}>
+            To 
+          </label>
+          <input
+            type="date"
+            value={reportToDate}
+            onChange={(e) => setReportToDate(e.target.value)}
+            style={{
+              padding: "5px 8px",
+              border: "1px solid #cbd5e1",
+              borderRadius: "6px",
+              fontSize: "0.8rem",
+              height: "32px"
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Tabs only after date selected */}
+      {reportFromDate && reportToDate && (
+        <>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              flexWrap: "wrap",
+              marginBottom: "12px"
+            }}
+          >
+            {reportTabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveReportTab(tab)}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "6px",
+                  border: activeReportTab === tab ? "1px solid #f59e0b" : "1px solid #e5e7eb",
+                  background: activeReportTab === tab ? "#fef3c7" : "#ffffff",
+                  color: activeReportTab === tab ? "#92400e" : "#334155",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontSize: "0.8rem",
+                  lineHeight: 1.2
+                }}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <div
+            style={{
+              borderTop: "1px solid #eef2f7",
+              paddingTop: "10px",
+              display: "grid",
+              gap: "6px"
+            }}
+          >
+            {getCurrentReportList().map((report, index) => (
+              <div
+                key={report}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "8px",
+                  padding: "6px 8px",
+                  border: "1px solid #f5f7fa",
+                  borderRadius: "7px",
+                  background: "#fafafa",
+                  flexWrap: "wrap"
+                }}
+              >
+                <div
+                  style={{
+                    color: "#334155",
+                    fontSize: "0.82rem",
+                    fontWeight: 500,
+                    lineHeight: 1.25,
+                    flex: 1,
+                    minWidth: "220px"
+                  }}
+                >
+                  {index + 1}. {report}
+                </div>
+
+                <button
+                  onClick={() => handleDownload(report)}
+                  style={{
+                    padding: "4px 10px",
+                    background: "#ffffff",
+                    color: "#2563eb",
+                    border: "1px solid #93c5fd",
+                    borderRadius: "6px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontSize: "0.76rem",
+                    minWidth: "78px",
+                    lineHeight: 1.2
+                  }}
+                >
+                  Download
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+)}
 {isDownloadCenter && (
   <div style={{ padding: "8px 0 24px 0" }}>
     <div
@@ -5963,12 +8733,13 @@ useEffect(() => {
           
           
       
-
-          {!isDownloadCenter && !isTDSTCS && ((isITC04 && selectedItcTable) || (!isITC04 && selectedSection)) && currentColumns.length > 0 && (
+{!isDownloadCenter && !isTDSTCS && !isReports && ((isITC04 && selectedItcTable) || (!isITC04 && selectedSection)) && currentColumns.length > 0 && (          
   <>
-    <h2 style={{ margin: "8px 0 8px 0", fontSize: "1.2rem", color: "#1e293b" }}>
-  {isITC04 ? selectedItcTable : selectedSection}
-</h2>
+    {!isReports && !isDownloadCenter && !isTDSTCS && (
+  <h2 style={{ margin: "8px 0 8px 0", fontSize: "1.2rem", color: "#1e293b" }}>
+    {isITC04 ? selectedItcTable : selectedSection}
+  </h2>
+)}
     <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 8, background: "white", marginTop: "0px",     // ← yahan 0 ya -4px daal sakte ho agar bhi space dikhe
   padding: "0" }}>
       <table style={{ 
@@ -6041,28 +8812,33 @@ useEffect(() => {
 
 
   
-  // ──────────────────────────────
-  // is this column a dropdown?
-  // ──────────────────────────────
-  const isDropdownField =
-    col.key === "pos" ||
-    ["invoice", "invtype", "invoicetype"].some((term) =>
-      (col.key || "").toLowerCase().includes(term) ||
-      (col.label || "").toLowerCase().includes(term)
-    ) ||
-    col.key === "exportType" ||
-    col.key === "financialYear" ||
-    col.key === "originalMonth" ||
-    col.key === "noteType" ||
-    col.key === "nature" ||
-    col.key === "urType" ||
-    ["applicableTaxRate", "applicablePercent", "applicable %"].includes(col.key) ||
-    ["rate", "gstRate", "taxRate"].includes(col.key) ||
-    (col.key || "").toLowerCase() === "type" ||
-    (col.key || "").toLowerCase() === "notetype" ||
-    (col.key || "").toLowerCase() === "rcm" ||
-    (col.key || "").toLowerCase() === "uqc" ||
-    (col.key || "").toLowerCase().replace(/\s/g, "") === "natureofsupply";
+ 
+const fieldKey = (col.key || "").toLowerCase();
+
+const isDropdownField =
+  col.key === "pos" ||
+  fieldKey === "invtype" ||
+  fieldKey === "invoicetype" ||
+  fieldKey === "exporttype" ||
+  fieldKey === "financialyear" ||
+  fieldKey === "originalmonth" ||
+  fieldKey === "notetype" ||
+  fieldKey === "nature" ||
+  fieldKey === "urtype" ||
+  fieldKey === "applicabletaxrate" ||
+fieldKey === "applicabletaxrateb2cla" ||
+fieldKey === "applicablepercent" ||
+fieldKey === "applicable %".replace(/\s/g, "") ||
+fieldKey === "rate" ||
+fieldKey === "rateb2cla" ||
+fieldKey === "gstrate" ||
+fieldKey === "taxrate" ||
+  fieldKey === "type" ||
+  fieldKey === "rcm" ||
+  fieldKey === "uqc" ||
+  fieldKey === "jobworkertype" ||
+  fieldKey === "goodstype" ||
+  fieldKey.replace(/\s/g, "") === "natureofsupply";
 
   // ──────────────────────────────
   // Normal input (text / number)
@@ -6116,20 +8892,21 @@ useEffect(() => {
   ];
 }
  else if (
-    ["invoice", "invtype", "invoicetype"].some((term) =>
-      (col.key || "").toLowerCase().includes(term) ||
-      (col.label || "").toLowerCase().includes(term)
-    )
-  ) {
-    dropdownType = "invoiceType";
-    placeholderText = "Select Invoice Type";
-    dropdownWidth = "340px";
-    optionsArray = [
-      "Regular B2B", "SEZ Supply WPAY", "SEZ Supply WOPAY",
-      "Deemed Export", "Intra-State Supply Attracting IGST"
-    ].map(opt => ({ label: opt, value: opt }));
-    textAlign = "left";
-  }
+  (col.key || "").toLowerCase() === "invtype" ||
+  (col.key || "").toLowerCase() === "invoicetype"
+) {
+  dropdownType = "invoiceType";
+  placeholderText = "Select Invoice Type";
+  dropdownWidth = "340px";
+  optionsArray = [
+    "Regular B2B",
+    "SEZ Supply WPAY",
+    "SEZ Supply WOPAY",
+    "Deemed Export",
+    "Intra-State Supply Attracting IGST"
+  ].map(opt => ({ label: opt, value: opt }));
+  textAlign = "left";
+}
   else if (col.key === "financialYear") {
   dropdownType = "financialYear";
   placeholderText = "Select Financial Year";
@@ -6169,12 +8946,14 @@ useEffect(() => {
     placeholderText = "Select UR Type";
     dropdownWidth = "240px";
     optionsArray = urTypeOptions.map(opt => ({ label: opt, value: opt }));
-  } else if (["applicableTaxRate", "applicablePercent", "applicable %"].includes(col.key)) {
+  } else if (
+  ["applicableTaxRate", "applicablePercent", "applicable %", "applicableTaxRateB2CLA"].includes(col.key)
+) {
     dropdownType = "applicableTaxRate";
     placeholderText = "Select %";
     dropdownWidth = "140px";
     optionsArray = ["0%", "65%"].map(opt => ({ label: opt, value: opt }));
-  } else if (["rate", "gstRate", "taxRate"].includes(col.key)) {
+ } else if (["rate", "gstRate", "taxRate", "rateB2CLA"].includes(col.key)) {
     dropdownType = "rate";
     placeholderText = "Select Rate";
     dropdownWidth = "220px";
@@ -6467,78 +9246,158 @@ return (
 )}
           </div>
         )}
-        
 
-        {/* Summary Tab */}
-        {activeSubTab === "Summary" && (
-          <div style={{ padding: "20px" }}>
-            <h2 style={{ textAlign: "center", marginBottom: "32px", fontSize: "2rem", color: "#1e293b" }}>GSTR-1 Summary</h2>
-            <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
-                <thead>
-                  <tr style={{ background: "#f1f5f9", fontWeight: 700, borderBottom: "2px solid #cbd5e1" }}>
-                    <th style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
-                      <input
-                        type="checkbox"
-                        checked={selectAll}
-                        onChange={toggleSelectAll}
-                        style={{ cursor: "pointer" }}
-                      />
-                    </th>
-                    <th style={{ padding: "16px", textAlign: "left", border: "1px solid #cbd5e1" }}>Act</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Taxable</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>IGST</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>CGST</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>SGST</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Cess</th>
-                    <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Total</th>
-                    <th style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>Action</th>
+      {/* Summary Tab */}
+{activeSubTab === "Summary" && !isDownloadCenter && !isReports && (
+  <div style={{ padding: "20px" }}>
+    {isGSTR3B ? (
+      <>
+        <h2
+          style={{
+            textAlign: "center",
+            marginBottom: "24px",
+            fontSize: "2rem",
+            color: "#1e293b"
+          }}
+        >
+          GSTR-3B Summary
+        </h2>
+
+        <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
+            <thead>
+              <tr style={{ background: "#f1f5f9", fontWeight: 700 }}>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "left" }}>Section Name</th>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>Status</th>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>Rows</th>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>Saved At</th>
+                <th style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {gstr3bSections.map((section) => {
+                const item = gstr3bSavedSummary[section];
+                return (
+                  <tr key={section}>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1" }}>{section}</td>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>
+                      {item ? "Saved" : "Not Saved"}
+                    </td>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>
+                      {item?.rows?.length || 0}
+                    </td>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>
+                      {item?.savedAt || "—"}
+                    </td>
+                    <td style={{ padding: "14px", border: "1px solid #cbd5e1", textAlign: "center" }}>
+                      <button
+                        disabled={!item}
+                        onClick={() => downloadGstr3bSectionExcel(section)}
+                        style={{
+                          padding: "8px 14px",
+                          background: item ? "#eff6ff" : "#f3f4f6",
+                          border: item ? "1px solid #3b82f6" : "1px solid #d1d5db",
+                          borderRadius: 6,
+                          color: item ? "#1d4ed8" : "#9ca3af",
+                          cursor: item ? "pointer" : "not-allowed",
+                          fontWeight: 600
+                        }}
+                      >
+                        Download Excel
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {visibleSummary.map((item, index) => (
-                    <tr key={index}>
-                      <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
-                        <input
-                          type="checkbox"
-                          checked={selectedRows.includes(item.id)}
-                          onChange={() => toggleRow(item.id)}
-                          style={{ cursor: "pointer" }}
-                        />
-                      </td>
-                      <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>{item.label}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.taxable)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.igst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cgst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.sgst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cess)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.total)}</td>
-                      <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
-                    </tr>
-                  ))}
-                  {visibleSummary.length > 0 && (
-                    <tr style={{ background: "#e0f2fe", fontWeight: 700 }}>
-                      <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}></td>
-                      <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>Grand Total</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.taxable)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.igst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cgst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.sgst)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cess)}</td>
-                      <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.total)}</td>
-                      <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
-                    </tr>
-                  )}
-                  {visibleSummary.length === 0 && (
-                    <tr>
-                      <td colSpan={10} style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>
-                        No data saved yet
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                );
+              })}
+
+              {Object.keys(gstr3bSavedSummary).length === 0 && (
+                <tr>
+                  <td colSpan={5} style={{ padding: "32px", textAlign: "center", color: "#64748b" }}>
+                    No GSTR-3B section saved yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </>
+    ) : (
+      <>
+        <h2 style={{ textAlign: "center", marginBottom: "32px", fontSize: "2rem", color: "#1e293b" }}>
+          GSTR-1 Summary
+        </h2>
+
+        <div style={{ overflowX: "auto", border: "1px solid #e5e7eb", borderRadius: 10 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 15 }}>
+            <thead>
+              <tr style={{ background: "#f1f5f9", fontWeight: 700, borderBottom: "2px solid #cbd5e1" }}>
+                <th style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={toggleSelectAll}
+                    style={{ cursor: "pointer" }}
+                  />
+                </th>
+                <th style={{ padding: "16px", textAlign: "left", border: "1px solid #cbd5e1" }}>Act</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Taxable</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>IGST</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>CGST</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>SGST</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Cess</th>
+                <th style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>Total</th>
+                <th style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleSummary.map((item, index) => (
+                <tr key={index}>
+                  <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}>
+                    <input
+                      type="checkbox"
+                      checked={selectedRows.includes(item.id)}
+                      onChange={() => toggleRow(item.id)}
+                      style={{ cursor: "pointer" }}
+                    />
+                  </td>
+                  <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>{item.label}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.taxable)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.igst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cgst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.sgst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.cess)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(item.total)}</td>
+                  <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
+                </tr>
+              ))}
+
+              {visibleSummary.length > 0 && (
+                <tr style={{ background: "#e0f2fe", fontWeight: 700 }}>
+                  <td style={{ padding: "16px", textAlign: "center", borderRight: "1px solid #cbd5e1" }}></td>
+                  <td style={{ padding: "16px", border: "1px solid #cbd5e1" }}>Grand Total</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.taxable)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.igst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cgst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.sgst)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.cess)}</td>
+                  <td style={{ padding: "16px", textAlign: "right", border: "1px solid #cbd5e1" }}>{formatIndian(grandTotal.total)}</td>
+                  <td style={{ padding: "16px", textAlign: "center", border: "1px solid #cbd5e1" }}>—</td>
+                </tr>
+              )}
+
+              {visibleSummary.length === 0 && (
+                <tr>
+                  <td colSpan={10} style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>
+                    No data saved yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </>
+    )}
+  
 
             {/* Bottom Buttons */}
             <div style={{ marginTop: 24, display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
@@ -6758,7 +9617,7 @@ return (
           </div>
         );
       }
-      const regularGstrTabs = ["gstr-1", "gstr-1A", "gstr 3b", "itc-04","tds/tcs","download center"];
+      const regularGstrTabs = ["gstr-1", "gstr-1A", "gstr 3b", "itc-04", "tds/tcs", "reports","download center"];
     if (regularGstrTabs.includes(activeMenu)) {
   const displayTitle =
     activeMenu === "tds/tcs"
