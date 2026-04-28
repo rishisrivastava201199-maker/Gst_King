@@ -2376,6 +2376,30 @@ const handleClientSelect = () => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImportSheets, setSelectedImportSheets] = useState([]);
+const [selectedImportFile, setSelectedImportFile] = useState(null);
+
+
+const handleImportFileChange = (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  setSelectedImportFile(file);
+};
+
+const handleImportUpload = () => {
+  if (!selectedOptions.length) {
+    alert("Please select at least one section");
+    return;
+  }
+
+  if (!selectedImportFile) {
+    alert("Please upload a file");
+    return;
+  }
+
+  processExcelUpload(selectedImportFile, selectedOptions);
+};
+  
   
   const [dynamicClient, setDynamicClient] = useState({
     gstin: client?.gstin || "09ABMCS5888A1ZU",
@@ -4252,7 +4276,7 @@ useEffect(() => {
 }, []);
 
 
-const reportTabs = ["Summary", "Month Wise", "Compare", "Annual"];
+const reportTabs = ["Summary", "Month Wise", "Compare", "Annual", "PDF Reports"];
 
 const summaryReports = [
   "GSTR-3B Summary",
@@ -4307,6 +4331,16 @@ const annualReports = [
   "Tax Liability and ITC Summary"
 ];
 
+
+const pdfReports = [
+  "Transfer to Annual",
+  "GSTR-1 Return Filed PDF Download",
+  "GSTR-3B Return Filed PDF Download",
+  "Transfer to Annual",
+  "TDS & TCS credit received details PDF",
+  "GSTR-9 Return filed -PDF ",
+  "GSTR-9C Return filed -PDF"
+];
 const getCurrentReportList = () => {
   switch (activeReportTab) {
     case "Summary":
@@ -4317,6 +4351,8 @@ const getCurrentReportList = () => {
       return compareReports;
     case "Annual":
       return annualReports;
+    case "PDF Reports":
+      return pdfReports;
     default:
       return [];
   }
@@ -4386,10 +4422,10 @@ const REPORT_FILE_MAP = {
     url: "/GSTR-3B%20vs%20GSTR-1.xlsx",
     downloadName: "GSTR-3B vs GSTR-1.xlsx",
   },
-  "Tax Compare Report": {
-    url: "/Tax%20Compare%20Report.xlsx",
-    downloadName: "Tax Compare Report.xlsx",
-  },
+"Tax Compare Report": {
+  url: "/TAX%20COMPARE%20REPORT.xlsx",
+  downloadName: "TAX COMPARE REPORT.xlsx",
+},
   "GSTR-9 Compare Report": {
     url: "/GSTR-9%20Compare%20Report.xlsx",
     downloadName: "GSTR-9 Compare Report.xlsx",
@@ -4525,6 +4561,96 @@ const trimProblematicTemplate = (ws, reportName) => {
   }
 };
 
+const hardSanitizeTaxCompareWorksheet = (ws) => {
+  try {
+    if (!ws) return;
+
+    const MAX_COL = 7; // A:G only
+
+    // 1) remove data validations fully
+    if (ws.dataValidations) {
+      ws.dataValidations.model = [];
+    }
+    if (ws.model?.dataValidations) {
+      ws.model.dataValidations = { model: [] };
+    }
+    if (ws._model?.dataValidations) {
+      ws._model.dataValidations = { model: [] };
+    }
+
+    // 2) remove merges containing XFD
+    if (Array.isArray(ws.model?.merges)) {
+      ws.model.merges = ws.model.merges.filter(
+        (ref) => !String(ref).includes("XFD")
+      );
+    }
+
+    if (ws._merges) {
+      Object.keys(ws._merges).forEach((key) => {
+        if (String(key).includes("XFD")) {
+          delete ws._merges[key];
+        }
+      });
+    }
+
+    // 3) trim columns metadata
+    if (Array.isArray(ws.model?.cols)) {
+      ws.model.cols = ws.model.cols
+        .filter((c) => Number(c.min) <= MAX_COL)
+        .map((c) => ({
+          ...c,
+          min: Math.min(Number(c.min), MAX_COL),
+          max: Math.min(Number(c.max), MAX_COL),
+        }));
+    }
+
+    if (Array.isArray(ws._columns) && ws._columns.length > MAX_COL) {
+      ws._columns = ws._columns.slice(0, MAX_COL);
+    }
+
+    // 4) trim row cell arrays beyond G
+    if (Array.isArray(ws._rows)) {
+      ws._rows.forEach((row) => {
+        if (!row) return;
+
+        if (Array.isArray(row.values) && row.values.length > MAX_COL + 1) {
+          row.values = row.values.slice(0, MAX_COL + 1);
+        }
+
+        if (Array.isArray(row._cells) && row._cells.length > MAX_COL) {
+          row._cells = row._cells.slice(0, MAX_COL);
+        }
+
+        if (row.model && Array.isArray(row.model.cells) && row.model.cells.length > MAX_COL) {
+          row.model.cells = row.model.cells.slice(0, MAX_COL);
+        }
+      });
+    }
+
+    // 5) trim worksheet dimensions
+    if (ws.model) {
+      ws.model.dimensions = {
+        top: 1,
+        left: 1,
+        bottom: Math.max(ws.rowCount || 10, 10),
+        right: MAX_COL,
+      };
+    }
+
+    // 6) safety cleanup for views / autoFilter
+    if (ws.model?.autoFilter) {
+      const ref = String(ws.model.autoFilter);
+      if (ref.includes("XFD")) {
+        delete ws.model.autoFilter;
+      }
+    }
+
+    console.log(`✅ Hard sanitized: ${ws.name}`);
+  } catch (err) {
+    console.error(`❌ hardSanitizeTaxCompareWorksheet failed for ${ws?.name}`, err);
+  }
+};
+
 const handleDownload = async (reportName) => {
   try {
     const file = REPORT_FILE_MAP[reportName];
@@ -4534,11 +4660,77 @@ const handleDownload = async (reportName) => {
       return;
     }
 
-    const response = await fetch(file.url);
-    const arrayBuffer = await response.arrayBuffer();
 
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(arrayBuffer);
+    const response = await fetch(file.url);
+
+if (!response.ok) {
+  throw new Error(`File not found: ${file.url} | Status: ${response.status}`);
+}
+
+const contentType = response.headers.get("content-type") || "";
+console.log("📦 content-type:", contentType);
+
+if (
+  contentType.includes("text/html") ||
+  contentType.includes("application/json")
+) {
+  throw new Error(`Wrong file response for ${file.url}. Got: ${contentType}`);
+}
+
+const arrayBuffer = await response.arrayBuffer();
+
+if (!arrayBuffer || arrayBuffer.byteLength < 100) {
+  throw new Error(`Downloaded file is empty or invalid: ${file.url}`);
+}
+
+const workbook = new ExcelJS.Workbook();
+await workbook.xlsx.load(arrayBuffer);
+
+
+// const handleDownload = async (reportName) => {
+//   try {
+//     const file = REPORT_FILE_MAP[reportName];
+
+//     if (!file) {
+//       alert("Invalid report");
+//       return;
+//     }
+
+//     console.log("📥 Downloading report:", reportName);
+//     console.log("📁 File URL:", file.url);
+
+//     const response = await fetch(file.url);
+
+//     if (!response.ok) {
+//       throw new Error(`File not found: ${file.url} | Status: ${response.status}`);
+//     }
+
+//     const contentType = response.headers.get("content-type") || "";
+//     console.log("📦 Content-Type:", contentType);
+
+//     if (
+//       contentType.includes("text/html") ||
+//       contentType.includes("application/json")
+//     ) {
+//       throw new Error(`Wrong file fetched. Expected .xlsx but got ${contentType}`);
+//     }
+
+//     const arrayBuffer = await response.arrayBuffer();
+
+//     if (!arrayBuffer || arrayBuffer.byteLength < 100) {
+//       throw new Error(`Invalid or empty file fetched from ${file.url}`);
+//     }
+
+//     const workbook = new ExcelJS.Workbook();
+//     await workbook.xlsx.load(arrayBuffer);
+
+
+
+    // const response = await fetch(file.url);
+    // const arrayBuffer = await response.arrayBuffer();
+
+    // const workbook = new ExcelJS.Workbook();
+    // await workbook.xlsx.load(arrayBuffer);
 
     // =========================
     // GSTR-1 Summary
@@ -5530,7 +5722,50 @@ if (reportName === "GSTR-3B vs TDS/TCS") {
 
   console.log("✅ GSTR-3B vs TDS/TCS fresh sheet created");
 }
+if (reportName === "Tax Compare Report") {
+  console.log("🔥 Filling Tax Compare Report");
 
+  const fillTaxCompareSheet = (ws, startRow, rows) => {
+    rows.forEach((item, index) => {
+      const r = startRow + index;
+
+      ws.getCell(`C${r}`).value = item.taxable ?? 0;
+      ws.getCell(`D${r}`).value = item.igst ?? 0;
+      ws.getCell(`E${r}`).value = item.cgst ?? 0;
+      ws.getCell(`F${r}`).value = item.sgst ?? 0;
+      ws.getCell(`G${r}`).value = item.cess ?? 0;
+    });
+  };
+
+  const staticRows = [
+    { taxable: 50000, igst: 9000,  cgst: 4500, sgst: 4500, cess: 500 },
+    { taxable: 65000, igst: 11700, cgst: 5850, sgst: 5850, cess: 650 },
+    { taxable: 80000, igst: 14400, cgst: 7200, sgst: 7200, cess: 800 },
+    { taxable: 90000, igst: 16200, cgst: 8100, sgst: 8100, cess: 900 },
+    { taxable: 70000, igst: 12600, cgst: 6300, sgst: 6300, cess: 700 },
+  ];
+
+  const targetSheets = [
+    "GSTR1VsGSTR3B",
+    "GSTR2VsGSTR3B",
+    "GSTR2AVsGSTR3B",
+    "GSTR2BVsGSTR3B",
+  ];
+
+  targetSheets.forEach((sheetName) => {
+    const ws = workbook.getWorksheet(sheetName);
+
+    if (!ws) {
+      console.warn(`⚠ Sheet not found: ${sheetName}`);
+      return;
+    }
+
+    hardSanitizeTaxCompareWorksheet(ws);
+    fillTaxCompareSheet(ws, 3, staticRows);
+
+    console.log(`✅ Filled Tax Compare sheet: ${sheetName}`);
+  });
+}
     const buffer = await workbook.xlsx.writeBuffer();
 
     const blob = new Blob([buffer], {
@@ -5595,7 +5830,9 @@ if (reportName === "GSTR-3B vs TDS/TCS") {
 <button onClick={() => handleDownload("GSTR-2B vs GSTR-3B ITC")}>
   Download GSTR-2B vs GSTR-3B
 </button>
-
+<button onClick={() => handleDownload("Tax Compare Report")}>
+  Download Tax Compare Report
+</button>
 
 <button
   onClick={() => handleDownload("GSTR-3B vs GSTR-1")}
@@ -6962,10 +7199,253 @@ const updateInterstateCell = (setter, rows, index, field, value) => {
       </div>
     )}
 
+
+    {importStep === "list" && (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+      gap: "20px",
+      alignItems: "stretch",
+      width: "100%",
+    }}
+  >
+    {/* LEFT SIDE - SELECT SECTIONS */}
+    <div
+      style={{
+        width: "100%",
+        background: "white",
+        borderRadius: "12px",
+        padding: "28px",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+        minHeight: "420px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "24px",
+        }}
+      >
+        <h2
+          style={{
+            margin: 0,
+            fontSize: "1.45rem",
+            fontWeight: 700,
+            color: "#111827",
+          }}
+        >
+          Select Sections
+        </h2>
+        <div style={{ fontSize: "0.95rem", color: "#4b5563" }}>
+          For: <strong>{selectedSource || "—"}</strong>
+        </div>
+      </div>
+
+      <div
+        style={{
+          height: "1px",
+          background: "#e5e7eb",
+          margin: "0 0 20px 0",
+        }}
+      />
+
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          marginBottom: "20px",
+          cursor: "pointer",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={selectAllImport}
+          onChange={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleSelectAllImport();
+          }}
+          style={{
+            width: "16px",
+            height: "16px",
+            accentColor: "#4f46e5",
+          }}
+        />
+        <span style={{ fontWeight: 600, fontSize: "0.98rem" }}>Select All</span>
+      </label>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "12px 20px",
+        }}
+      >
+        {importOptions.map((option, idx) => (
+          <div
+            key={idx}
+            onClick={() => handleOptionToggle(option)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "8px 12px",
+              borderRadius: "6px",
+              cursor: "pointer",
+              background: selectedOptions.includes(option) ? "#eff6ff" : "transparent",
+              border: selectedOptions.includes(option)
+                ? "1px solid #bfdbfe"
+                : "1px solid #e5e7eb",
+              transition: "all 0.15s ease",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={selectedOptions.includes(option)}
+              readOnly
+              style={{
+                width: "14px",
+                height: "14px",
+                accentColor: "#4f46e5",
+                pointerEvents: "none",
+              }}
+            />
+            <span style={{ fontSize: "0.92rem", color: "#374151" }}>{option}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* RIGHT SIDE - UPLOAD */}
+    <div
+      style={{
+        width: "100%",
+        background: "white",
+        borderRadius: "12px",
+        padding: "28px",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+        minHeight: "420px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+      }}
+    >
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "24px",
+          }}
+        >
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "1.45rem",
+              fontWeight: 700,
+              color: "#111827",
+            }}
+          >
+            Upload File
+          </h2>
+          <div style={{ fontSize: "0.95rem", color: "#4b5563" }}>
+            Selected: <strong>{selectedOptions.length}</strong>
+          </div>
+        </div>
+
+        <div
+          style={{
+            height: "1px",
+            background: "#e5e7eb",
+            margin: "0 0 20px 0",
+          }}
+        />
+
+        <div
+          style={{
+            border: "2px dashed #c7d2fe",
+            borderRadius: "12px",
+            padding: "32px 20px",
+            background: selectedOptions.length > 0 ? "#f8faff" : "#f9fafb",
+            textAlign: "center",
+            transition: "all 0.2s ease",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "1rem",
+              fontWeight: 600,
+              color: "#374151",
+              marginBottom: "10px",
+            }}
+          >
+            {selectedOptions.length > 0
+              ? "Upload your file here"
+              : "First select at least one section"}
+          </div>
+
+          <div
+            style={{
+              fontSize: "0.9rem",
+              color: "#6b7280",
+              marginBottom: "18px",
+            }}
+          >
+            {selectedOptions.length > 0
+              ? "Choose Excel file to continue import"
+              : "Upload will be enabled after section selection"}
+          </div>
+
+          <input
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            disabled={selectedOptions.length === 0}
+            onChange={(e) => {
+              if (selectedOptions.length === 0) return;
+              handleImportFile(e);
+            }}
+            style={{
+              padding: "10px",
+              border: "1px solid #d1d5db",
+              borderRadius: "8px",
+              background: "white",
+              cursor: selectedOptions.length > 0 ? "pointer" : "not-allowed",
+              width: "100%",
+              maxWidth: "320px",
+            }}
+          />
+        </div>
+      </div>
+
+      {selectedOptions.length > 0 && (
+        <div
+          style={{
+            marginTop: "24px",
+            padding: "14px 16px",
+            borderRadius: "10px",
+            background: "#eef2ff",
+            border: "1px solid #c7d2fe",
+            color: "#3730a3",
+            fontSize: "0.92rem",
+            lineHeight: 1.5,
+          }}
+        >
+          After file upload, processing and summary flow will continue as before.
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
     {/* ────────────────────────────── */}
     {/* CHECKBOX SELECTION (compact) */}
     {/* ────────────────────────────── */}
-    {importStep === "list" && (
+    {/* {importStep === "list" && (
       <div style={{ display: "flex", justifyContent: "center" }}>
         <div
           style={{
@@ -7052,7 +7532,7 @@ const updateInterstateCell = (setter, rows, index, field, value) => {
           )}
         </div>
       </div>
-    )}
+    )} */}
 
     {/* ────────────────────────────── */}
     {/* UPLOAD SCREEN (compact) */}
